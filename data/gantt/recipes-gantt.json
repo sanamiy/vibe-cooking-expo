@@ -1,0 +1,3685 @@
+{
+  "version": 1,
+  "recipes": [
+    {
+      "version": 1,
+      "recipe_id": "701794",
+      "recipe_name": "たっぷり野菜のミネストローネ",
+      "total_estimated_minutes": 20,
+      "tasks": [
+        {
+          "task_id": "701794-s1",
+          "step_index": 1,
+          "label": "じゃがいも、にんじん、玉ねぎ、キャベツは1ｃｍ角に切",
+          "source_text": "（１）じゃがいも、にんじん、玉ねぎ、キャベツは１ｃｍ角に切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "701794-s2",
+          "step_index": 2,
+          "label": "鍋ににんにく、オリーブオイルを入れて熱し、香りが出た",
+          "source_text": "（２）鍋ににんにく、オリーブオイルを入れて熱し、香りが出たら（１）を加えて炒める。<br />野菜がしんなりしたら、ホールトマトをつぶしながら加え、Ａを加えて煮立てる。",
+          "start_min": 4,
+          "duration_min": 6,
+          "end_min": 10,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "701794-s1"
+          ]
+        },
+        {
+          "task_id": "701794-s3",
+          "step_index": 3,
+          "label": "中火で10分ほど煮て、塩・こしょうで味を調える。器に",
+          "source_text": "（３）中火で１０分ほど煮て、塩・こしょうで味を調える。器に盛り、パセリを散らす。",
+          "start_min": 10,
+          "duration_min": 10,
+          "end_min": 20,
+          "requires_timer": true,
+          "timer_minutes": 10,
+          "confidence": 0.9,
+          "depends_on": [
+            "701794-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "703024",
+      "recipe_name": "とろ～り卵に仕上げる！基本の親子丼",
+      "total_estimated_minutes": 9,
+      "tasks": [
+        {
+          "task_id": "703024-s1",
+          "step_index": 1,
+          "label": "鶏肉は2ｃｍ角に切り、玉ねぎは薄切りにする。みつばは",
+          "source_text": "（１）鶏肉は２ｃｍ角に切り、玉ねぎは薄切りにする。みつばは２ｃｍ長さに切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "703024-s2",
+          "step_index": 2,
+          "label": "小さめのフライパンにＡを入れて煮立てる。（1）の鶏肉",
+          "source_text": "（２）小さめのフライパンにＡを入れて煮立てる。（１）の鶏肉・玉ねぎを加えて中火で３分煮て、溶き卵を回し入れ、半熟状に煮る。",
+          "start_min": 4,
+          "duration_min": 3,
+          "end_min": 7,
+          "requires_timer": true,
+          "timer_minutes": 3,
+          "confidence": 0.9,
+          "depends_on": [
+            "703024-s1"
+          ]
+        },
+        {
+          "task_id": "703024-s3",
+          "step_index": 3,
+          "label": "半量ずつご飯にかけ、（1）のみつばを散らす。",
+          "source_text": "（３）半量ずつご飯にかけ、（１）のみつばを散らす。",
+          "start_min": 7,
+          "duration_min": 2,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "703024-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "703164",
+      "recipe_name": "大根のべっこう煮",
+      "total_estimated_minutes": 88,
+      "tasks": [
+        {
+          "task_id": "703164-s1",
+          "step_index": 1,
+          "label": "大根は2ｃｍ厚さの半月切りにする。",
+          "source_text": "（１）大根は２ｃｍ厚さの半月切りにする。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "703164-s2",
+          "step_index": 2,
+          "label": "鍋に（1）の大根、かぶるくらいの水（分量外）を入れて",
+          "source_text": "（２）鍋に（１）の大根、かぶるくらいの水（分量外）を入れて煮立て、２０分ほど竹串がスッと通るまでゆでる。",
+          "start_min": 3,
+          "duration_min": 20,
+          "end_min": 23,
+          "requires_timer": true,
+          "timer_minutes": 20,
+          "confidence": 0.9,
+          "depends_on": [
+            "703164-s1"
+          ]
+        },
+        {
+          "task_id": "703164-s3",
+          "step_index": 3,
+          "label": "別の鍋に（2）の大根、Ａを入れて火にかけ、煮立ったら",
+          "source_text": "（３）別の鍋に（２）の大根、Ａを入れて火にかけ、煮立ったら弱火にし、落としぶたをして５分煮る。しょうゆを加えて３０分煮て、火を止め、味がしみるまで３０分ほどおく（時間外）。",
+          "start_min": 23,
+          "duration_min": 65,
+          "end_min": 88,
+          "requires_timer": true,
+          "timer_minutes": 65,
+          "confidence": 0.9,
+          "depends_on": [
+            "703164-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "704422",
+      "recipe_name": "お好み焼き",
+      "total_estimated_minutes": 26,
+      "tasks": [
+        {
+          "task_id": "704422-s1",
+          "step_index": 1,
+          "label": "豚肉は2～3等分に切り、塩、こしょうをする。キャベツ",
+          "source_text": "（１）豚肉は２～３等分に切り、塩、こしょうをする。キャベツは粗く刻み、青ねぎは小口切りにする。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "704422-s2",
+          "step_index": 2,
+          "label": "ボウルにＡを入れてよく混ぜ、割りほぐした卵、おろし長",
+          "source_text": "（２）ボウルにＡを入れてよく混ぜ、割りほぐした卵、おろし長いもの順に加えて混ぜる。さらに、ふるっておいた薄力粉を加えて泡立て器でなめらかになるまで混ぜ合わせる。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704422-s1"
+          ]
+        },
+        {
+          "task_id": "704422-s3",
+          "step_index": 3,
+          "label": "（2）に（1）のキャベツ・青ねぎを加えて混ぜ合わせる",
+          "source_text": "（３）（２）に（１）のキャベツ・青ねぎを加えて混ぜ合わせる。",
+          "start_min": 6,
+          "duration_min": 3,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704422-s2"
+          ]
+        },
+        {
+          "task_id": "704422-s4",
+          "step_index": 4,
+          "label": "フライパンに「健康サララ」大さじ1を熱し（3）の1／",
+          "source_text": "（４）フライパンに「健康サララ」大さじ１を熱し（３）の１／４量弱を直径１４～１５ｃｍ大に丸く広げ、紅しょうが、揚げ玉の１／４量を上にふりかける。",
+          "start_min": 9,
+          "duration_min": 3,
+          "end_min": 12,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "704422-s3"
+          ]
+        },
+        {
+          "task_id": "704422-s5",
+          "step_index": 5,
+          "label": "（4）の上に（1）の豚肉の1／4量を全体にのせ、（3",
+          "source_text": "（５）（４）の上に（１）の豚肉の１／４量を全体にのせ、（３）を少量のせて広げ、中火で焼く。",
+          "start_min": 12,
+          "duration_min": 6,
+          "end_min": 18,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704422-s4"
+          ]
+        },
+        {
+          "task_id": "704422-s6",
+          "step_index": 6,
+          "label": "焼き目がついたら、裏返し、弱火でフタをして、火が通る",
+          "source_text": "（６）焼き目がついたら、裏返し、弱火でフタをして、火が通るまで焼く。残り３枚も同様に焼く。",
+          "start_min": 18,
+          "duration_min": 6,
+          "end_min": 24,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704422-s5"
+          ]
+        },
+        {
+          "task_id": "704422-s7",
+          "step_index": 7,
+          "label": "皿に盛り、お好み焼きソースと「サラリア」を塗り、削り",
+          "source_text": "（７）皿に盛り、お好み焼きソースと「サラリア」を塗り、削り節と青のりを上に散らす。",
+          "start_min": 24,
+          "duration_min": 2,
+          "end_min": 26,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704422-s6"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "704642",
+      "recipe_name": "あんこう鍋",
+      "total_estimated_minutes": 70,
+      "tasks": [
+        {
+          "task_id": "704642-s1",
+          "step_index": 1,
+          "label": "あんこうは沸騰した湯で10秒ほど湯引きし、氷水につけ",
+          "source_text": "（１）あんこうは沸騰した湯で１０秒ほど湯引きし、氷水につけてザルに上げ、水気をきる。",
+          "start_min": 0,
+          "duration_min": 1,
+          "end_min": 1,
+          "requires_timer": true,
+          "timer_minutes": 1,
+          "confidence": 0.9,
+          "depends_on": []
+        },
+        {
+          "task_id": "704642-s2",
+          "step_index": 2,
+          "label": "あんきもは蒸し器で10分～25分蒸し、5ｍｍ幅に切る",
+          "source_text": "（２）あんきもは蒸し器で１０分～２５分蒸し、５ｍｍ幅に切る。",
+          "start_min": 1,
+          "duration_min": 35,
+          "end_min": 36,
+          "requires_timer": true,
+          "timer_minutes": 35,
+          "confidence": 0.9,
+          "depends_on": [
+            "704642-s1"
+          ]
+        },
+        {
+          "task_id": "704642-s3",
+          "step_index": 3,
+          "label": "にんじんは飾り用に7～8枚、5ｍｍ幅の薄切りにし、花",
+          "source_text": "（３）にんじんは飾り用に７～８枚、５ｍｍ幅の薄切りにし、花型で抜いて下ゆでし、残りは半月切りにする。春菊は根元を切り、長さを３等分に切る。",
+          "start_min": 36,
+          "duration_min": 4,
+          "end_min": 40,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704642-s2"
+          ]
+        },
+        {
+          "task_id": "704642-s4",
+          "step_index": 4,
+          "label": "しいたけは石づきを取り、表面に飾り包丁を入れる。えの",
+          "source_text": "（４）しいたけは石づきを取り、表面に飾り包丁を入れる。えのきだけは根元を切り、大きめにほぐす。ねぎは５ｍｍ幅の斜め切りにし、白菜は５ｃｍ角に切る。",
+          "start_min": 40,
+          "duration_min": 4,
+          "end_min": 44,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704642-s3"
+          ]
+        },
+        {
+          "task_id": "704642-s5",
+          "step_index": 5,
+          "label": "焼き豆腐は8等分に切り、しらたきは水で洗い、サッとゆ",
+          "source_text": "（５）焼き豆腐は８等分に切り、しらたきは水で洗い、サッとゆでて５ｃｍ長さに切る。",
+          "start_min": 44,
+          "duration_min": 4,
+          "end_min": 48,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704642-s4"
+          ]
+        },
+        {
+          "task_id": "704642-s6",
+          "step_index": 6,
+          "label": "土鍋を熱し、（2）のあんきも1／3量を入れ、弱火で丁",
+          "source_text": "（６）土鍋を熱し、（２）のあんきも１／３量を入れ、弱火で丁寧にそぼろ状にからいりする。少し焦げ目がつき、脂が出てきたら、みそを少しずつ加えてさらによくいる。",
+          "start_min": 48,
+          "duration_min": 8,
+          "end_min": 56,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704642-s5"
+          ]
+        },
+        {
+          "task_id": "704642-s7",
+          "step_index": 7,
+          "label": "分量の水を少しずつかき混ぜながら加え、Ａを加えて味を",
+          "source_text": "（７）分量の水を少しずつかき混ぜながら加え、Ａを加えて味を調える。",
+          "start_min": 56,
+          "duration_min": 3,
+          "end_min": 59,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "704642-s6"
+          ]
+        },
+        {
+          "task_id": "704642-s8",
+          "step_index": 8,
+          "label": "（1）のあんこう、（3）の半月切りにしたにんじん、（",
+          "source_text": "（８）（１）のあんこう、（３）の半月切りにしたにんじん、（４）、（５）を加え、強火にかけ、煮立ったら残りのあんきもを加え、アクを取りながらさらに煮る。",
+          "start_min": 59,
+          "duration_min": 8,
+          "end_min": 67,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "704642-s7"
+          ]
+        },
+        {
+          "task_id": "704642-s9",
+          "step_index": 9,
+          "label": "具材に火が通ったら、（3）の春菊・飾り用のにんじんを",
+          "source_text": "（９）具材に火が通ったら、（３）の春菊・飾り用のにんじんを加える。",
+          "start_min": 67,
+          "duration_min": 3,
+          "end_min": 70,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "704642-s8"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "705346",
+      "recipe_name": "だし香る　豚バラと白菜の重ね鍋",
+      "total_estimated_minutes": 13,
+      "tasks": [
+        {
+          "task_id": "705346-s1",
+          "step_index": 1,
+          "label": "白菜は1枚ずつはがし、白菜と豚肉を交互に4回重ねる。",
+          "source_text": "（１）白菜は１枚ずつはがし、白菜と豚肉を交互に４回重ねる。５ｃｍ幅に切り、鍋のフチに沿って敷き詰める。これを３～４回繰り返す。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "705346-s2",
+          "step_index": 2,
+          "label": "「ほんだし」をまんべんなくふり入れ、Ａを加えて火にか",
+          "source_text": "（２）「ほんだし」をまんべんなくふり入れ、Ａを加えて火にかける。沸騰したらフタをして煮る。",
+          "start_min": 3,
+          "duration_min": 8,
+          "end_min": 11,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "705346-s1"
+          ]
+        },
+        {
+          "task_id": "705346-s3",
+          "step_index": 3,
+          "label": "火が通ったら白髪ねぎ、小ねぎ、しょうがを混ぜ合わせた",
+          "source_text": "（３）火が通ったら白髪ねぎ、小ねぎ、しょうがを混ぜ合わせたものを上に盛る。",
+          "start_min": 11,
+          "duration_min": 2,
+          "end_min": 13,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "705346-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "705645",
+      "recipe_name": "肉じゃが",
+      "total_estimated_minutes": 29,
+      "tasks": [
+        {
+          "task_id": "705645-s1",
+          "step_index": 1,
+          "label": "玉ねぎは8等分のくし形切りにし、にんじんは1．5ｃｍ",
+          "source_text": "（１）玉ねぎは８等分のくし形切りにし、にんじんは１．５ｃｍ幅のいちょう切りにする。じゃがいもは４等分に切る。さやいんげんは３ｃｍ長さに切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "705645-s2",
+          "step_index": 2,
+          "label": "フライパンに油を中火で熱し、牛肉を入れて炒める。肉の",
+          "source_text": "（２）フライパンに油を中火で熱し、牛肉を入れて炒める。肉の色が変わったら、（１）の玉ねぎ・にんじん・じゃがいもの順に加え炒め合わせる。",
+          "start_min": 4,
+          "duration_min": 3,
+          "end_min": 7,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "705645-s1"
+          ]
+        },
+        {
+          "task_id": "705645-s3",
+          "step_index": 3,
+          "label": "Ａを加え、煮立ったらアクを取り、フタをして弱火で10",
+          "source_text": "（３）Ａを加え、煮立ったらアクを取り、フタをして弱火で１０分煮、Ｂを加えてさらに５分煮る。しょうゆを加え、フタをせず５分煮る。フライパンの底から返すように煮汁を煮からめる。",
+          "start_min": 7,
+          "duration_min": 20,
+          "end_min": 27,
+          "requires_timer": true,
+          "timer_minutes": 20,
+          "confidence": 0.9,
+          "depends_on": [
+            "705645-s2"
+          ]
+        },
+        {
+          "task_id": "705645-s4",
+          "step_index": 4,
+          "label": "器に盛り、（1）のさやいんげんを散らす。",
+          "source_text": "（４）器に盛り、（１）のさやいんげんを散らす。",
+          "start_min": 27,
+          "duration_min": 2,
+          "end_min": 29,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "705645-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "705646",
+      "recipe_name": "ロールキャベツ",
+      "total_estimated_minutes": 55,
+      "tasks": [
+        {
+          "task_id": "705646-s1",
+          "step_index": 1,
+          "label": "フライパンに油を中火で熱し、玉ねぎをしんなりするまで",
+          "source_text": "（１）フライパンに油を中火で熱し、玉ねぎをしんなりするまで炒め、粗熱を取る。",
+          "start_min": 0,
+          "duration_min": 8,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "705646-s2",
+          "step_index": 2,
+          "label": "キャベツは芯のまわりに深い切り込みを入れ、芯を取り除",
+          "source_text": "（２）キャベツは芯のまわりに深い切り込みを入れ、芯を取り除く。",
+          "start_min": 8,
+          "duration_min": 3,
+          "end_min": 11,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "705646-s1"
+          ]
+        },
+        {
+          "task_id": "705646-s3",
+          "step_index": 3,
+          "label": "鍋に湯を沸かし、（2）のキャベツを入れ、外側4枚を菜",
+          "source_text": "（３）鍋に湯を沸かし、（２）のキャベツを入れ、外側４枚を菜ばしではがす。やわらかくなるまで５分ほどゆで、ザルに上げて水気をきる。残りも同様にする。キャベツを１枚ずつ広げ、芯の厚い部分をそぎ取る。",
+          "start_min": 11,
+          "duration_min": 5,
+          "end_min": 16,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": [
+            "705646-s2"
+          ]
+        },
+        {
+          "task_id": "705646-s4",
+          "step_index": 4,
+          "label": "ボウルにひき肉を入れ、粘りが出るまでよく練り混ぜ、（",
+          "source_text": "（４）ボウルにひき肉を入れ、粘りが出るまでよく練り混ぜ、（１）の玉ねぎ、Ａを加えてさらによく混ぜ、タネを８等分にする。",
+          "start_min": 16,
+          "duration_min": 3,
+          "end_min": 19,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "705646-s3"
+          ]
+        },
+        {
+          "task_id": "705646-s5",
+          "step_index": 5,
+          "label": "（3）のキャベツに（4）のタネをのせ、葉の手前をタネ",
+          "source_text": "（５）（３）のキャベツに（４）のタネをのせ、葉の手前をタネにかぶせる。左右の葉を内側に折り込み、きっちりと巻いて包む（葉が小さい時は数枚重ねながら巻く）。同様にあと７個作る。",
+          "start_min": 19,
+          "duration_min": 3,
+          "end_min": 22,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "705646-s4"
+          ]
+        },
+        {
+          "task_id": "705646-s6",
+          "step_index": 6,
+          "label": "巻き終わりを下にして鍋に並べ入れ、Ｂを加えて中火で煮",
+          "source_text": "（６）巻き終わりを下にして鍋に並べ入れ、Ｂを加えて中火で煮立てて、アクを取る。弱火にしてフタをし、３０分ほど煮る。",
+          "start_min": 22,
+          "duration_min": 30,
+          "end_min": 52,
+          "requires_timer": true,
+          "timer_minutes": 30,
+          "confidence": 0.9,
+          "depends_on": [
+            "705646-s5"
+          ]
+        },
+        {
+          "task_id": "705646-s7",
+          "step_index": 7,
+          "label": "器に汁ごと盛り、好みでパセリをふる。",
+          "source_text": "（７）器に汁ごと盛り、好みでパセリをふる。",
+          "start_min": 52,
+          "duration_min": 3,
+          "end_min": 55,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "705646-s6"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "705648",
+      "recipe_name": "豚汁",
+      "total_estimated_minutes": 20,
+      "tasks": [
+        {
+          "task_id": "705648-s1",
+          "step_index": 1,
+          "label": "豚肉は3ｃｍ幅に切る。じゃがいもは5～6ｍｍ幅のいち",
+          "source_text": "（１）豚肉は３ｃｍ幅に切る。じゃがいもは５～６ｍｍ幅のいちょう切りにし、大根、にんじんは３～４ｍｍ幅のいちょう切りにする。ごぼうはささがきにし、５分ほど水にさらして水気をきる。糸こんにゃくは食べやすい長さに切る。",
+          "start_min": 0,
+          "duration_min": 5,
+          "end_min": 5,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": []
+        },
+        {
+          "task_id": "705648-s2",
+          "step_index": 2,
+          "label": "鍋に油を中火で熱し、（1）の豚肉を炒め、（1）の野菜",
+          "source_text": "（２）鍋に油を中火で熱し、（１）の豚肉を炒め、（１）の野菜を加え、さらに炒める。全体に油がまわったら、（１）の糸こんにゃくを加えてサッと炒め合わせる。",
+          "start_min": 5,
+          "duration_min": 3,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "705648-s1"
+          ]
+        },
+        {
+          "task_id": "705648-s3",
+          "step_index": 3,
+          "label": "Ａを加え、煮立ったらアクを取り、フタをして10分煮る",
+          "source_text": "（３）Ａを加え、煮立ったらアクを取り、フタをして１０分煮る。玉じゃくしにみそを入れ、煮汁で溶きのばして加える。",
+          "start_min": 8,
+          "duration_min": 10,
+          "end_min": 18,
+          "requires_timer": true,
+          "timer_minutes": 10,
+          "confidence": 0.9,
+          "depends_on": [
+            "705648-s2"
+          ]
+        },
+        {
+          "task_id": "705648-s4",
+          "step_index": 4,
+          "label": "椀に盛り、小ねぎを散らす。",
+          "source_text": "（４）椀に盛り、小ねぎを散らす。",
+          "start_min": 18,
+          "duration_min": 2,
+          "end_min": 20,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "705648-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "705936",
+      "recipe_name": "あんかけ焼きそば",
+      "total_estimated_minutes": 22,
+      "tasks": [
+        {
+          "task_id": "705936-s1",
+          "step_index": 1,
+          "label": "豚肉は2ｃｍ幅に切る。玉ねぎはタテ1ｃｍ幅に切り、 ",
+          "source_text": "（１）豚肉は２ｃｍ幅に切る。玉ねぎはタテ１ｃｍ幅に切り、<br />しいたけは石づきを取って４等分に切る。白菜は葉と芯の部分を切り分け、<br />４～５ｃｍ長さ、２ｃｍ幅に切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "705936-s2",
+          "step_index": 2,
+          "label": "にんじんは短冊切りにし、絹さやはスジを取る。",
+          "source_text": "（２）にんじんは短冊切りにし、絹さやはスジを取る。",
+          "start_min": 4,
+          "duration_min": 3,
+          "end_min": 7,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "705936-s1"
+          ]
+        },
+        {
+          "task_id": "705936-s3",
+          "step_index": 3,
+          "label": "ボウルにＡを合わせる。",
+          "source_text": "（３）ボウルにＡを合わせる。",
+          "start_min": 7,
+          "duration_min": 3,
+          "end_min": 10,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "705936-s2"
+          ]
+        },
+        {
+          "task_id": "705936-s4",
+          "step_index": 4,
+          "label": "フライパンを中火で熱し、中華めんを入れてほぐし、全体",
+          "source_text": "（４）フライパンを中火で熱し、中華めんを入れてほぐし、全体に広げる。<br />フライ返しで押さえながら焼き色がつくまで両面３分ずつ焼く。<br />半分に分け、それぞれ器に盛る。",
+          "start_min": 10,
+          "duration_min": 3,
+          "end_min": 13,
+          "requires_timer": true,
+          "timer_minutes": 3,
+          "confidence": 0.9,
+          "depends_on": [
+            "705936-s3"
+          ]
+        },
+        {
+          "task_id": "705936-s5",
+          "step_index": 5,
+          "label": "フライパンに油を熱し、（1）の豚肉を入れて炒める。 ",
+          "source_text": "（５）フライパンに油を熱し、（１）の豚肉を入れて炒める。<br />肉の色が変わったら、（１）の玉ねぎ・しいたけを加えて炒め合わせる。",
+          "start_min": 13,
+          "duration_min": 3,
+          "end_min": 16,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "705936-s4"
+          ]
+        },
+        {
+          "task_id": "705936-s6",
+          "step_index": 6,
+          "label": "玉ねぎがしんなりとしたら（1）の白菜の芯、（2）のに",
+          "source_text": "（６）玉ねぎがしんなりとしたら（１）の白菜の芯、（２）のにんじん・絹さやを加え、<br />全体に油がまわるまで炒め、（３）を加える。",
+          "start_min": 16,
+          "duration_min": 3,
+          "end_min": 19,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "705936-s5"
+          ]
+        },
+        {
+          "task_id": "705936-s7",
+          "step_index": 7,
+          "label": "煮立ったら、（1）の白菜の葉を加えてひと煮し、塩・こ",
+          "source_text": "（７）煮立ったら、（１）の白菜の葉を加えてひと煮し、塩・こしょうで味を調え、<br />とろみがつくまで煮、ごま油を加えて合わせ、（４）のめんに等分にかける。",
+          "start_min": 19,
+          "duration_min": 3,
+          "end_min": 22,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "705936-s6"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "706119",
+      "recipe_name": "ホットケーキ",
+      "total_estimated_minutes": 34,
+      "tasks": [
+        {
+          "task_id": "706119-s1",
+          "step_index": 1,
+          "label": "ボウルにＡをふるい入れ、泡立て器で混ぜる。",
+          "source_text": "（１）ボウルにＡをふるい入れ、泡立て器で混ぜる。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "706119-s2",
+          "step_index": 2,
+          "label": "別のボウルに卵を割りほぐし、牛乳を加えて混ぜる。",
+          "source_text": "（２）別のボウルに卵を割りほぐし、牛乳を加えて混ぜる。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706119-s1"
+          ]
+        },
+        {
+          "task_id": "706119-s3",
+          "step_index": 3,
+          "label": "（1）のボウルに（2）を加え、泡立て器で粉っぽさがな",
+          "source_text": "（３）（１）のボウルに（２）を加え、泡立て器で粉っぽさがなくなるまで混ぜ、生地を作る。",
+          "start_min": 6,
+          "duration_min": 3,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "706119-s2"
+          ]
+        },
+        {
+          "task_id": "706119-s4",
+          "step_index": 4,
+          "label": "フライパンに油をしみ込ませたキッチンペーパーで油を薄",
+          "source_text": "（４）フライパンに油をしみ込ませたキッチンペーパーで油を薄く塗り、フライパンを熱する。",
+          "start_min": 9,
+          "duration_min": 3,
+          "end_min": 12,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "706119-s3"
+          ]
+        },
+        {
+          "task_id": "706119-s5",
+          "step_index": 5,
+          "label": "ぬれたふきんの上にフライパンを置いて熱を取り、再び弱",
+          "source_text": "（５）ぬれたふきんの上にフライパンを置いて熱を取り、再び弱火にかけ、（３）の生地をおたま１杯、上から中心に落とす（こうすると丸い形になる）。",
+          "start_min": 12,
+          "duration_min": 8,
+          "end_min": 20,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706119-s4"
+          ]
+        },
+        {
+          "task_id": "706119-s6",
+          "step_index": 6,
+          "label": "約3分焼き、表面にプツプツと穴がでてきたら裏返し、約",
+          "source_text": "（６）約３分焼き、表面にプツプツと穴がでてきたら裏返し、約２分弱火のまま焼き、取り出す。",
+          "start_min": 20,
+          "duration_min": 5,
+          "end_min": 25,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": [
+            "706119-s5"
+          ]
+        },
+        {
+          "task_id": "706119-s7",
+          "step_index": 7,
+          "label": "2枚目からは油をひかずにフライパンをぬれふきんの上に",
+          "source_text": "（７）２枚目からは油をひかずにフライパンをぬれふきんの上に置いて熱を取り、弱火にかけて同様に焼く。",
+          "start_min": 25,
+          "duration_min": 6,
+          "end_min": 31,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706119-s6"
+          ]
+        },
+        {
+          "task_id": "706119-s8",
+          "step_index": 8,
+          "label": "器に盛り、好みでバター、メープルシロップをかける。",
+          "source_text": "（８）器に盛り、好みでバター、メープルシロップをかける。",
+          "start_min": 31,
+          "duration_min": 3,
+          "end_min": 34,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "706119-s7"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "706281",
+      "recipe_name": "ナポリタン",
+      "total_estimated_minutes": 16,
+      "tasks": [
+        {
+          "task_id": "706281-s1",
+          "step_index": 1,
+          "label": "スパゲッティは塩を入れた熱湯で表示時間通りにゆで、ザ",
+          "source_text": "（１）スパゲッティは塩を入れた熱湯で表示時間通りにゆで、ザルに上げて水気をきる。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "706281-s2",
+          "step_index": 2,
+          "label": "玉ねぎはタテ薄切りにし、ソーセージは5ｍｍ幅の斜め薄",
+          "source_text": "（２）玉ねぎはタテ薄切りにし、ソーセージは５ｍｍ幅の斜め薄切りにする。ピーマンはヘタと種を取り、５ｍｍ幅に切る。",
+          "start_min": 3,
+          "duration_min": 4,
+          "end_min": 7,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706281-s1"
+          ]
+        },
+        {
+          "task_id": "706281-s3",
+          "step_index": 3,
+          "label": "フライパンに油を熱し、（2）の玉ねぎ・ピーマンを弱火",
+          "source_text": "（３）フライパンに油を熱し、（２）の玉ねぎ・ピーマンを弱火で炒める。しんなりしてきたら（２）のソーセージを加え、弱火で焼く。ソーセージに焼き色がついたら「コンソメ」、ケチャップを加えてひと炒めする。",
+          "start_min": 7,
+          "duration_min": 6,
+          "end_min": 13,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706281-s2"
+          ]
+        },
+        {
+          "task_id": "706281-s4",
+          "step_index": 4,
+          "label": "（1）のスパゲッティを加えて炒め、Ａで味を調える。好",
+          "source_text": "（４）（１）のスパゲッティを加えて炒め、Ａで味を調える。好みで粉チーズをふる。",
+          "start_min": 13,
+          "duration_min": 3,
+          "end_min": 16,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "706281-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "706369",
+      "recipe_name": "チキンクリームシチュー",
+      "total_estimated_minutes": 41,
+      "tasks": [
+        {
+          "task_id": "706369-s1",
+          "step_index": 1,
+          "label": "じゃがいもは4等分に切る。玉ねぎはくし形に切り、にん",
+          "source_text": "（１）じゃがいもは４等分に切る。玉ねぎはくし形に切り、にんじんは乱切りにする。ブロッコリーは小房に分け、下ゆでする。鶏肉はひと口大に切り、塩で下味をつけ、フライパンで軽く焼き色をつけ、取り出す。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "706369-s2",
+          "step_index": 2,
+          "label": "鍋にバター大さじ1、油を中火で熱し、（1）の玉ねぎを",
+          "source_text": "（２）鍋にバター大さじ１、油を中火で熱し、（１）の玉ねぎを入れてサッと炒める。（１）のじゃがいもを加えて炒め合わせ、（１）のにんじんを加え、全体に油がまわるまで炒める。",
+          "start_min": 4,
+          "duration_min": 6,
+          "end_min": 10,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706369-s1"
+          ]
+        },
+        {
+          "task_id": "706369-s3",
+          "step_index": 3,
+          "label": "いったん火を止めて薄力粉をふり入れ、全体を混ぜたら中",
+          "source_text": "（３）いったん火を止めて薄力粉をふり入れ、全体を混ぜたら中火にかけて炒める。Ａを加えて煮立たせる。",
+          "start_min": 10,
+          "duration_min": 6,
+          "end_min": 16,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706369-s2"
+          ]
+        },
+        {
+          "task_id": "706369-s4",
+          "step_index": 4,
+          "label": "ポコポコ煮立つくらいの火加減にし、15～20分ほどじ",
+          "source_text": "（４）ポコポコ煮立つくらいの火加減にし、１５～２０分ほどじゃがいもに火が通るまで、底が焦げないように途中かき混ぜながら煮る（とろみがつかない場合は、様子を見ながら加熱時間を追加してください）。",
+          "start_min": 16,
+          "duration_min": 20,
+          "end_min": 36,
+          "requires_timer": true,
+          "timer_minutes": 20,
+          "confidence": 0.9,
+          "depends_on": [
+            "706369-s3"
+          ]
+        },
+        {
+          "task_id": "706369-s5",
+          "step_index": 5,
+          "label": "（1）の鶏肉を戻し入れ、Ｂを加えて5分煮て、（1）の",
+          "source_text": "（５）（１）の鶏肉を戻し入れ、Ｂを加えて５分煮て、（１）のブロッコリー、白ワイン、バター大さじ１を加えて味を調える。",
+          "start_min": 36,
+          "duration_min": 5,
+          "end_min": 41,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": [
+            "706369-s4"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "706796",
+      "recipe_name": "たっぷり野菜のコンソメスープ",
+      "total_estimated_minutes": 20,
+      "tasks": [
+        {
+          "task_id": "706796-s1",
+          "step_index": 1,
+          "label": "キャベツは葉をひと口大にちぎり、芯は薄切りにする。じ",
+          "source_text": "（１）キャベツは葉をひと口大にちぎり、芯は薄切りにする。じゃがいもはひと口大に切る。にんじんは乱切り、玉ねぎは薄切りにする。ソーセージは長さを４等分に切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "706796-s2",
+          "step_index": 2,
+          "label": "鍋にＡ、（1）のじゃがいも・にんじん・玉ねぎを入れて",
+          "source_text": "（２）鍋にＡ、（１）のじゃがいも・にんじん・玉ねぎを入れて火にかけ、フタをして７～８分ほど煮る。",
+          "start_min": 4,
+          "duration_min": 8,
+          "end_min": 12,
+          "requires_timer": true,
+          "timer_minutes": 8,
+          "confidence": 0.9,
+          "depends_on": [
+            "706796-s1"
+          ]
+        },
+        {
+          "task_id": "706796-s3",
+          "step_index": 3,
+          "label": "（1）のキャベツ・ソーセージを加え、7～8分煮る。塩",
+          "source_text": "（３）（１）のキャベツ・ソーセージを加え、７～８分煮る。塩・こしょうで味を調える。",
+          "start_min": 12,
+          "duration_min": 8,
+          "end_min": 20,
+          "requires_timer": true,
+          "timer_minutes": 8,
+          "confidence": 0.9,
+          "depends_on": [
+            "706796-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "706807",
+      "recipe_name": "中華屋さんの肉野菜炒め",
+      "total_estimated_minutes": 13,
+      "tasks": [
+        {
+          "task_id": "706807-s1",
+          "step_index": 1,
+          "label": "ボウルにＡを混ぜ、合わせ調味料を作る。キャベツはひと",
+          "source_text": "（１）ボウルにＡを混ぜ、合わせ調味料を作る。キャベツはひと口大に切り、玉ねぎはくし形に切る。にんじんは短冊切りにし、にらは３ｃｍの長さに切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "706807-s2",
+          "step_index": 2,
+          "label": "フライパンに油を熱し、にんにく、豚肉を炒め、（1）の",
+          "source_text": "（２）フライパンに油を熱し、にんにく、豚肉を炒め、（１）のにんじん・玉ねぎ・キャベツ、もやし、（１）のにらの順に加えて炒める。",
+          "start_min": 4,
+          "duration_min": 6,
+          "end_min": 10,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706807-s1"
+          ]
+        },
+        {
+          "task_id": "706807-s3",
+          "step_index": 3,
+          "label": "（1）の合わせ調味料をよく混ぜて加え、とろみをつける",
+          "source_text": "（３）（１）の合わせ調味料をよく混ぜて加え、とろみをつける。",
+          "start_min": 10,
+          "duration_min": 3,
+          "end_min": 13,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "706807-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "706981",
+      "recipe_name": "鶏のうま味が効いてる！水炊き",
+      "total_estimated_minutes": 18,
+      "tasks": [
+        {
+          "task_id": "706981-s1",
+          "step_index": 1,
+          "label": "鶏肉はひと口大に切り、水菜は4ｃｍ長さに切る。ねぎは",
+          "source_text": "（１）鶏肉はひと口大に切り、水菜は４ｃｍ長さに切る。ねぎは１ｃｍ幅の斜め切りにし、しめじ、えのきだけは根元を切って小房に分ける。豆腐はひと口大の角切りにする。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "706981-s2",
+          "step_index": 2,
+          "label": "鍋にＡ、（1）の鶏肉を入れて強火にかけ、沸騰したらア",
+          "source_text": "（２）鍋にＡ、（１）の鶏肉を入れて強火にかけ、沸騰したらアクを取り、中火にする。",
+          "start_min": 4,
+          "duration_min": 8,
+          "end_min": 12,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "706981-s1"
+          ]
+        },
+        {
+          "task_id": "706981-s3",
+          "step_index": 3,
+          "label": "鶏肉に火が通ったら、（1）の水菜・ねぎ・きのこ類・豆",
+          "source_text": "（３）鶏肉に火が通ったら、（１）の水菜・ねぎ・きのこ類・豆腐を加え、Ｂを加えて味を調える。",
+          "start_min": 12,
+          "duration_min": 3,
+          "end_min": 15,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "706981-s2"
+          ]
+        },
+        {
+          "task_id": "706981-s4",
+          "step_index": 4,
+          "label": "好みでＣをつけて食べる。",
+          "source_text": "（４）好みでＣをつけて食べる。",
+          "start_min": 15,
+          "duration_min": 3,
+          "end_min": 18,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "706981-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "707201",
+      "recipe_name": "かんたんチヂミ",
+      "total_estimated_minutes": 18,
+      "tasks": [
+        {
+          "task_id": "707201-s1",
+          "step_index": 1,
+          "label": "にらは3ｃｍ長さに切り、にんじんはせん切りにする。",
+          "source_text": "（１）にらは３ｃｍ長さに切り、にんじんはせん切りにする。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "707201-s2",
+          "step_index": 2,
+          "label": "ボウルにＡを順に入れてよく混ぜ、豚肉、（1）のにら・",
+          "source_text": "（２）ボウルにＡを順に入れてよく混ぜ、豚肉、（１）のにら・にんじんを加えてサックリと混ぜ合わせ、生地を作る。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "707201-s1"
+          ]
+        },
+        {
+          "task_id": "707201-s3",
+          "step_index": 3,
+          "label": "別のボウルにＢを混ぜ合わせ、たれを作る。",
+          "source_text": "（３）別のボウルにＢを混ぜ合わせ、たれを作る。",
+          "start_min": 6,
+          "duration_min": 3,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "707201-s2"
+          ]
+        },
+        {
+          "task_id": "707201-s4",
+          "step_index": 4,
+          "label": "フライパンにごま油を熱し、（2）の生地を流し入れ、厚",
+          "source_text": "（４）フライパンにごま油を熱し、（２）の生地を流し入れ、厚さが均等になるように平らにならし、両面カリッと焼く。",
+          "start_min": 9,
+          "duration_min": 6,
+          "end_min": 15,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "707201-s3"
+          ]
+        },
+        {
+          "task_id": "707201-s5",
+          "step_index": 5,
+          "label": "食べやすい大きさに切って器に盛り、（3）のたれを添え",
+          "source_text": "（５）食べやすい大きさに切って器に盛り、（３）のたれを添える。",
+          "start_min": 15,
+          "duration_min": 3,
+          "end_min": 18,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "707201-s4"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "707350",
+      "recipe_name": "こだわり手作り！回鍋肉",
+      "total_estimated_minutes": 22,
+      "tasks": [
+        {
+          "task_id": "707350-s1",
+          "step_index": 1,
+          "label": "豚肉は5ｃｍ幅に切り、キャベツはひと口大のザク切りに",
+          "source_text": "（１）豚肉は５ｃｍ幅に切り、キャベツはひと口大のザク切りにする。ピーマンは種を取って乱切りにし、ねぎは１ｃｍ幅の斜め切りにする。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "707350-s2",
+          "step_index": 2,
+          "label": "フライパンに油大さじ1を熱し、（1）のキャベツ・ピー",
+          "source_text": "（２）フライパンに油大さじ１を熱し、（１）のキャベツ・ピーマンを強火で炒め、いったん取り出す。フライパンで（１）の豚肉・ねぎを中火で炒め、肉に焼き色がついたらいったん取り出す。",
+          "start_min": 3,
+          "duration_min": 8,
+          "end_min": 11,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "707350-s1"
+          ]
+        },
+        {
+          "task_id": "707350-s3",
+          "step_index": 3,
+          "label": "フライパンに残りの油を熱し、中火でＡを炒め、香りがた",
+          "source_text": "（３）フライパンに残りの油を熱し、中火でＡを炒め、香りがたったら、Ｂを加えてひと煮立ちさせる。",
+          "start_min": 11,
+          "duration_min": 8,
+          "end_min": 19,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "707350-s2"
+          ]
+        },
+        {
+          "task_id": "707350-s4",
+          "step_index": 4,
+          "label": "（2）の豚肉・ねぎを戻し入れて合わせ、（2）のキャベ",
+          "source_text": "（４）（２）の豚肉・ねぎを戻し入れて合わせ、（２）のキャベツ・ピーマンを戻し入れ、炒め合わせる。Ｃの水溶き片栗粉を回し入れ、とろみをつける。",
+          "start_min": 19,
+          "duration_min": 3,
+          "end_min": 22,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "707350-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "708304",
+      "recipe_name": "たまご雑炊",
+      "total_estimated_minutes": 8,
+      "tasks": [
+        {
+          "task_id": "708304-s1",
+          "step_index": 1,
+          "label": "卵は溶きほぐす。",
+          "source_text": "（１）卵は溶きほぐす。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "708304-s2",
+          "step_index": 2,
+          "label": "鍋にご飯、Ａを入れて火にかけ、ご飯が汁を吸ってきたら",
+          "source_text": "（２）鍋にご飯、Ａを入れて火にかけ、ご飯が汁を吸ってきたら、（１）の溶き卵を流し入れ、しょうゆで味を調える。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "708304-s1"
+          ]
+        },
+        {
+          "task_id": "708304-s3",
+          "step_index": 3,
+          "label": "器に盛り、のり、小ねぎを散らす。",
+          "source_text": "（３）器に盛り、のり、小ねぎを散らす。",
+          "start_min": 6,
+          "duration_min": 2,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "708304-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "709692",
+      "recipe_name": "うどんつゆ",
+      "total_estimated_minutes": 6,
+      "tasks": [
+        {
+          "task_id": "709692-s1",
+          "step_index": 1,
+          "label": "鍋にＡを入れて火にかけ、ひと煮立ちしたら火から下ろす",
+          "source_text": "（１）鍋にＡを入れて火にかけ、ひと煮立ちしたら火から下ろす。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "709692-s2",
+          "step_index": 2,
+          "label": "器に盛ったうどんにアツアツのつゆをかけ、小ねぎをのせ",
+          "source_text": "（２）器に盛ったうどんにアツアツのつゆをかけ、小ねぎをのせる。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "709692-s1"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "800912",
+      "recipe_name": "チーズタッカルビ",
+      "total_estimated_minutes": 28,
+      "tasks": [
+        {
+          "task_id": "800912-s1",
+          "step_index": 1,
+          "label": "鶏肉はひと口大に切る。キャベツはザク切りにし、玉ねぎ",
+          "source_text": "（１）鶏肉はひと口大に切る。キャベツはザク切りにし、玉ねぎはくし形切りにする。にんじんは短冊切りにする。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "800912-s2",
+          "step_index": 2,
+          "label": "ボウルに（1）の鶏肉、Ａを入れて混ぜ合わせ、10分ほ",
+          "source_text": "（２）ボウルに（１）の鶏肉、Ａを入れて混ぜ合わせ、１０分ほど漬け込む。",
+          "start_min": 4,
+          "duration_min": 10,
+          "end_min": 14,
+          "requires_timer": true,
+          "timer_minutes": 10,
+          "confidence": 0.9,
+          "depends_on": [
+            "800912-s1"
+          ]
+        },
+        {
+          "task_id": "800912-s3",
+          "step_index": 3,
+          "label": "ホットプレートを160～170℃に温め、ごま油をひき",
+          "source_text": "（３）ホットプレートを１６０～１７０℃に温め、ごま油をひき、（１）のキャベツ・玉ねぎ・にんじんを入れてサッと炒める。野菜がしんなりしたら、（１）の鶏肉を加えて炒め合わせ、肉に焼き色がついたら、フタをして蒸し焼きにする。",
+          "start_min": 14,
+          "duration_min": 6,
+          "end_min": 20,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "800912-s2"
+          ]
+        },
+        {
+          "task_id": "800912-s4",
+          "step_index": 4,
+          "label": "肉に火が通ったら、具材を寄せて中央を空け、チーズを加",
+          "source_text": "（４）肉に火が通ったら、具材を寄せて中央を空け、チーズを加えて弱火にし、チーズが溶けるまで火を通す。",
+          "start_min": 20,
+          "duration_min": 8,
+          "end_min": 28,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "800912-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "801030",
+      "recipe_name": "ほうれん草とにんじんの白和え",
+      "total_estimated_minutes": 19,
+      "tasks": [
+        {
+          "task_id": "801030-s1",
+          "step_index": 1,
+          "label": "豆腐はキッチンペーパーで包み、重しをして15分ほど、",
+          "source_text": "（１）豆腐はキッチンペーパーで包み、重しをして１５分ほど、水きりをする（時間外）。",
+          "start_min": 0,
+          "duration_min": 15,
+          "end_min": 15,
+          "requires_timer": true,
+          "timer_minutes": 15,
+          "confidence": 0.9,
+          "depends_on": []
+        },
+        {
+          "task_id": "801030-s2",
+          "step_index": 2,
+          "label": "鍋に湯を沸かし、ほうれん草を入れて1分ほどゆで、水に",
+          "source_text": "（２）鍋に湯を沸かし、ほうれん草を入れて１分ほどゆで、水にとり、水気をしぼって３ｃｍ長さに切る。にんじんは２ｃｍ長さの細切りにして下ゆでする。",
+          "start_min": 15,
+          "duration_min": 1,
+          "end_min": 16,
+          "requires_timer": true,
+          "timer_minutes": 1,
+          "confidence": 0.9,
+          "depends_on": [
+            "801030-s1"
+          ]
+        },
+        {
+          "task_id": "801030-s3",
+          "step_index": 3,
+          "label": "ボウルに（1）の豆腐を入れ、泡立て器で混ぜる。なめら",
+          "source_text": "（３）ボウルに（１）の豆腐を入れ、泡立て器で混ぜる。なめらかになったら、Ａを加えて混ぜ合わせ、（２）のほうれん草・にんじんを加えてあえる。",
+          "start_min": 16,
+          "duration_min": 3,
+          "end_min": 19,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "801030-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805253",
+      "recipe_name": "濃厚チーズクリームのカルボナーラ風",
+      "total_estimated_minutes": 9,
+      "tasks": [
+        {
+          "task_id": "805253-s1",
+          "step_index": 1,
+          "label": "スパゲッティは塩（分量外）を加えた熱湯で表示時間通り",
+          "source_text": "（１）スパゲッティは塩（分量外）を加えた熱湯で表示時間通りにゆで、ザルに上げて水気をきる。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805253-s2",
+          "step_index": 2,
+          "label": "（1）のスパゲッティが温かいうちにボウルに移し入れる",
+          "source_text": "（２）（１）のスパゲッティが温かいうちにボウルに移し入れる。卵を割り入れ、「Ｂｉｓｔｒｏ　Ｄｏ」を加熱せずにそのまま加えて混ぜ合わせる。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805253-s1"
+          ]
+        },
+        {
+          "task_id": "805253-s3",
+          "step_index": 3,
+          "label": "器に盛り、生ハムをのせ、粉チーズをかける。",
+          "source_text": "（３）器に盛り、生ハムをのせ、粉チーズをかける。",
+          "start_min": 6,
+          "duration_min": 3,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805253-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805264",
+      "recipe_name": "パッタイ風そうめん",
+      "total_estimated_minutes": 16,
+      "tasks": [
+        {
+          "task_id": "805264-s1",
+          "step_index": 1,
+          "label": "にらは3ｃｍ長さに切る。ピーナッツは粗く砕く。レモン",
+          "source_text": "（１）にらは３ｃｍ長さに切る。ピーナッツは粗く砕く。レモンはくし形に切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "805264-s2",
+          "step_index": 2,
+          "label": "そうめんは表示時間通りにゆでて冷水で洗い、ザルに上げ",
+          "source_text": "（２）そうめんは表示時間通りにゆでて冷水で洗い、ザルに上げて水気をよくきる。",
+          "start_min": 4,
+          "duration_min": 3,
+          "end_min": 7,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805264-s1"
+          ]
+        },
+        {
+          "task_id": "805264-s3",
+          "step_index": 3,
+          "label": "フライパンにごま油を熱し、ひき肉を入れて炒める。肉に",
+          "source_text": "（３）フライパンにごま油を熱し、ひき肉を入れて炒める。肉に火が通ってきたら、むきえび、もやし、（１）のにらの順に加えて全体に火が通るまで炒め、「丸鶏がらスープ」を加えて混ぜ合わせる。",
+          "start_min": 7,
+          "duration_min": 3,
+          "end_min": 10,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805264-s2"
+          ]
+        },
+        {
+          "task_id": "805264-s4",
+          "step_index": 4,
+          "label": "（2）のそうめんを加えてほぐしながら炒め、Ａを加えて",
+          "source_text": "（４）（２）のそうめんを加えてほぐしながら炒め、Ａを加えて全体をサッと炒め合わせる。",
+          "start_min": 10,
+          "duration_min": 3,
+          "end_min": 13,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805264-s3"
+          ]
+        },
+        {
+          "task_id": "805264-s5",
+          "step_index": 5,
+          "label": "器に盛り、好みで（1）のピーナッツを散らし、（1）の",
+          "source_text": "（５）器に盛り、好みで（１）のピーナッツを散らし、（１）のレモンを添える。",
+          "start_min": 13,
+          "duration_min": 3,
+          "end_min": 16,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805264-s4"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805265",
+      "recipe_name": "豚肉のフォー風そうめん",
+      "total_estimated_minutes": 11,
+      "tasks": [
+        {
+          "task_id": "805265-s1",
+          "step_index": 1,
+          "label": "パクチーはザク切りにする。",
+          "source_text": "（１）パクチーはザク切りにする。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805265-s2",
+          "step_index": 2,
+          "label": "鍋にたっぷりの湯を沸かしてそうめんを入れ、そうめんが",
+          "source_text": "（２）鍋にたっぷりの湯を沸かしてそうめんを入れ、そうめんがほぐれたら、大豆もやしを加える。そうめんの表示時間通りにゆで、ザルに上げて水気をきる。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805265-s1"
+          ]
+        },
+        {
+          "task_id": "805265-s3",
+          "step_index": 3,
+          "label": "鍋にＡを入れて火にかけ、煮立ったら、豚肉を加え、肉に",
+          "source_text": "（３）鍋にＡを入れて火にかけ、煮立ったら、豚肉を加え、肉に火が通るまで２分ほどゆでる。アクを取り、Ｂを加えて混ぜ、ひと煮立ちさせる。",
+          "start_min": 6,
+          "duration_min": 2,
+          "end_min": 8,
+          "requires_timer": true,
+          "timer_minutes": 2,
+          "confidence": 0.9,
+          "depends_on": [
+            "805265-s2"
+          ]
+        },
+        {
+          "task_id": "805265-s4",
+          "step_index": 4,
+          "label": "器に（2）のそうめん・大豆もやしを盛り、（3）のスー",
+          "source_text": "（４）器に（２）のそうめん・大豆もやしを盛り、（３）のスープを注ぎ、（３）の豚肉、（１）のパクチーをのせ、レモンを添える。",
+          "start_min": 8,
+          "duration_min": 3,
+          "end_min": 11,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805265-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805266",
+      "recipe_name": "肉みそなす",
+      "total_estimated_minutes": 15,
+      "tasks": [
+        {
+          "task_id": "805266-s1",
+          "step_index": 1,
+          "label": "なすはタテ半分に切り、さらに半分に切ってから、4～5",
+          "source_text": "（１）なすはタテ半分に切り、さらに半分に切ってから、４～５ｃｍ幅に切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "805266-s2",
+          "step_index": 2,
+          "label": "フライパンに油、（1）のなすを入れて火にかけ、なすに",
+          "source_text": "（２）フライパンに油、（１）のなすを入れて火にかけ、なすに油をなじませる。なすの皮を下に向け、フタをして２分蒸し焼きにする。",
+          "start_min": 4,
+          "duration_min": 2,
+          "end_min": 6,
+          "requires_timer": true,
+          "timer_minutes": 2,
+          "confidence": 0.9,
+          "depends_on": [
+            "805266-s1"
+          ]
+        },
+        {
+          "task_id": "805266-s3",
+          "step_index": 3,
+          "label": "なすをフライパンの片側に寄せ、空いたスペースにひき肉",
+          "source_text": "（３）なすをフライパンの片側に寄せ、空いたスペースにひき肉を加えて炒める。火が通ったら、いったん火を止める。",
+          "start_min": 6,
+          "duration_min": 6,
+          "end_min": 12,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805266-s2"
+          ]
+        },
+        {
+          "task_id": "805266-s4",
+          "step_index": 4,
+          "label": "「Ｃｏｏｋ　Ｄｏきょうの大皿」を加えて再び火をつけ、",
+          "source_text": "（４）「Ｃｏｏｋ　Ｄｏきょうの大皿」を加えて再び火をつけ、全体によくからめながら１分炒め合わせる。",
+          "start_min": 12,
+          "duration_min": 1,
+          "end_min": 13,
+          "requires_timer": true,
+          "timer_minutes": 1,
+          "confidence": 0.9,
+          "depends_on": [
+            "805266-s3"
+          ]
+        },
+        {
+          "task_id": "805266-s5",
+          "step_index": 5,
+          "label": "器に盛り、好みで小ねぎを散らす。",
+          "source_text": "（５）器に盛り、好みで小ねぎを散らす。",
+          "start_min": 13,
+          "duration_min": 2,
+          "end_min": 15,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805266-s4"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805269",
+      "recipe_name": "キャベツの肉巻き",
+      "total_estimated_minutes": 22,
+      "tasks": [
+        {
+          "task_id": "805269-s1",
+          "step_index": 1,
+          "label": "豚肉は少し重ねながらタテ長に並べ、塩・こしょうをふる",
+          "source_text": "（１）豚肉は少し重ねながらタテ長に並べ、塩・こしょうをふる。　並べた豚肉の上にキャベツをのせ、豚肉の幅に合わせて左右を折りたたむ。手前からギュッと押さえながら巻き、手前にのせて押さえながらくるくると巻く。全体に軽く塩・こしょうをし、片栗粉をまぶす。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805269-s2",
+          "step_index": 2,
+          "label": "フライパンに「ピュアセレクト　マヨネーズ」を熱し、巻",
+          "source_text": "（２）フライパンに「ピュアセレクト　マヨネーズ」を熱し、巻き終わりを下にして、２分ほど焼く。全面に焼き色がつくまで転がしながら、２分ほど焼く。",
+          "start_min": 3,
+          "duration_min": 4,
+          "end_min": 7,
+          "requires_timer": true,
+          "timer_minutes": 4,
+          "confidence": 0.9,
+          "depends_on": [
+            "805269-s1"
+          ]
+        },
+        {
+          "task_id": "805269-s3",
+          "step_index": 3,
+          "label": "水を加え、フタをして弱火で8分ほど蒸し焼きにする。",
+          "source_text": "（３）水を加え、フタをして弱火で８分ほど蒸し焼きにする。",
+          "start_min": 7,
+          "duration_min": 8,
+          "end_min": 15,
+          "requires_timer": true,
+          "timer_minutes": 8,
+          "confidence": 0.9,
+          "depends_on": [
+            "805269-s2"
+          ]
+        },
+        {
+          "task_id": "805269-s4",
+          "step_index": 4,
+          "label": "火が通ったら、粗熱を取り、食べやすい大きさに切る。",
+          "source_text": "（４）火が通ったら、粗熱を取り、食べやすい大きさに切る。",
+          "start_min": 15,
+          "duration_min": 4,
+          "end_min": 19,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805269-s3"
+          ]
+        },
+        {
+          "task_id": "805269-s5",
+          "step_index": 5,
+          "label": "器に盛り、混ぜ合わせたＡをかける。",
+          "source_text": "（５）器に盛り、混ぜ合わせたＡをかける。",
+          "start_min": 19,
+          "duration_min": 3,
+          "end_min": 22,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805269-s4"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805279",
+      "recipe_name": "濃厚トマトクリーム鶏ポテチーズ",
+      "total_estimated_minutes": 19,
+      "tasks": [
+        {
+          "task_id": "805279-s1",
+          "step_index": 1,
+          "label": "鶏肉は小さめのひと口大に切る。",
+          "source_text": "（１）鶏肉は小さめのひと口大に切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "805279-s2",
+          "step_index": 2,
+          "label": "じゃがいもは皮つきのままよく洗ってくし形切りにし、水",
+          "source_text": "（２）じゃがいもは皮つきのままよく洗ってくし形切りにし、水にさらして水気をきる。耐熱皿にじゃがいもをのせてラップをかけ、電子レンジ（６００Ｗ）で６分加熱する。",
+          "start_min": 4,
+          "duration_min": 6,
+          "end_min": 10,
+          "requires_timer": true,
+          "timer_minutes": 6,
+          "confidence": 0.9,
+          "depends_on": [
+            "805279-s1"
+          ]
+        },
+        {
+          "task_id": "805279-s3",
+          "step_index": 3,
+          "label": "熱したフライパンに油大さじ1を入れ、（2）のじゃがい",
+          "source_text": "（３）熱したフライパンに油大さじ１を入れ、（２）のじゃがいもを加えて両面に焼き目がつくまで炒め、いったん皿に取り出す。",
+          "start_min": 10,
+          "duration_min": 3,
+          "end_min": 13,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805279-s2"
+          ]
+        },
+        {
+          "task_id": "805279-s4",
+          "step_index": 4,
+          "label": "同じフライパンに油大さじ1／2を入れ、（1）の鶏肉を",
+          "source_text": "（４）同じフライパンに油大さじ１／２を入れ、（１）の鶏肉を加えてフタをして蒸し焼きにする。肉に火が通ったら、いったん火を止め、（３）のじゃがいもを戻し入れる。",
+          "start_min": 13,
+          "duration_min": 3,
+          "end_min": 16,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805279-s3"
+          ]
+        },
+        {
+          "task_id": "805279-s5",
+          "step_index": 5,
+          "label": "「Ｂｉｓｔｒｏ　Ｄｏ」を加えて再び火をつけ、ソースと",
+          "source_text": "（５）「Ｂｉｓｔｒｏ　Ｄｏ」を加えて再び火をつけ、ソースと具材がよくからむまで混ぜ合わせ、チーズをのせて溶けるまでフタをする。",
+          "start_min": 16,
+          "duration_min": 3,
+          "end_min": 19,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805279-s4"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805281",
+      "recipe_name": "鮭とブロッコリーの青のりグラタン",
+      "total_estimated_minutes": 22,
+      "tasks": [
+        {
+          "task_id": "805281-s1",
+          "step_index": 1,
+          "label": "さけは2～3等分に切り、「やさしお」をふる。ブロッコ",
+          "source_text": "（１）さけは２～３等分に切り、「やさしお」をふる。ブロッコリーは熱湯でゆでる。玉ねぎは薄切りにする。",
+          "start_min": 0,
+          "duration_min": 8,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "805281-s2",
+          "step_index": 2,
+          "label": "フライパンにバターを熱し、（1）のさけ・玉ねぎを入れ",
+          "source_text": "（２）フライパンにバターを熱し、（１）のさけ・玉ねぎを入れて炒める。さけの両面に焼き色がついたら、薄力粉を加え、粉っぽさがなくなるまで炒める。",
+          "start_min": 8,
+          "duration_min": 6,
+          "end_min": 14,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805281-s1"
+          ]
+        },
+        {
+          "task_id": "805281-s3",
+          "step_index": 3,
+          "label": "牛乳を一気に加え、Ａを加えてとろみがつくまで加熱する",
+          "source_text": "（３）牛乳を一気に加え、Ａを加えてとろみがつくまで加熱する。",
+          "start_min": 14,
+          "duration_min": 3,
+          "end_min": 17,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805281-s2"
+          ]
+        },
+        {
+          "task_id": "805281-s4",
+          "step_index": 4,
+          "label": "耐熱皿に入れ、（1）のブロッコリーをのせて粉チーズを",
+          "source_text": "（４）耐熱皿に入れ、（１）のブロッコリーをのせて粉チーズをふり、オーブントースター（１２００Ｗ）で焼き色がつくまで５分焼く。",
+          "start_min": 17,
+          "duration_min": 5,
+          "end_min": 22,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": [
+            "805281-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805282",
+      "recipe_name": "豚肉のオイスター照り焼き",
+      "total_estimated_minutes": 15,
+      "tasks": [
+        {
+          "task_id": "805282-s1",
+          "step_index": 1,
+          "label": "豚肉に薄力粉をまぶす。トマトはくし形切りにする。",
+          "source_text": "（１）豚肉に薄力粉をまぶす。トマトはくし形切りにする。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805282-s2",
+          "step_index": 2,
+          "label": "フライパンに油を熱し、（1）の豚肉を入れ、両面に焼き",
+          "source_text": "（２）フライパンに油を熱し、（１）の豚肉を入れ、両面に焼き色がつくまで焼く。",
+          "start_min": 3,
+          "duration_min": 6,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805282-s1"
+          ]
+        },
+        {
+          "task_id": "805282-s3",
+          "step_index": 3,
+          "label": "Ａを加え、全体を炒めながらからめる。",
+          "source_text": "（３）Ａを加え、全体を炒めながらからめる。",
+          "start_min": 9,
+          "duration_min": 3,
+          "end_min": 12,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805282-s2"
+          ]
+        },
+        {
+          "task_id": "805282-s4",
+          "step_index": 4,
+          "label": "器に盛り、グリーンリーフ、（1）のトマトをのせ、豚肉",
+          "source_text": "（４）器に盛り、グリーンリーフ、（１）のトマトをのせ、豚肉の表面に「やさしお」をふる。",
+          "start_min": 12,
+          "duration_min": 3,
+          "end_min": 15,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805282-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805283",
+      "recipe_name": "大根と水菜のシャキシャキサラダ～中華風ドレッシング～",
+      "total_estimated_minutes": 5,
+      "tasks": [
+        {
+          "task_id": "805283-s1",
+          "step_index": 1,
+          "label": "えびは熱湯で2分ゆでる。大根はせん切りにし、水菜は4",
+          "source_text": "（１）えびは熱湯で２分ゆでる。大根はせん切りにし、水菜は４～５ｃｍ幅に切る。",
+          "start_min": 0,
+          "duration_min": 2,
+          "end_min": 2,
+          "requires_timer": true,
+          "timer_minutes": 2,
+          "confidence": 0.9,
+          "depends_on": []
+        },
+        {
+          "task_id": "805283-s2",
+          "step_index": 2,
+          "label": "ボウルにＡを入れてよく混ぜ、（1）の大根・水菜・えび",
+          "source_text": "（２）ボウルにＡを入れてよく混ぜ、（１）の大根・水菜・えびを加えて全体をあえる。",
+          "start_min": 2,
+          "duration_min": 3,
+          "end_min": 5,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805283-s1"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805285",
+      "recipe_name": "カリッと油淋鶏～トマトオイスターソース～",
+      "total_estimated_minutes": 40,
+      "tasks": [
+        {
+          "task_id": "805285-s1",
+          "step_index": 1,
+          "label": "鶏肉はたたいて厚さを均一にし、半分に切ってビニール袋",
+          "source_text": "（１）鶏肉はたたいて厚さを均一にし、半分に切ってビニール袋に入れる。Ａを加えて肉と一緒にもみ、冷蔵庫で３０分以上漬ける（時間外）。水菜は食べやすい長さに切る。",
+          "start_min": 0,
+          "duration_min": 30,
+          "end_min": 30,
+          "requires_timer": true,
+          "timer_minutes": 30,
+          "confidence": 0.9,
+          "depends_on": []
+        },
+        {
+          "task_id": "805285-s2",
+          "step_index": 2,
+          "label": "トマトは1ｃｍ角に切ってボウルに入れ、Ｂを加えて混ぜ",
+          "source_text": "（２）トマトは１ｃｍ角に切ってボウルに入れ、Ｂを加えて混ぜ合わせる。",
+          "start_min": 30,
+          "duration_min": 3,
+          "end_min": 33,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805285-s1"
+          ]
+        },
+        {
+          "task_id": "805285-s3",
+          "step_index": 3,
+          "label": "（1）の鶏肉に「やさしお」をふり、片栗粉をまぶす。フ",
+          "source_text": "（３）（１）の鶏肉に「やさしお」をふり、片栗粉をまぶす。フライパンに多めの油を熱し、鶏肉を入れ、両面がカリッとするまで揚げ焼きにし、食べやすい大きさに切る。",
+          "start_min": 33,
+          "duration_min": 4,
+          "end_min": 37,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805285-s2"
+          ]
+        },
+        {
+          "task_id": "805285-s4",
+          "step_index": 4,
+          "label": "器に（1）の水菜を敷き、（3）を盛り、（2）をかける",
+          "source_text": "（４）器に（１）の水菜を敷き、（３）を盛り、（２）をかける。",
+          "start_min": 37,
+          "duration_min": 3,
+          "end_min": 40,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805285-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805286",
+      "recipe_name": "大豆ぎゅぎゅっと！カレーチーズコロッケ",
+      "total_estimated_minutes": 12,
+      "tasks": [
+        {
+          "task_id": "805286-s1",
+          "step_index": 1,
+          "label": "玉ねぎ、にんにくはみじん切りにする。チーズは8等分の",
+          "source_text": "（１）玉ねぎ、にんにくはみじん切りにする。チーズは８等分の角切りにする。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805286-s2",
+          "step_index": 2,
+          "label": "ボウルに大豆の水煮を入れてめん棒などでつぶし、（1）",
+          "source_text": "（２）ボウルに大豆の水煮を入れてめん棒などでつぶし、（１）の玉ねぎ・にんにく、Ａを加えてよく混ぜ、８等分にする。（１）のチーズを加えて小さな小判型にし、薄力粉、溶き卵、パン粉を順につける。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805286-s1"
+          ]
+        },
+        {
+          "task_id": "805286-s3",
+          "step_index": 3,
+          "label": "フライパンに多めの油を熱し、（2）を入れてきつね色に",
+          "source_text": "（３）フライパンに多めの油を熱し、（２）を入れてきつね色になるまで裏表返しながら揚げる。",
+          "start_min": 6,
+          "duration_min": 3,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805286-s2"
+          ]
+        },
+        {
+          "task_id": "805286-s4",
+          "step_index": 4,
+          "label": "器に盛り、ベビーリーフをのせ、ケチャップを添える。",
+          "source_text": "（４）器に盛り、ベビーリーフをのせ、ケチャップを添える。",
+          "start_min": 9,
+          "duration_min": 3,
+          "end_min": 12,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805286-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805289",
+      "recipe_name": "水晶鶏のレモンみぞれがけ",
+      "total_estimated_minutes": 14,
+      "tasks": [
+        {
+          "task_id": "805289-s1",
+          "step_index": 1,
+          "label": "ささ身は筋を取ってそぎ切りにし、「やさしお」をふって",
+          "source_text": "（１）ささ身は筋を取ってそぎ切りにし、「やさしお」をふって片栗粉をまぶす。レモンはいちょう切りにし、しそ２枚はせん切りにし、残りは飾り用にとっておく。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805289-s2",
+          "step_index": 2,
+          "label": "大根はすりおろし、軽く水気をきってボウルに入れ、（1",
+          "source_text": "（２）大根はすりおろし、軽く水気をきってボウルに入れ、（１）のレモン・せん切りにしたしそ、Ａを加えて混ぜ合わせる。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805289-s1"
+          ]
+        },
+        {
+          "task_id": "805289-s3",
+          "step_index": 3,
+          "label": "鍋に湯を沸かし、（1）のささ身を入れて火が通るまで5",
+          "source_text": "（３）鍋に湯を沸かし、（１）のささ身を入れて火が通るまで５分加熱し、氷水にさらして冷やし、水気をきる。",
+          "start_min": 6,
+          "duration_min": 5,
+          "end_min": 11,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": [
+            "805289-s2"
+          ]
+        },
+        {
+          "task_id": "805289-s4",
+          "step_index": 4,
+          "label": "器に（1）のとっておいたしそを敷き、（3）を盛り、（",
+          "source_text": "（４）器に（１）のとっておいたしそを敷き、（３）を盛り、（２）をのせる。",
+          "start_min": 11,
+          "duration_min": 3,
+          "end_min": 14,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805289-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805290",
+      "recipe_name": "キャベツとアスパラと桜えびのアーリオ・オーリオ",
+      "total_estimated_minutes": 8,
+      "tasks": [
+        {
+          "task_id": "805290-s1",
+          "step_index": 1,
+          "label": "キャベツはザク切りする。アスパラは根元の固い部分を切",
+          "source_text": "（１）キャベツはザク切りする。アスパラは根元の固い部分を切り落とし、斜め切りにする。にんにくはみじん切りにする。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805290-s2",
+          "step_index": 2,
+          "label": "フライパンにオリーブオイルを熱し、（1）のにんにくを",
+          "source_text": "（２）フライパンにオリーブオイルを熱し、（１）のにんにくを入れて弱火で炒める。香りが立ったら、（１）のアスパラ、桜えびを加えて１～２分炒め、（１）のキャベツを加えて全体をサッと炒める。",
+          "start_min": 3,
+          "duration_min": 2,
+          "end_min": 5,
+          "requires_timer": true,
+          "timer_minutes": 2,
+          "confidence": 0.9,
+          "depends_on": [
+            "805290-s1"
+          ]
+        },
+        {
+          "task_id": "805290-s3",
+          "step_index": 3,
+          "label": "Ａを加え、フタをしてキャベツがしんなりして「コンソメ",
+          "source_text": "（３）Ａを加え、フタをしてキャベツがしんなりして「コンソメ」が溶けるまで時々混ぜながら加熱し、「やさしお」、ブラックペッパーで味を調える。",
+          "start_min": 5,
+          "duration_min": 3,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805290-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805291",
+      "recipe_name": "春菊のシーザーサラダ　温玉のせ",
+      "total_estimated_minutes": 10,
+      "tasks": [
+        {
+          "task_id": "805291-s1",
+          "step_index": 1,
+          "label": "春菊は根元の固い部分を切り落とし、3～4ｃｍ幅に切る",
+          "source_text": "（１）春菊は根元の固い部分を切り落とし、３～４ｃｍ幅に切る。アボカドは薄切りにし、ミックスナッツは粗く刻む。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "805291-s2",
+          "step_index": 2,
+          "label": "Ａは混ぜ合わせる。",
+          "source_text": "（２）Ａは混ぜ合わせる。",
+          "start_min": 4,
+          "duration_min": 3,
+          "end_min": 7,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805291-s1"
+          ]
+        },
+        {
+          "task_id": "805291-s3",
+          "step_index": 3,
+          "label": "器に（1）の春菊を盛り、（1）のアボカド・ミックスナ",
+          "source_text": "（３）器に（１）の春菊を盛り、（１）のアボカド・ミックスナッツ、温泉卵をのせ、粉チーズをふり、（２）をかける。",
+          "start_min": 7,
+          "duration_min": 3,
+          "end_min": 10,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805291-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805292",
+      "recipe_name": "コクうまスンドゥブチゲ",
+      "total_estimated_minutes": 14,
+      "tasks": [
+        {
+          "task_id": "805292-s1",
+          "step_index": 1,
+          "label": "豚肉、豆腐は食べやすい大きさに切る。小ねぎは5ｃｍ長",
+          "source_text": "（１）豚肉、豆腐は食べやすい大きさに切る。小ねぎは５ｃｍ長さに切り、にんにくはすりおろす。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "805292-s2",
+          "step_index": 2,
+          "label": "鍋にごま油を熱し、（1）の豚肉を入れて色が変わるまで",
+          "source_text": "（２）鍋にごま油を熱し、（１）の豚肉を入れて色が変わるまで炒める。凍ったままのシーフードミックス、（１）のにんにく、酒を加え、フタをして１～２分加熱する。",
+          "start_min": 4,
+          "duration_min": 2,
+          "end_min": 6,
+          "requires_timer": true,
+          "timer_minutes": 2,
+          "confidence": 0.9,
+          "depends_on": [
+            "805292-s1"
+          ]
+        },
+        {
+          "task_id": "805292-s3",
+          "step_index": 3,
+          "label": "（1）の豆腐・小ねぎ、Ａを加えて5分ほど煮、卵を割り",
+          "source_text": "（３）（１）の豆腐・小ねぎ、Ａを加えて５分ほど煮、卵を割り落とし、好みの固さになるまで加熱する。",
+          "start_min": 6,
+          "duration_min": 5,
+          "end_min": 11,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": [
+            "805292-s2"
+          ]
+        },
+        {
+          "task_id": "805292-s4",
+          "step_index": 4,
+          "label": "器に盛り、一味唐がらしをふる。",
+          "source_text": "（４）器に盛り、一味唐がらしをふる。",
+          "start_min": 11,
+          "duration_min": 3,
+          "end_min": 14,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805292-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805293",
+      "recipe_name": "じゃがオイスターバター",
+      "total_estimated_minutes": 8,
+      "tasks": [
+        {
+          "task_id": "805293-s1",
+          "step_index": 1,
+          "label": "じゃがいもは皮をよく洗い、芽を取り除き、皮つきのまま",
+          "source_text": "（１）じゃがいもは皮をよく洗い、芽を取り除き、皮つきのままふんわりラップをして電子レンジ（６００Ｗ）で中に火が通るまで４～５分加熱し、十字に切り込みを入れる。",
+          "start_min": 0,
+          "duration_min": 5,
+          "end_min": 5,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": []
+        },
+        {
+          "task_id": "805293-s2",
+          "step_index": 2,
+          "label": "器に盛り、熱いうちにバターをのせ、「オイスターソース",
+          "source_text": "（２）器に盛り、熱いうちにバターをのせ、「オイスターソース」をかける。",
+          "start_min": 5,
+          "duration_min": 3,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805293-s1"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805294",
+      "recipe_name": "チンゲン菜の湯引き",
+      "total_estimated_minutes": 8,
+      "tasks": [
+        {
+          "task_id": "805294-s1",
+          "step_index": 1,
+          "label": "チンゲン菜は根元からタテ4～6等分に切る。",
+          "source_text": "（１）チンゲン菜は根元からタテ４～６等分に切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "805294-s2",
+          "step_index": 2,
+          "label": "鍋に湯を沸かし、（1）のチンゲン菜を1分ほどゆで、水",
+          "source_text": "（２）鍋に湯を沸かし、（１）のチンゲン菜を１分ほどゆで、水気をきる。",
+          "start_min": 4,
+          "duration_min": 1,
+          "end_min": 5,
+          "requires_timer": true,
+          "timer_minutes": 1,
+          "confidence": 0.9,
+          "depends_on": [
+            "805294-s1"
+          ]
+        },
+        {
+          "task_id": "805294-s3",
+          "step_index": 3,
+          "label": "器に盛り、Ａをかける。",
+          "source_text": "（３）器に盛り、Ａをかける。",
+          "start_min": 5,
+          "duration_min": 3,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805294-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805310",
+      "recipe_name": "材料３つで！豚こま香味炒め",
+      "total_estimated_minutes": 16,
+      "tasks": [
+        {
+          "task_id": "805310-s1",
+          "step_index": 1,
+          "label": "豚肉はひと口大に切る。ピーマンは5ｍｍ幅の細切りにす",
+          "source_text": "（１）豚肉はひと口大に切る。ピーマンは５ｍｍ幅の細切りにする。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "805310-s2",
+          "step_index": 2,
+          "label": "フライパンにもやしを入れて油大さじ1を回しかけ、火を",
+          "source_text": "（２）フライパンにもやしを入れて油大さじ１を回しかけ、火をつけて炒める。もやしに火が通ったら、いったん取り出す。",
+          "start_min": 4,
+          "duration_min": 6,
+          "end_min": 10,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805310-s1"
+          ]
+        },
+        {
+          "task_id": "805310-s3",
+          "step_index": 3,
+          "label": "フライパンに油大さじ1を熱し、（1）の豚肉・ピーマン",
+          "source_text": "（３）フライパンに油大さじ１を熱し、（１）の豚肉・ピーマンを入れて炒める。肉の色が変わってきたら、火を止め、「香味ペースト」を加えて炒め合わせる。",
+          "start_min": 10,
+          "duration_min": 3,
+          "end_min": 13,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805310-s2"
+          ]
+        },
+        {
+          "task_id": "805310-s4",
+          "step_index": 4,
+          "label": "（2）のもやしを戻し入れ、サッと炒め合わせる。",
+          "source_text": "（４）（２）のもやしを戻し入れ、サッと炒め合わせる。",
+          "start_min": 13,
+          "duration_min": 3,
+          "end_min": 16,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805310-s3"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805326",
+      "recipe_name": "氷みぞれつゆ　かつおだしそうめん",
+      "total_estimated_minutes": 8,
+      "tasks": [
+        {
+          "task_id": "805326-s1",
+          "step_index": 1,
+          "label": "「氷みぞれつゆ」は外袋から内袋を取り出して冷凍庫に平",
+          "source_text": "（１）「氷みぞれつゆ」は外袋から内袋を取り出して冷凍庫に平らに置き、２４時間以上凍らせる（時間外）。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805326-s2",
+          "step_index": 2,
+          "label": "そうめんはゆでて水で洗い、よく水をきって器に盛る。",
+          "source_text": "（２）そうめんはゆでて水で洗い、よく水をきって器に盛る。",
+          "start_min": 3,
+          "duration_min": 2,
+          "end_min": 5,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805326-s1"
+          ]
+        },
+        {
+          "task_id": "805326-s3",
+          "step_index": 3,
+          "label": "（1）の「氷みぞれつゆ」を袋のまま細かく割りほぐし、",
+          "source_text": "（３）（１）の「氷みぞれつゆ」を袋のまま細かく割りほぐし、（２）の上にかける。",
+          "start_min": 5,
+          "duration_min": 3,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805326-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "805327",
+      "recipe_name": "氷みぞれつゆ　鶏だしゆず風味そうめん",
+      "total_estimated_minutes": 8,
+      "tasks": [
+        {
+          "task_id": "805327-s1",
+          "step_index": 1,
+          "label": "「氷みぞれつゆ」は外袋から内袋を取り出して冷凍庫に平",
+          "source_text": "（１）「氷みぞれつゆ」は外袋から内袋を取り出して冷凍庫に平らに置き、２４時間以上凍らせる（時間外）。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "805327-s2",
+          "step_index": 2,
+          "label": "そうめんはゆでて水で洗い、よく水をきって器に盛る。",
+          "source_text": "（２）そうめんはゆでて水で洗い、よく水をきって器に盛る。",
+          "start_min": 3,
+          "duration_min": 2,
+          "end_min": 5,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "805327-s1"
+          ]
+        },
+        {
+          "task_id": "805327-s3",
+          "step_index": 3,
+          "label": "（1）の「氷みぞれつゆ」を袋のまま細かく割りほぐし、",
+          "source_text": "（３）（１）の「氷みぞれつゆ」を袋のまま細かく割りほぐし、（２）の上にかける。",
+          "start_min": 5,
+          "duration_min": 3,
+          "end_min": 8,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "805327-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "002290",
+      "recipe_name": "いちごのクラフティ",
+      "total_estimated_minutes": 72,
+      "tasks": [
+        {
+          "task_id": "002290-s1",
+          "step_index": 1,
+          "label": "クッキーを砕いてボウルに入れ、バター、牛乳とともに手",
+          "source_text": "（１）クッキーを砕いてボウルに入れ、バター、牛乳とともに手で練る。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "002290-s2",
+          "step_index": 2,
+          "label": "型（直経22ｃｍのクラフティ型）にバターを薄く塗り、",
+          "source_text": "（２）型（直経２２ｃｍのクラフティ型）にバターを薄く塗り、（１）の生地を厚さ約４ｍｍに<br />パレットで敷き込み、冷凍庫で約１５～２０分冷やす。オーブンは１８０℃に予熱する。",
+          "start_min": 3,
+          "duration_min": 20,
+          "end_min": 23,
+          "requires_timer": true,
+          "timer_minutes": 20,
+          "confidence": 0.9,
+          "depends_on": [
+            "002290-s1"
+          ]
+        },
+        {
+          "task_id": "002290-s3",
+          "step_index": 3,
+          "label": "ボウルに卵を割りほぐし、グラニュー糖を加えて泡立て器",
+          "source_text": "（３）ボウルに卵を割りほぐし、グラニュー糖を加えて泡立て器でよく混ぜる。",
+          "start_min": 23,
+          "duration_min": 3,
+          "end_min": 26,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "002290-s2"
+          ]
+        },
+        {
+          "task_id": "002290-s4",
+          "step_index": 4,
+          "label": "サワークリームを加えて、ダマにならないようによく混ぜ",
+          "source_text": "（４）サワークリームを加えて、ダマにならないようによく混ぜ、生クリームとキルシュ<br />を加え、軽く混ぜ合わせる。",
+          "start_min": 26,
+          "duration_min": 3,
+          "end_min": 29,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "002290-s3"
+          ]
+        },
+        {
+          "task_id": "002290-s5",
+          "step_index": 5,
+          "label": "（2）の型に（4）の生地を八分目まで流し、180℃の",
+          "source_text": "（５）（２）の型に（４）の生地を八分目まで流し、１８０℃のオーブンで約２０～２５分焼く。<br />いちごはぬれぶきんで汚れを取り、ヘタは取る。",
+          "start_min": 29,
+          "duration_min": 25,
+          "end_min": 54,
+          "requires_timer": true,
+          "timer_minutes": 25,
+          "confidence": 0.9,
+          "depends_on": [
+            "002290-s4"
+          ]
+        },
+        {
+          "task_id": "002290-s6",
+          "step_index": 6,
+          "label": "（5）が八分通り焼けたら（ふっくらと外側に火が通った",
+          "source_text": "（６）（５）が八分通り焼けたら（ふっくらと外側に火が通った状態）オーブンから出して、<br />いちごを押しつけるようにして並べる。",
+          "start_min": 54,
+          "duration_min": 3,
+          "end_min": 57,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "002290-s5"
+          ]
+        },
+        {
+          "task_id": "002290-s7",
+          "step_index": 7,
+          "label": "残りの生地をいちごの間に、スプーンで流し入れ、再び1",
+          "source_text": "（７）残りの生地をいちごの間に、スプーンで流し入れ、再び１８０℃のオーブンに入れて<br />約１５分、表面に焦げ目がつき、いちごから果汁が出るまで焼く。",
+          "start_min": 57,
+          "duration_min": 15,
+          "end_min": 72,
+          "requires_timer": true,
+          "timer_minutes": 15,
+          "confidence": 0.9,
+          "depends_on": [
+            "002290-s6"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "010132",
+      "recipe_name": "いちごのババロア風",
+      "total_estimated_minutes": 18,
+      "tasks": [
+        {
+          "task_id": "010132-s1",
+          "step_index": 1,
+          "label": "Ａ、Ｂはそれぞれ合わせ、ふやかしておく。",
+          "source_text": "（１）Ａ、Ｂはそれぞれ合わせ、ふやかしておく。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "010132-s2",
+          "step_index": 2,
+          "label": "鍋に水カップ2／3を入れて火にかけ、Ａを加えて沸騰さ",
+          "source_text": "（２）鍋に水カップ２／３を入れて火にかけ、Ａを加えて沸騰させないように注意しながら溶かす。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "010132-s1"
+          ]
+        },
+        {
+          "task_id": "010132-s3",
+          "step_index": 3,
+          "label": "火を止め、「パルスイート」、レモン汁を加え、型（直径",
+          "source_text": "（３）火を止め、「パルスイート」、レモン汁を加え、型（直径１８ｃｍキャセロール型）に流し入れ、冷やし固める（時間外）。",
+          "start_min": 6,
+          "duration_min": 3,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "010132-s2"
+          ]
+        },
+        {
+          "task_id": "010132-s4",
+          "step_index": 4,
+          "label": "鍋に水カップ1／4を入れて火にかけ、Ｂを加えて溶かし",
+          "source_text": "（４）鍋に水カップ１／４を入れて火にかけ、Ｂを加えて溶かし、粗熱を取り、「パルスイート」を加える。",
+          "start_min": 9,
+          "duration_min": 3,
+          "end_min": 12,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "010132-s3"
+          ]
+        },
+        {
+          "task_id": "010132-s5",
+          "step_index": 5,
+          "label": "いちごはつぶし、生クリームは泡立て、（4）に加える。",
+          "source_text": "（５）いちごはつぶし、生クリームは泡立て、（４）に加える。",
+          "start_min": 12,
+          "duration_min": 3,
+          "end_min": 15,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "010132-s4"
+          ]
+        },
+        {
+          "task_id": "010132-s6",
+          "step_index": 6,
+          "label": "（3）が固まったら、その上にいちごの輪切りを並べ、（",
+          "source_text": "（６）（３）が固まったら、その上にいちごの輪切りを並べ、（５）を流し入れて冷やし固める（時間外）。",
+          "start_min": 15,
+          "duration_min": 3,
+          "end_min": 18,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "010132-s5"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "010660",
+      "recipe_name": "いちごのオムレット",
+      "total_estimated_minutes": 15,
+      "tasks": [
+        {
+          "task_id": "010660-s1",
+          "step_index": 1,
+          "label": "ボウルに卵白を入れてよく泡立てる。",
+          "source_text": "（１）ボウルに卵白を入れてよく泡立てる。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "010660-s2",
+          "step_index": 2,
+          "label": "別のボウルに卵黄を溶き、グラニュー糖を加えて混ぜ、（",
+          "source_text": "（２）別のボウルに卵黄を溶き、グラニュー糖を加えて混ぜ、（１）の１／３量を加えて泡立て、<br />残りの（１）を加えてサックリ混ぜる。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "010660-s1"
+          ]
+        },
+        {
+          "task_id": "010660-s3",
+          "step_index": 3,
+          "label": "いちごにＡを混ぜ合わせる。",
+          "source_text": "（３）いちごにＡを混ぜ合わせる。",
+          "start_min": 6,
+          "duration_min": 3,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "010660-s2"
+          ]
+        },
+        {
+          "task_id": "010660-s4",
+          "step_index": 4,
+          "label": "熱したホットプレートに（2）の生地の半量を丸く流す。",
+          "source_text": "（４）熱したホットプレートに（２）の生地の半量を丸く流す。生地の手前側半分に<br />（３）のいちごの半量をのせ、二つ折りにする。同様にもう１枚作る。",
+          "start_min": 9,
+          "duration_min": 3,
+          "end_min": 12,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "010660-s3"
+          ]
+        },
+        {
+          "task_id": "010660-s5",
+          "step_index": 5,
+          "label": "器に盛り、いったアーモンドスライスをのせ、「パルスイ",
+          "source_text": "（５）器に盛り、いったアーモンドスライスをのせ、「パルスイート」をふる。",
+          "start_min": 12,
+          "duration_min": 3,
+          "end_min": 15,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "010660-s4"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "701486",
+      "recipe_name": "グリーンアスパラといちごのサラダ",
+      "total_estimated_minutes": 7,
+      "tasks": [
+        {
+          "task_id": "701486-s1",
+          "step_index": 1,
+          "label": "グリーンアスパラは4～5ｃｍ長さに切り、熱湯で色よく",
+          "source_text": "（１）グリーンアスパラは４～５ｃｍ長さに切り、熱湯で色よくゆで、冷水にとって手早く冷まし、水気をしっかりきる。いちごはヘタを取り、くし形に切る。",
+          "start_min": 0,
+          "duration_min": 4,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": []
+        },
+        {
+          "task_id": "701486-s2",
+          "step_index": 2,
+          "label": "Ａを混ぜ合わせ、（1）のグリーンアスパラ・いちごをあ",
+          "source_text": "（２）Ａを混ぜ合わせ、（１）のグリーンアスパラ・いちごをあえる。",
+          "start_min": 4,
+          "duration_min": 3,
+          "end_min": 7,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "701486-s1"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "702595",
+      "recipe_name": "いちごのミルクレープ",
+      "total_estimated_minutes": 56,
+      "tasks": [
+        {
+          "task_id": "702595-s1",
+          "step_index": 1,
+          "label": "クレープを作る。バターは電子レンジ（500Ｗ）で約3",
+          "source_text": "（１）クレープを作る。バターは電子レンジ（５００Ｗ）で約３０秒加熱し、溶かしておく。",
+          "start_min": 0,
+          "duration_min": 1,
+          "end_min": 1,
+          "requires_timer": true,
+          "timer_minutes": 1,
+          "confidence": 0.9,
+          "depends_on": []
+        },
+        {
+          "task_id": "702595-s2",
+          "step_index": 2,
+          "label": "ボウルにＡをふるい入れ、卵を加えて混ぜ合わせる。",
+          "source_text": "（２）ボウルにＡをふるい入れ、卵を加えて混ぜ合わせる。",
+          "start_min": 1,
+          "duration_min": 3,
+          "end_min": 4,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "702595-s1"
+          ]
+        },
+        {
+          "task_id": "702595-s3",
+          "step_index": 3,
+          "label": "牛乳の半量、（1）の溶かしバターを加えてよく混ぜ合わ",
+          "source_text": "（３）牛乳の半量、（１）の溶かしバターを加えてよく混ぜ合わせ、残りの牛乳、バニラエッセンスを加え、生地をなじませる。（３０分以上置くと生地ののびがよくなります）。",
+          "start_min": 4,
+          "duration_min": 30,
+          "end_min": 34,
+          "requires_timer": true,
+          "timer_minutes": 30,
+          "confidence": 0.9,
+          "depends_on": [
+            "702595-s2"
+          ]
+        },
+        {
+          "task_id": "702595-s4",
+          "step_index": 4,
+          "label": "直径20～22ｃｍのフライパンにキッチンペーパーで薄",
+          "source_text": "（４）直径２０～２２ｃｍのフライパンにキッチンペーパーで薄く油を塗り、中火にする。（３）の生地をおたま１杯分位の生地を流し入れ、フライパンを回し、一面に広げる（または玉じゃくしの底で円を描くように生地を広げる）。",
+          "start_min": 34,
+          "duration_min": 8,
+          "end_min": 42,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "702595-s3"
+          ]
+        },
+        {
+          "task_id": "702595-s5",
+          "step_index": 5,
+          "label": "フチが乾いてきたら竹串でまわりをなぞり、裏返し、10",
+          "source_text": "（５）フチが乾いてきたら竹串でまわりをなぞり、裏返し、１０秒位焼き、取り出す。同様にして生地をすべて焼き、冷ましておく（約１５枚焼ける）。",
+          "start_min": 42,
+          "duration_min": 1,
+          "end_min": 43,
+          "requires_timer": true,
+          "timer_minutes": 1,
+          "confidence": 0.9,
+          "depends_on": [
+            "702595-s4"
+          ]
+        },
+        {
+          "task_id": "702595-s6",
+          "step_index": 6,
+          "label": "いちご10粒は粗みじん切りにし、残りは飾り用にタテ半",
+          "source_text": "（６）いちご１０粒は粗みじん切りにし、残りは飾り用にタテ半分に切り、３等分に切る。",
+          "start_min": 43,
+          "duration_min": 4,
+          "end_min": 47,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.6,
+          "depends_on": [
+            "702595-s5"
+          ]
+        },
+        {
+          "task_id": "702595-s7",
+          "step_index": 7,
+          "label": "ボウルにＢを入れ、氷水にあてながら泡立て、八分立ての",
+          "source_text": "（７）ボウルにＢを入れ、氷水にあてながら泡立て、八分立てのホイップクリームを作る。",
+          "start_min": 47,
+          "duration_min": 3,
+          "end_min": 50,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "702595-s6"
+          ]
+        },
+        {
+          "task_id": "702595-s8",
+          "step_index": 8,
+          "label": "（5）のクレープ1枚を広げ、（7）のホイップクリーム",
+          "source_text": "（８）（５）のクレープ１枚を広げ、（７）のホイップクリームを塗り、粗みじん切りにしたいちごを適量散らし、クレープを上に重ねる。これを交互にくり返す。",
+          "start_min": 50,
+          "duration_min": 3,
+          "end_min": 53,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "702595-s7"
+          ]
+        },
+        {
+          "task_id": "702595-s9",
+          "step_index": 9,
+          "label": "一番上に残りのホイップクリームで輪を描き、その上に飾",
+          "source_text": "（９）一番上に残りのホイップクリームで輪を描き、その上に飾り用のいちご、ミントの葉を飾る。",
+          "start_min": 53,
+          "duration_min": 3,
+          "end_min": 56,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "702595-s8"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "703205",
+      "recipe_name": "いちごチョコ大福",
+      "total_estimated_minutes": 17,
+      "tasks": [
+        {
+          "task_id": "703205-s1",
+          "step_index": 1,
+          "label": "いちごはヘタを取っておく。ホワイトチョコレートは刻ん",
+          "source_text": "（１）いちごはヘタを取っておく。ホワイトチョコレートは刻んで、湯せんにかけて溶かす。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "703205-s2",
+          "step_index": 2,
+          "label": "（1）のいちごに先端から竹串を刺し、先端を残して（1",
+          "source_text": "（２）（１）のいちごに先端から竹串を刺し、先端を残して（１）のチョコレートをからめ、<br />安定するコップなどに立てかけて乾かす。",
+          "start_min": 3,
+          "duration_min": 3,
+          "end_min": 6,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "703205-s1"
+          ]
+        },
+        {
+          "task_id": "703205-s3",
+          "step_index": 3,
+          "label": "白あんは12等分にして円形状に平たくのばし、（2）の",
+          "source_text": "（３）白あんは１２等分にして円形状に平たくのばし、（２）のいちごを先端を残して包む。",
+          "start_min": 6,
+          "duration_min": 3,
+          "end_min": 9,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "703205-s2"
+          ]
+        },
+        {
+          "task_id": "703205-s4",
+          "step_index": 4,
+          "label": "耐熱ボウルに白玉粉を入れ、水を少しずつ加えながら、な",
+          "source_text": "（４）耐熱ボウルに白玉粉を入れ、水を少しずつ加えながら、なめらかになるまで混ぜ、Ａを<br />加えて、さらに混ぜ合わせる。ラップをかけて電子レンジ（６００Ｗ）で２分加熱する。",
+          "start_min": 9,
+          "duration_min": 2,
+          "end_min": 11,
+          "requires_timer": true,
+          "timer_minutes": 2,
+          "confidence": 0.9,
+          "depends_on": [
+            "703205-s3"
+          ]
+        },
+        {
+          "task_id": "703205-s5",
+          "step_index": 5,
+          "label": "途中一度取り出し、木べらで均一に混ぜ、全体が半透明に",
+          "source_text": "（５）途中一度取り出し、木べらで均一に混ぜ、全体が半透明になるまでさらに２～３分程<br />加熱する。片栗粉を敷いたバットにあけ、全体を１２等分にする。",
+          "start_min": 11,
+          "duration_min": 3,
+          "end_min": 14,
+          "requires_timer": true,
+          "timer_minutes": 3,
+          "confidence": 0.9,
+          "depends_on": [
+            "703205-s4"
+          ]
+        },
+        {
+          "task_id": "703205-s6",
+          "step_index": 6,
+          "label": "手で（5）を平らにのばし、（3）のいちごに先端が中心",
+          "source_text": "（６）手で（５）を平らにのばし、（３）のいちごに先端が中心になるようにかぶせ、<br />とじ目をしっかりととじる。",
+          "start_min": 14,
+          "duration_min": 3,
+          "end_min": 17,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "703205-s5"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "704604",
+      "recipe_name": "いちごシロップのミルク割り",
+      "total_estimated_minutes": 11,
+      "tasks": [
+        {
+          "task_id": "704604-s1",
+          "step_index": 1,
+          "label": "いちごはヘタを取り除く。",
+          "source_text": "（１）いちごはヘタを取り除く。",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "704604-s2",
+          "step_index": 2,
+          "label": "耐熱の密閉容器に（1）のいちご、「パルスイート」を入",
+          "source_text": "（２）耐熱の密閉容器に（１）のいちご、「パルスイート」を入れて菜ばしで軽く混ぜ、<br />レモン汁、水を加え、フタをせずに電子レンジ（６００Ｗ）で５分加熱し、<br />そのまま冷まし（時間外）、いちごシロップを作る。",
+          "start_min": 3,
+          "duration_min": 5,
+          "end_min": 8,
+          "requires_timer": true,
+          "timer_minutes": 5,
+          "confidence": 0.9,
+          "depends_on": [
+            "704604-s1"
+          ]
+        },
+        {
+          "task_id": "704604-s3",
+          "step_index": 3,
+          "label": "グラスに（2）のいちごシロップ90ｍｌを注ぎ、冷たい",
+          "source_text": "（３）グラスに（２）のいちごシロップ９０ｍｌを注ぎ、冷たい牛乳９０ｍｌで割る。",
+          "start_min": 8,
+          "duration_min": 3,
+          "end_min": 11,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": [
+            "704604-s2"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    },
+    {
+      "version": 1,
+      "recipe_id": "704622",
+      "recipe_name": "簡単ヘルシーいちごジャム",
+      "total_estimated_minutes": 13,
+      "tasks": [
+        {
+          "task_id": "704622-s1",
+          "step_index": 1,
+          "label": "いちごはヘタを取る。",
+          "source_text": "（１）いちごはヘタを取る。 ",
+          "start_min": 0,
+          "duration_min": 3,
+          "end_min": 3,
+          "requires_timer": false,
+          "timer_minutes": null,
+          "confidence": 0.45,
+          "depends_on": []
+        },
+        {
+          "task_id": "704622-s2",
+          "step_index": 2,
+          "label": "大きめの耐熱ボウルに（1）のいちご、「パルスイート」",
+          "source_text": "（２）大きめの耐熱ボウルに（１）のいちご、「パルスイート」、レモン汁を入れて混ぜ合わせ、ラップをかけずに電子レンジ（６００Ｗ）で６分加熱し、アクを取り、一度混ぜ合わせ、さらに４分加熱する。",
+          "start_min": 3,
+          "duration_min": 10,
+          "end_min": 13,
+          "requires_timer": true,
+          "timer_minutes": 10,
+          "confidence": 0.9,
+          "depends_on": [
+            "704622-s1"
+          ]
+        }
+      ],
+      "generation": {
+        "method": "llm-assisted-rule-based",
+        "generated_at": "2026-02-23T11:12:38Z"
+      }
+    }
+  ]
+}
