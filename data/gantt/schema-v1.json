@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibe-cooking.local/gantt/schema-v1.json",
+  "title": "Vibe Cooking Recipe Gantt v1",
+  "type": "object",
+  "required": ["version", "recipe_id", "total_estimated_minutes", "tasks", "generation"],
+  "properties": {
+    "version": { "const": 1 },
+    "recipe_id": { "type": "string" },
+    "recipe_name": { "type": "string" },
+    "total_estimated_minutes": { "type": "integer", "minimum": 0 },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "task_id",
+          "step_index",
+          "label",
+          "source_text",
+          "start_min",
+          "duration_min",
+          "end_min",
+          "requires_timer",
+          "timer_minutes",
+          "confidence",
+          "depends_on"
+        ],
+        "properties": {
+          "task_id": { "type": "string" },
+          "step_index": { "type": "integer", "minimum": 1 },
+          "label": { "type": "string" },
+          "source_text": { "type": "string" },
+          "start_min": { "type": "integer", "minimum": 0 },
+          "duration_min": { "type": "integer", "minimum": 1 },
+          "end_min": { "type": "integer", "minimum": 0 },
+          "requires_timer": { "type": "boolean" },
+          "timer_minutes": { "type": ["integer", "null"], "minimum": 1 },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "depends_on": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "required": ["method", "generated_at"],
+      "properties": {
+        "method": { "type": "string" },
+        "generated_at": { "type": "string" }
+      }
+    }
+  }
+}

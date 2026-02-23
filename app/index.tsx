@@ -46,17 +46,22 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: selectedCount > 0 ? 120 + insets.bottom : 24 }]}>
-        <View style={styles.row}>
-          <Text style={styles.sectionTitle}>献立を決める</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{selectedLabel}</Text>
+        <View style={styles.sectionHeader}>
+          <View style={styles.row}>
+            <Text style={styles.sectionTitle}>献立を決める</Text>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{selectedLabel}</Text>
+            </View>
           </View>
+          <View style={styles.divider} />
         </View>
         <Text style={styles.help}>1〜5個の料理を選択してください</Text>
 
-        {recipes.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} isSelected={selectedIds.includes(recipe.id)} onToggle={toggle} />
-        ))}
+        <View style={styles.cardContainer}>
+          {recipes.map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} isSelected={selectedIds.includes(recipe.id)} onToggle={toggle} />
+          ))}
+        </View>
       </ScrollView>
 
       {selectedCount > 0 ? (
@@ -74,41 +79,94 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: theme.colors.bg },
   header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 14,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+    backgroundColor: theme.colors.card,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
-    backgroundColor: theme.colors.card,
   },
-  title: { fontSize: 28, fontWeight: '800', color: theme.colors.primary },
-  subtitle: { marginTop: 4, color: theme.colors.subText, fontSize: 13 },
-  settingsBtn: { position: 'absolute', right: 16, top: 16, padding: 8 },
+  title: { 
+    fontSize: 28, 
+    fontWeight: '800', 
+    color: theme.colors.primary,
+    fontFamily: 'Quicksand',
+  },
+  subtitle: { 
+    marginTop: 8, 
+    color: theme.colors.subText, 
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  settingsBtn: { position: 'absolute', right: 16, top: 20, padding: 8 },
   settingsText: { fontSize: 24 },
-  content: { padding: 16 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  sectionTitle: { fontSize: 20, fontWeight: '700', color: theme.colors.text },
-  badge: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.pill,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+  content: { 
+    padding: 20,
   },
-  badgeText: { fontWeight: '700', color: theme.colors.text },
-  help: { color: theme.colors.subText, marginVertical: 10 },
+  sectionHeader: {
+    marginBottom: 8,
+  },
+  row: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  sectionTitle: { 
+    fontSize: 24, 
+    fontWeight: '700', 
+    color: theme.colors.text,
+    fontFamily: 'M PLUS Rounded 1c',
+  },
+  divider: {
+    height: 3,
+    backgroundColor: theme.colors.divider,
+    width: 40,
+    borderRadius: 2,
+  },
+  badge: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.pill,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+  },
+  badgeText: { 
+    fontWeight: '700', 
+    color: '#fff',
+    fontSize: 14,
+  },
+  help: { 
+    color: theme.colors.subText, 
+    marginBottom: 24,
+    fontSize: 14,
+  },
+  cardContainer: {
+    gap: 20,
+  },
   bottomBar: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: theme.colors.card,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-    paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    // iOS Shadow
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: -4 },
+    // Android Shadow
+    elevation: 8,
   },
-  bottomRow: { gap: 10 },
-  bottomInfo: { color: theme.colors.text, fontWeight: '600' },
+  bottomRow: { 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bottomInfo: { 
+    color: theme.colors.text, 
+    fontWeight: '700',
+    fontSize: 16,
+  },
 });

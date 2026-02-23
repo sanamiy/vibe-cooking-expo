@@ -28,7 +28,7 @@ export default function RecipeDetailScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}><Text style={styles.back}>← 戻る</Text></Pressable>
+        <Pressable onPress={() => router.back()} style={styles.backBtn}><Text style={styles.back}>← 戻る</Text></Pressable>
         <Text style={styles.title}>Vibe Cooking 🍳</Text>
       </View>
 
@@ -37,24 +37,45 @@ export default function RecipeDetailScreen() {
         <Image source={{ uri: recipe.image_url }} style={styles.hero} resizeMode="cover" />
         <Text style={styles.description}>{recipe.description}</Text>
 
-        <Text style={styles.section}>材料（{settings.servingsPerMeal}人前）</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.section}>材料（{settings.servingsPerMeal}人前）</Text>
+          <View style={styles.divider} />
+        </View>
         <View style={styles.card}>
           {ingredients.map((item, idx) => (
-            <Text key={`${idx}-${item}`} style={styles.line}>・{item}</Text>
+            <View key={`${idx}-${item}`} style={styles.ingredientRow}>
+              <View style={styles.bullet} />
+              <Text style={styles.line}>{item}</Text>
+            </View>
           ))}
         </View>
 
-        <Text style={styles.section}>作り方</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.section}>作り方</Text>
+          <View style={styles.divider} />
+        </View>
         <View style={styles.card}>
           {(recipe.instruction_steps ?? []).length > 0
             ? recipe.instruction_steps?.map((step, idx) => (
                 <View key={idx} style={styles.stepWrap}>
-                  <Text style={styles.step}>[{idx + 1}] {stripHtml(step.text)}</Text>
-                  {step.image_url ? <Image source={{ uri: step.image_url }} style={styles.stepImage} resizeMode="cover" /> : null}
+                  <View style={styles.stepNumberBadge}>
+                    <Text style={styles.stepNumber}>{idx + 1}</Text>
+                  </View>
+                  <View style={styles.stepContent}>
+                    <Text style={styles.step}>{stripHtml(step.text)}</Text>
+                    {step.image_url ? <Image source={{ uri: step.image_url }} style={styles.stepImage} resizeMode="cover" /> : null}
+                  </View>
                 </View>
               ))
             : recipe.instructions?.map((step, idx) => (
-                <Text key={idx} style={styles.step}>[{idx + 1}] {stripHtml(step)}</Text>
+                <View key={idx} style={styles.stepWrap}>
+                  <View style={styles.stepNumberBadge}>
+                    <Text style={styles.stepNumber}>{idx + 1}</Text>
+                  </View>
+                  <View style={styles.stepContent}>
+                    <Text style={styles.step}>{stripHtml(step)}</Text>
+                  </View>
+                </View>
               ))}
         </View>
       </ScrollView>
@@ -68,19 +89,150 @@ export default function RecipeDetailScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: theme.colors.bg },
-  header: { padding: 16, borderBottomWidth: 1, borderBottomColor: theme.colors.border, backgroundColor: theme.colors.card },
-  back: { color: theme.colors.subText, fontWeight: '700', marginBottom: 4 },
-  title: { color: theme.colors.primary, fontWeight: '800', fontSize: 22 },
-  content: { padding: 16 },
-  recipeName: { fontSize: 24, fontWeight: '800', color: theme.colors.text, marginBottom: 12 },
-  hero: { width: '100%', height: 220, borderRadius: theme.radius.lg, marginBottom: 12 },
-  description: { color: theme.colors.text, lineHeight: 22, marginBottom: 14 },
-  section: { fontSize: 18, fontWeight: '700', color: theme.colors.text, marginBottom: 8 },
-  card: { backgroundColor: '#fff', borderRadius: theme.radius.lg, padding: 12, marginBottom: 16, gap: 6 },
-  line: { color: theme.colors.text, lineHeight: 22 },
-  stepWrap: { gap: 8, marginBottom: 10 },
-  step: { color: theme.colors.text, lineHeight: 22 },
-  stepImage: { width: '100%', height: 170, borderRadius: theme.radius.md },
-  bottomBar: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: theme.colors.card, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingHorizontal: 16, paddingTop: 10 },
+  header: { 
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1, 
+    borderBottomColor: theme.colors.border, 
+    backgroundColor: theme.colors.card,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backBtn: {
+    position: 'absolute',
+    left: 20,
+    top: 20,
+    zIndex: 1,
+  },
+  back: { 
+    color: theme.colors.subText, 
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  title: { 
+    color: theme.colors.primary, 
+    fontWeight: '800', 
+    fontSize: 22,
+    fontFamily: 'Quicksand',
+  },
+  content: { padding: 20 },
+  recipeName: { 
+    fontSize: 28, 
+    fontWeight: '800', 
+    color: theme.colors.text, 
+    marginBottom: 16,
+    fontFamily: 'M PLUS Rounded 1c',
+  },
+  hero: { 
+    width: '100%', 
+    height: 240, 
+    borderRadius: theme.radius.lg, 
+    marginBottom: 16 
+  },
+  description: { 
+    color: theme.colors.text, 
+    lineHeight: 24, 
+    marginBottom: 24,
+    fontSize: 16,
+  },
+  sectionHeader: {
+    marginBottom: 16,
+  },
+  section: { 
+    fontSize: 22, 
+    fontWeight: '700', 
+    color: theme.colors.text,
+    fontFamily: 'M PLUS Rounded 1c',
+    marginBottom: 8,
+  },
+  divider: {
+    height: 3,
+    backgroundColor: theme.colors.divider,
+    width: 40,
+    borderRadius: 2,
+  },
+  card: { 
+    backgroundColor: theme.colors.card, 
+    borderRadius: theme.radius.lg, 
+    padding: 20, 
+    marginBottom: 32,
+    // iOS Shadow
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    // Android Shadow
+    elevation: 4,
+  },
+  ingredientRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  bullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.secondary,
+    marginRight: 12,
+  },
+  line: { 
+    color: theme.colors.text, 
+    lineHeight: 24,
+    fontSize: 16,
+    flex: 1,
+  },
+  stepWrap: { 
+    flexDirection: 'row',
+    marginBottom: 20,
+    gap: 16,
+  },
+  stepNumberBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: theme.colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+  stepNumber: {
+    color: theme.colors.text,
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  stepContent: {
+    flex: 1,
+  },
+  step: { 
+    color: theme.colors.text, 
+    lineHeight: 24,
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  stepImage: { 
+    width: '100%', 
+    height: 200, 
+    borderRadius: theme.radius.md,
+    marginTop: 8,
+  },
+  bottomBar: { 
+    position: 'absolute', 
+    left: 0, 
+    right: 0, 
+    bottom: 0, 
+    backgroundColor: theme.colors.card, 
+    paddingHorizontal: 20, 
+    paddingTop: 16,
+    // iOS Shadow
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: -4 },
+    // Android Shadow
+    elevation: 8,
+  },
   notFound: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

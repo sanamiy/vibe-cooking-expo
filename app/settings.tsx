@@ -28,7 +28,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.back()} style={styles.backBtn}>
           <Text style={styles.back}>← 戻る</Text>
         </Pressable>
         <Text style={styles.title}>キッチン設定</Text>
@@ -44,7 +44,7 @@ export default function SettingsScreen() {
           </View>
           <View style={styles.counterControl}>
             <Pressable
-              style={[styles.counterBtn, stoveBurners <= 1 && styles.counterBtnDisabled]}
+              style={({pressed}) => [styles.counterBtn, stoveBurners <= 1 && styles.counterBtnDisabled, pressed && !styles.counterBtnDisabled && {opacity: 0.8}]}
               onPress={decrementBurners}
               disabled={stoveBurners <= 1}>
               <Text style={[styles.counterBtnText, stoveBurners <= 1 && styles.counterBtnTextDisabled]}>−</Text>
@@ -54,7 +54,7 @@ export default function SettingsScreen() {
               <Text style={styles.unit}>口</Text>
             </View>
             <Pressable
-              style={[styles.counterBtn, stoveBurners >= 5 && styles.counterBtnDisabled]}
+              style={({pressed}) => [styles.counterBtn, stoveBurners >= 5 && styles.counterBtnDisabled, pressed && !styles.counterBtnDisabled && {opacity: 0.8}]}
               onPress={incrementBurners}
               disabled={stoveBurners >= 5}>
               <Text style={[styles.counterBtnText, stoveBurners >= 5 && styles.counterBtnTextDisabled]}>＋</Text>
@@ -70,7 +70,7 @@ export default function SettingsScreen() {
           </View>
           <View style={styles.counterControl}>
             <Pressable
-              style={[styles.counterBtn, servingsPerMeal <= 1 && styles.counterBtnDisabled]}
+              style={({pressed}) => [styles.counterBtn, servingsPerMeal <= 1 && styles.counterBtnDisabled, pressed && !styles.counterBtnDisabled && {opacity: 0.8}]}
               onPress={decrementServings}
               disabled={servingsPerMeal <= 1}>
               <Text style={[styles.counterBtnText, servingsPerMeal <= 1 && styles.counterBtnTextDisabled]}>−</Text>
@@ -80,7 +80,7 @@ export default function SettingsScreen() {
               <Text style={styles.unit}>人前</Text>
             </View>
             <Pressable
-              style={[styles.counterBtn, servingsPerMeal >= 10 && styles.counterBtnDisabled]}
+              style={({pressed}) => [styles.counterBtn, servingsPerMeal >= 10 && styles.counterBtnDisabled, pressed && !styles.counterBtnDisabled && {opacity: 0.8}]}
               onPress={incrementServings}
               disabled={servingsPerMeal >= 10}>
               <Text style={[styles.counterBtnText, servingsPerMeal >= 10 && styles.counterBtnTextDisabled]}>＋</Text>
@@ -101,55 +101,126 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: theme.colors.bg },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 2,
-    borderColor: theme.colors.border,
+  header: { 
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1, 
+    borderBottomColor: theme.colors.border, 
     backgroundColor: theme.colors.card,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  back: { color: theme.colors.subText, fontWeight: '700', marginBottom: 6, fontSize: 13 },
-  title: { color: theme.colors.text, fontWeight: '800', fontSize: 20 },
-  content: { paddingTop: 28, paddingHorizontal: 16, maxWidth: 480, width: '100%', alignSelf: 'center' },
-  description: { color: theme.colors.subText, textAlign: 'center', lineHeight: 22, marginBottom: 24, fontSize: 13 },
+  backBtn: {
+    position: 'absolute',
+    left: 20,
+    top: 20,
+    zIndex: 1,
+  },
+  back: { 
+    color: theme.colors.subText, 
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  title: { 
+    color: theme.colors.primary, 
+    fontWeight: '800', 
+    fontSize: 20,
+    fontFamily: 'M PLUS Rounded 1c',
+  },
+  content: { paddingTop: 32, paddingHorizontal: 20, maxWidth: 480, width: '100%', alignSelf: 'center' },
+  description: { 
+    color: theme.colors.subText, 
+    textAlign: 'center', 
+    lineHeight: 24, 
+    marginBottom: 32, 
+    fontSize: 15 
+  },
   settingCard: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
-    padding: 20,
-    marginBottom: 16,
+    padding: 24,
+    marginBottom: 20,
+    // iOS Shadow
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    // Android Shadow
+    elevation: 4,
   },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 18 },
-  icon: { fontSize: 20 },
-  cardTitle: { color: theme.colors.text, fontWeight: '700', fontSize: 16 },
-  counterControl: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 28, marginBottom: 10 },
+  cardHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    gap: 8, 
+    marginBottom: 24,
+  },
+  icon: { fontSize: 24 },
+  cardTitle: { 
+    color: theme.colors.text, 
+    fontWeight: '800', 
+    fontSize: 18,
+    fontFamily: 'M PLUS Rounded 1c',
+  },
+  counterControl: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    gap: 32, 
+    marginBottom: 16,
+  },
   counterBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
     borderColor: theme.colors.primary,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
   counterBtnDisabled: {
-    borderColor: '#D9CCC2',
-    backgroundColor: '#FCFAF8',
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.bg,
   },
-  counterBtnText: { color: theme.colors.primary, fontSize: 24, fontWeight: '300', lineHeight: 26 },
-  counterBtnTextDisabled: { color: '#D9CCC2' },
-  counterValueWrap: { flexDirection: 'row', alignItems: 'baseline', gap: 4, minWidth: 92, justifyContent: 'center' },
-  counterValue: { color: theme.colors.text, fontWeight: '800', fontSize: 30 },
-  unit: { color: theme.colors.text, fontWeight: '700', fontSize: 16 },
-  cardCaption: { color: theme.colors.subText, textAlign: 'center', fontSize: 12 },
-  actions: { marginTop: 12, alignItems: 'center' },
-  saveBtnWrap: { width: '100%', maxWidth: 320 },
+  counterBtnText: { 
+    color: theme.colors.primary, 
+    fontSize: 24, 
+    fontWeight: '600', 
+    lineHeight: 26,
+    marginTop: -2,
+  },
+  counterBtnTextDisabled: { color: theme.colors.subText },
+  counterValueWrap: { 
+    flexDirection: 'row', 
+    alignItems: 'baseline', 
+    gap: 4, 
+    minWidth: 80, 
+    justifyContent: 'center',
+  },
+  counterValue: { 
+    color: theme.colors.text, 
+    fontWeight: '800', 
+    fontSize: 36,
+    fontFamily: 'Quicksand',
+  },
+  unit: { 
+    color: theme.colors.subText, 
+    fontWeight: '700', 
+    fontSize: 16,
+  },
+  cardCaption: { 
+    color: theme.colors.subText, 
+    textAlign: 'center', 
+    fontSize: 13,
+  },
+  actions: { 
+    marginTop: 20, 
+    alignItems: 'center',
+  },
+  saveBtnWrap: { 
+    width: '100%', 
+  },
 });

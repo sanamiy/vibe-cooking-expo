@@ -64,26 +64,40 @@ export default function CookInteractiveScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}><Pressable onPress={() => router.back()}><Text style={styles.back}>← 買い出しへ戻る</Text></Pressable><Text style={styles.title}>調理ナビ</Text></View>
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} style={styles.backBtn}>
+          <Text style={styles.back}>← 買い出しへ</Text>
+        </Pressable>
+        <Text style={styles.title}>調理ナビ</Text>
+      </View>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.recipe}>{recipe.name}</Text>
-        <Text style={styles.meta}>推定 {gantt.total_estimated_minutes}分 / ステップ {steps.length}</Text>
+        <View style={styles.recipeHeader}>
+          <Text style={styles.recipe}>{recipe.name}</Text>
+          <Text style={styles.meta}>⏱ 推定 {gantt.total_estimated_minutes}分 / ステップ {steps.length}</Text>
+        </View>
 
         <View style={styles.card}>
-          <Text style={styles.stepChip}>STEP {currentIndex + 1} / {steps.length}</Text>
+          <View style={styles.stepHeader}>
+            <View style={styles.stepBadge}>
+              <Text style={styles.stepBadgeText}>STEP {currentIndex + 1} / {steps.length}</Text>
+            </View>
+          </View>
           <Text style={styles.stepText}>{stripHtml(currentStep?.text ?? '手順がありません')}</Text>
         </View>
 
-        {timerNotice ? <View style={styles.timer}><Text style={styles.timerText}>⏰ {timerNotice}</Text></View> : null}
-        {countdownLabel ? <View style={styles.countdown}><Text>タイマー: {countdownLabel}</Text></View> : null}
-
-        <View style={styles.card}>
-          <Text style={styles.subTitle}>音声入力（仮）</Text>
-          <View style={styles.voiceRow}>
-            <Pressable style={[styles.voiceBtn, styles.voicePrimary]} onPress={() => setCurrentIndex((p) => Math.min(steps.length - 1, p + 1))}><Text style={styles.voicePrimaryText}>できたよ〜</Text></Pressable>
-            <Pressable style={styles.voiceBtn}><Text>もう一回言って</Text></Pressable>
+        {timerNotice ? (
+          <View style={styles.timerNotice}>
+            <Text style={styles.timerNoticeIcon}>⏰</Text>
+            <Text style={styles.timerNoticeText}>{timerNotice}</Text>
           </View>
-        </View>
+        ) : null}
+        
+        {countdownLabel ? (
+          <View style={styles.countdown}>
+            <Text style={styles.countdownLabel}>タイマー</Text>
+            <Text style={styles.countdownValue}>{countdownLabel}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.card}>
           <Text style={styles.subTitle}>工程ガントチャート</Text>
@@ -99,6 +113,21 @@ export default function CookInteractiveScreen() {
             );
           })}
         </View>
+
+        <View style={styles.card}>
+          <Text style={styles.subTitle}>音声入力（仮）</Text>
+          <View style={styles.voiceRow}>
+            <Pressable 
+              style={({pressed}) => [styles.voiceBtn, styles.voicePrimary, pressed && {opacity: 0.8}]} 
+              onPress={() => setCurrentIndex((p) => Math.min(steps.length - 1, p + 1))}
+            >
+              <Text style={styles.voicePrimaryText}>できたよ〜</Text>
+            </Pressable>
+            <Pressable style={({pressed}) => [styles.voiceBtn, pressed && {opacity: 0.8}]}>
+              <Text style={styles.voiceBtnText}>もう一回言って</Text>
+            </Pressable>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -106,26 +135,149 @@ export default function CookInteractiveScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: theme.colors.bg },
-  header: { padding: 16, borderBottomWidth: 1, borderBottomColor: theme.colors.border, backgroundColor: theme.colors.card },
-  back: { color: theme.colors.subText, fontWeight: '700', marginBottom: 4 },
-  title: { color: theme.colors.primary, fontWeight: '800', fontSize: 22 },
-  content: { padding: 16, gap: 12 },
-  recipe: { fontSize: 22, fontWeight: '700', color: theme.colors.text },
-  meta: { color: theme.colors.subText },
-  card: { backgroundColor: '#fff', borderRadius: theme.radius.lg, padding: 12, gap: 8 },
-  stepChip: { color: theme.colors.primary, fontWeight: '700' },
-  stepText: { color: theme.colors.text, lineHeight: 22 },
-  timer: { backgroundColor: '#FFF1E9', borderColor: '#FFBF9E', borderWidth: 1, padding: 10, borderRadius: theme.radius.md },
-  timerText: { color: '#8A3D1E', fontWeight: '700' },
-  countdown: { backgroundColor: theme.colors.info, borderRadius: theme.radius.md, padding: 10 },
-  subTitle: { fontWeight: '700', color: theme.colors.text },
-  voiceRow: { flexDirection: 'row', gap: 8 },
-  voiceBtn: { minHeight: 44, borderRadius: theme.radius.md, backgroundColor: '#EFE8DF', paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' },
-  voicePrimary: { backgroundColor: theme.colors.primary },
-  voicePrimaryText: { color: '#fff', fontWeight: '700' },
-  ganttRow: { gap: 6 },
-  ganttLabel: { fontSize: 12, color: theme.colors.subText },
-  active: { color: theme.colors.primary, fontWeight: '700' },
-  track: { height: 20, backgroundColor: '#F2EDE7', borderRadius: 999, overflow: 'hidden', position: 'relative' },
-  bar: { height: '100%', backgroundColor: theme.colors.primary, borderRadius: 999, position: 'absolute', top: 0 },
+  header: { 
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1, 
+    borderBottomColor: theme.colors.border, 
+    backgroundColor: theme.colors.card,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backBtn: {
+    position: 'absolute',
+    left: 20,
+    top: 20,
+    zIndex: 1,
+  },
+  back: { 
+    color: theme.colors.subText, 
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  title: { 
+    color: theme.colors.primary, 
+    fontWeight: '800', 
+    fontSize: 20,
+    fontFamily: 'M PLUS Rounded 1c',
+  },
+  content: { padding: 20, gap: 20 },
+  recipeHeader: {
+    marginBottom: 4,
+  },
+  recipe: { 
+    fontSize: 24, 
+    fontWeight: '800', 
+    color: theme.colors.text,
+    fontFamily: 'M PLUS Rounded 1c',
+    marginBottom: 8,
+  },
+  meta: { 
+    color: theme.colors.subText,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  card: { 
+    backgroundColor: theme.colors.card, 
+    borderRadius: theme.radius.lg, 
+    padding: 20, 
+    gap: 16,
+    // iOS Shadow
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    // Android Shadow
+    elevation: 4,
+  },
+  stepHeader: {
+    flexDirection: 'row',
+  },
+  stepBadge: { 
+    backgroundColor: theme.colors.info,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: theme.radius.pill,
+  },
+  stepBadgeText: {
+    color: theme.colors.primary, 
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  stepText: { 
+    color: theme.colors.text, 
+    lineHeight: 28,
+    fontSize: 18,
+    fontFamily: 'M PLUS Rounded 1c',
+  },
+  timerNotice: { 
+    backgroundColor: '#FFF1E9', 
+    borderColor: '#FFBF9E', 
+    borderWidth: 1, 
+    padding: 16, 
+    borderRadius: theme.radius.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  timerNoticeIcon: {
+    fontSize: 24,
+  },
+  timerNoticeText: { 
+    color: '#8A3D1E', 
+    fontWeight: '700',
+    flex: 1,
+    lineHeight: 22,
+  },
+  countdown: { 
+    backgroundColor: theme.colors.primary, 
+    borderRadius: theme.radius.lg, 
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  countdownLabel: {
+    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  countdownValue: {
+    color: '#fff',
+    fontSize: 48,
+    fontWeight: '800',
+    fontFamily: 'Quicksand',
+  },
+  subTitle: { 
+    fontWeight: '800', 
+    color: theme.colors.text,
+    fontSize: 18,
+    fontFamily: 'M PLUS Rounded 1c',
+    marginBottom: 4,
+  },
+  voiceRow: { flexDirection: 'row', gap: 12 },
+  voiceBtn: { 
+    flex: 1,
+    minHeight: 48, 
+    borderRadius: theme.radius.pill, 
+    backgroundColor: theme.colors.bg, 
+    paddingHorizontal: 16, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  voicePrimary: { 
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  voicePrimaryText: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  voiceBtnText: { color: theme.colors.text, fontWeight: '700', fontSize: 14 },
+  ganttRow: { gap: 8, marginBottom: 8 },
+  ganttLabel: { fontSize: 13, color: theme.colors.subText, fontWeight: '600' },
+  active: { color: theme.colors.primary, fontWeight: '800' },
+  track: { height: 16, backgroundColor: theme.colors.bg, borderRadius: 8, overflow: 'hidden', position: 'relative' },
+  bar: { height: '100%', backgroundColor: theme.colors.primary, borderRadius: 8, position: 'absolute', top: 0 },
 });

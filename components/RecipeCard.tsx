@@ -11,15 +11,25 @@ interface Props {
 
 export const RecipeCard = ({ recipe, isSelected, onToggle }: Props) => (
   <Pressable onPress={() => onToggle(recipe.id)} style={[styles.card, isSelected && styles.selected]}>
-    <Image source={{ uri: recipe.image_url }} style={styles.img} resizeMode="cover" />
+    <View style={styles.imageContainer}>
+      <Image source={{ uri: recipe.image_url }} style={styles.img} resizeMode="cover" />
+    </View>
     <View style={styles.body}>
       <Text style={styles.title}>{recipe.name}</Text>
       <Text style={styles.desc} numberOfLines={2}>
         {recipe.description}
       </Text>
       <View style={styles.metaRow}>
-        <Text style={styles.meta}>⏱ {formatTime(recipe.total_time)}</Text>
-        {recipe.recipe_servings_label ? <Text style={styles.meta}>👨‍👩‍👧‍👦 {recipe.recipe_servings_label}</Text> : null}
+        <View style={styles.metaItem}>
+          <Text style={styles.metaIcon}>⏱</Text>
+          <Text style={styles.meta}>{formatTime(recipe.total_time)}</Text>
+        </View>
+        {recipe.recipe_servings_label ? (
+          <View style={styles.metaItem}>
+            <Text style={styles.metaIcon}>👨‍👩‍👧‍👦</Text>
+            <Text style={styles.meta}>{recipe.recipe_servings_label}</Text>
+          </View>
+        ) : null}
       </View>
     </View>
   </Pressable>
@@ -32,36 +42,56 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
     overflow: 'hidden',
-    marginBottom: 14,
+    marginBottom: 20,
+    // iOS Shadow
     shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
+    // Android Shadow
+    elevation: 4,
   },
   selected: {
     borderColor: theme.colors.primary,
+  },
+  imageContainer: {
+    position: 'relative',
   },
   img: {
     width: '100%',
     height: 180,
   },
   body: {
-    padding: 12,
-    gap: 6,
+    padding: 16,
+    gap: 8,
   },
   title: {
+    fontFamily: 'M PLUS Rounded 1c',
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 20,
     color: theme.colors.text,
   },
   desc: {
     color: theme.colors.subText,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 22,
   },
   metaRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 16,
+    marginTop: 4,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: theme.colors.bg,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: theme.radius.sm,
+  },
+  metaIcon: {
+    fontSize: 14,
   },
   meta: {
     color: theme.colors.subText,
