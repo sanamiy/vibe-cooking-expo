@@ -4,10 +4,10 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start",
-    "ios": "expo start --ios",
-    "android": "expo start --android",
-    "web": "expo start --web",
+    "start": "node scripts/start-expo-auto-port.js",
+    "ios": "node scripts/start-expo-auto-port.js -- --ios",
+    "android": "node scripts/start-expo-auto-port.js -- --android",
+    "web": "node scripts/start-expo-auto-port.js -- --web",
     "typecheck": "tsc --noEmit",
     "scrape:recipes": "python3 scripts/scraping-ajinomoto.py",
     "validate:recipes": "python3 scripts/validate_recipe_json.py"
