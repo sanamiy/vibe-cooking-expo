@@ -54,7 +54,7 @@ export async function classifyIntent(
       messages: [
         {
           role: "system",
-          content: `あなたは調理アシスタントの意図分類器です。
+          content: `あなたは調理アシスタントの意図分類器です。必ず日本語で回答してください。
 ユーザーの発話を以下のラベルのいずれかに分類してください。
 ラベル: next_step, previous_step, question, timer_status, end_session
 
@@ -116,7 +116,7 @@ ${recipeContext.stepTips?.length ? `\n【各工程の注意点・コツ】\n${re
   const messages = [
     {
       role: "system" as const,
-      content: `あなたは料理中のユーザーを助ける調理アシスタントです。
+      content: `あなたは料理中のユーザーを助ける調理アシスタントです。必ず日本語で回答してください。
 手が塞がっているので、簡潔に（1-2文で）答えてください。
 ${recipeInfo}
 
@@ -177,7 +177,7 @@ export async function handleBargeIn(
       messages: [
         {
           role: "system",
-          content: `あなたは調理アシスタントです。ユーザーがあなたの発話中に割り込みました。
+          content: `あなたは調理アシスタントです。必ず日本語で回答してください。ユーザーがあなたの発話中に割り込みました。
 ${recipeInfo}
 あなたが話していた内容: 「${interruptedSpeech}」
 現在の工程: ${currentStep}

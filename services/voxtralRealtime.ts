@@ -121,13 +121,14 @@ export class VoxtralRealtimeClient {
     }
 
     // Check if audio is essentially silence (skip to avoid hallucination)
-    let maxAmp = 0;
+    // Use RMS energy to detect speech vs background noise
+    let sumSq = 0;
     for (let i = 0; i < merged.length; i++) {
-      const abs = Math.abs(merged[i]);
-      if (abs > maxAmp) maxAmp = abs;
+      sumSq += merged[i] * merged[i];
     }
-    if (maxAmp < 200) {
-      // Too quiet, skip
+    const rms = Math.sqrt(sumSq / merged.length);
+    if (rms < 500) {
+      // Too quiet (background noise / silence), skip
       this.processing = false;
       return;
     }
@@ -140,6 +141,7 @@ export class VoxtralRealtimeClient {
       const formData = new FormData();
       formData.append("model", model);
       formData.append("file", wav, "audio.wav");
+      formData.append("language", "ja");
       formData.append("stream", "true");
 
       const resp = await (globalThis as any).fetch(
