@@ -1,149 +1,152 @@
-import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
-import { useCallback, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Platform } from "react-native";
+import { VoxtralRealtimeClient } from "@/services/voxtralRealtime";
+import { AudioCapture } from "@/services/audioCapture";
+import Constants from "expo-constants";
 
-export type VoiceCommand = 'NEXT' | 'PREVIOUS' | 'REPEAT' | 'UNKNOWN';
+export type VoiceCommand = "NEXT" | "PREVIOUS" | "REPEAT" | "UNKNOWN";
 
 interface UseVoiceCommandsProps {
   onCommand: (command: VoiceCommand) => void;
   onTranscript?: (text: string) => void;
   active?: boolean;
+  inputDeviceId?: string;
 }
 
-export function useVoiceCommands({ onCommand, onTranscript, active = true }: UseVoiceCommandsProps) {
+const MISTRAL_API_KEY =
+  Constants.expoConfig?.extra?.MISTRAL_API_KEY ??
+  process.env.EXPO_PUBLIC_MISTRAL_API_KEY ??
+  process.env.MISTRAL_API_KEY ??
+  "";
+
+export function useVoiceCommands({
+  onCommand,
+  onTranscript,
+  active = true,
+  inputDeviceId,
+}: UseVoiceCommandsProps) {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [permissionDenied, setPermissionDenied] = useState(false);
+
+  const voxtralRef = useRef<VoxtralRealtimeClient | null>(null);
+  const captureRef = useRef<AudioCapture | null>(null);
+  const activeRef = useRef(active);
+  activeRef.current = active;
+
+  const onTranscriptRef = useRef(onTranscript);
+  onTranscriptRef.current = onTranscript;
+  const onCommandRef = useRef(onCommand);
+  onCommandRef.current = onCommand;
 
   const parseCommand = useCallback((text: string): VoiceCommand => {
-    const normalized = text.toLowerCase().replace(/\s+/g, '');
-    
-    // 次へ進むコマンド
+    const normalized = text.toLowerCase().replace(/\s+/g, "");
+
     if (
-      normalized.includes('次') || 
-      normalized.includes('できた') || 
-      normalized.includes('終わった') || 
-      normalized.includes('ok') || 
-      normalized.includes('オーケー') ||
-      normalized.includes('次へ')
+      normalized.includes("次") ||
+      normalized.includes("できた") ||
+      normalized.includes("終わった") ||
+      normalized.includes("ok") ||
+      normalized.includes("オーケー") ||
+      normalized.includes("次へ")
     ) {
-      return 'NEXT';
-    }
-    
-    // 前に戻るコマンド
-    if (
-      normalized.includes('前') || 
-      normalized.includes('戻って') || 
-      normalized.includes('バック')
-    ) {
-      return 'PREVIOUS';
-    }
-    
-    // もう一回コマンド
-    if (
-      normalized.includes('もう一回') || 
-      normalized.includes('もう1回') || 
-      normalized.includes('リピート') || 
-      normalized.includes('え') || 
-      normalized.includes('何') || 
-      normalized.includes('なんて')
-    ) {
-      return 'REPEAT';
+      return "NEXT";
     }
 
-    return 'UNKNOWN';
+    if (
+      normalized.includes("前") ||
+      normalized.includes("戻って") ||
+      normalized.includes("バック")
+    ) {
+      return "PREVIOUS";
+    }
+
+    if (
+      normalized.includes("もう一回") ||
+      normalized.includes("もう1回") ||
+      normalized.includes("リピート") ||
+      normalized.includes("え") ||
+      normalized.includes("何") ||
+      normalized.includes("なんて")
+    ) {
+      return "REPEAT";
+    }
+
+    return "UNKNOWN";
   }, []);
 
-  useSpeechRecognitionEvent('result', (event) => {
-    if (!active) return;
-    
-    const transcript = event.results[0]?.transcript;
-    if (!transcript) return;
-
-    onTranscript?.(transcript);
-
-    const command = parseCommand(transcript);
-
-    if (command !== 'UNKNOWN') {
-      onCommand(command);
-    }
-  });
-
-  useSpeechRecognitionEvent('error', (event) => {
-    const benign = ['no-speech', 'aborted'];
-    if (!benign.includes(event.error)) {
-      console.error('Speech recognition error:', event.error, event.message);
-      setError(event.message);
-    }
-    setIsListening(false);
-    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-      setPermissionDenied(true);
-    }
-  });
-
-  useSpeechRecognitionEvent('start', () => {
-    setIsListening(true);
-    setError(null);
-  });
-
-  useSpeechRecognitionEvent('end', () => {
-    setIsListening(false);
-    
-    // Auto-restart if still active and permission not denied
-    if (active && !permissionDenied) {
-      setTimeout(() => {
-        startListening();
-      }, 500);
-    }
-  });
-
   const startListening = useCallback(async () => {
-    if (!active || permissionDenied) return;
-    
-    try {
-      if (Platform.OS !== 'web') {
-        const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-        if (!granted) {
-          setError('マイクへのアクセスが許可されていません');
-          return;
-        }
-      }
+    if (!activeRef.current) return;
+    if (Platform.OS !== "web") return;
 
-      await ExpoSpeechRecognitionModule.start({
-        lang: 'ja-JP',
-        interimResults: false,
-        continuous: true,
-      });
-      setIsListening(true);
+    try {
       setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '音声認識の開始に失敗しました');
-      setIsListening(false);
-    }
-  }, [active, permissionDenied]);
 
-  const stopListening = useCallback(async () => {
-    try {
-      await ExpoSpeechRecognitionModule.stop();
-      setIsListening(false);
+      const voxtral = new VoxtralRealtimeClient({
+        apiKey: MISTRAL_API_KEY,
+        onInterimTranscript: () => {},
+        onFinalTranscript: (text) => {
+          if (!activeRef.current || !text.trim()) return;
+          onTranscriptRef.current?.(text);
+          const command = parseCommand(text);
+          if (command !== "UNKNOWN") {
+            onCommandRef.current(command);
+          }
+        },
+        onError: (err) => {
+          console.error("Voxtral error:", err);
+          setError(err);
+        },
+        onConnectionChange: (connected) => {
+          setIsListening(connected);
+        },
+      });
+
+      voxtral.connect();
+      voxtralRef.current = voxtral;
+
+      const capture = new AudioCapture();
+      await capture.start({
+        deviceId: inputDeviceId,
+        onAudioChunk: (pcm16) => {
+          voxtral.appendAudio(pcm16);
+        },
+        onError: (err) => {
+          setError(err);
+        },
+      });
+      captureRef.current = capture;
     } catch (e) {
-      console.error('Failed to stop listening', e);
+      setError(
+        e instanceof Error ? e.message : "音声認識の開始に失敗しました"
+      );
+      setIsListening(false);
     }
+  }, [inputDeviceId, parseCommand]);
+
+  const stopListening = useCallback(() => {
+    voxtralRef.current?.disconnect();
+    voxtralRef.current = null;
+    captureRef.current?.stop();
+    captureRef.current = null;
+    setIsListening(false);
   }, []);
 
   useEffect(() => {
-    if (active && !isListening) {
+    if (active) {
       startListening();
-    } else if (!active && isListening) {
+    } else {
       stopListening();
     }
-
     return () => {
-      if (isListening) {
-        stopListening();
-      }
+      stopListening();
     };
-  }, [active, startListening, stopListening, isListening]);
+  }, [active, startListening, stopListening]);
+
+  useEffect(() => {
+    if (isListening && inputDeviceId) {
+      captureRef.current?.switchDevice(inputDeviceId);
+    }
+  }, [inputDeviceId, isListening]);
 
   return {
     isListening,

@@ -94,6 +94,7 @@ export default function CookInteractiveScreen() {
     onCommand: () => {},
     onTranscript: handleTranscript,
     active: dialogueState !== "processing",
+    inputDeviceId: selectedInputId,
   });
 
   // Let dialogue hook resume listening after TTS finishes
