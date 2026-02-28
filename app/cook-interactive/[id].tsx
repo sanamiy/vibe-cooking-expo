@@ -13,11 +13,17 @@ import {
   Text,
   View,
 } from "react-native";
-import * as Speech from "expo-speech";
-import { useVoiceCommands, VoiceCommand } from "@/hooks/useVoiceCommands";
+import { useVoiceCommands } from "@/hooks/useVoiceCommands";
+import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
+import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
+import { useAudioDevices } from "@/hooks/useAudioDevices";
 
-const makeTimerNotice = (minutes: number) =>
-  `${minutes}分経過しました。次に進みますか？`;
+const formatCountdownLabel = (countdown: number | null) => {
+  if (countdown === null) return "";
+  const mm = String(Math.floor(countdown / 60)).padStart(2, "0");
+  const ss = String(countdown % 60).padStart(2, "0");
+  return `${mm}:${ss}`;
+};
 
 const toSteps = (
   recipe: ReturnType<ReturnType<typeof useRecipes>["getRecipeById"]>
@@ -28,21 +34,12 @@ const toSteps = (
   return (recipe.instructions ?? []).map((text) => ({ text }));
 };
 
-const formatCountdownLabel = (countdown: number | null) => {
-  if (countdown === null) return "";
-  const mm = String(Math.floor(countdown / 60)).padStart(2, "0");
-  const ss = String(countdown % 60).padStart(2, "0");
-  return `${mm}:${ss}`;
-};
-
 export default function CookInteractiveScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getRecipeById } = useRecipes();
   const recipe = getRecipeById(String(id));
 
-  const steps = useMemo(() => {
-    return toSteps(recipe);
-  }, [recipe]);
+  const steps = useMemo(() => toSteps(recipe), [recipe]);
 
   const gantt = useMemo<RecipeGanttData>(() => {
     const prebuilt = (
@@ -52,86 +49,79 @@ export default function CookInteractiveScreen() {
   }, [id, steps]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timerNotice, setTimerNotice] = useState("");
   const [countdown, setCountdown] = useState<number | null>(null);
-  const [isVoiceActive, setIsVoiceActive] = useState(false);
 
-  const speak = useCallback((text: string) => {
-    Speech.stop(); // Stop any ongoing speech
-    Speech.speak(text, { language: "ja-JP", rate: 1.1 });
-  }, []);
+  const {
+    inputDevices,
+    outputDevices,
+    selectedInputId,
+    selectedOutputId,
+    selectInput,
+    selectOutput,
+  } = useAudioDevices();
 
-  // Read out the current step when it changes
-  useEffect(() => {
-    const currentStep = steps[currentIndex];
-    if (currentStep) {
-      speak(`ステップ${currentIndex + 1}。${stripHtml(currentStep.text)}`);
-    }
-    return () => {
-      Speech.stop();
-    };
-  }, [currentIndex, steps, speak]);
-
-  const handleVoiceCommand = useCallback(
-    (command: VoiceCommand) => {
-      if (command === "NEXT") {
-        setCurrentIndex((p) => Math.min(steps.length - 1, p + 1));
-      } else if (command === "PREVIOUS") {
-        setCurrentIndex((p) => Math.max(0, p - 1));
-      } else if (command === "REPEAT") {
-        const currentStep = steps[currentIndex];
-        if (currentStep) {
-          speak(
-            `もう一度読み上げます。ステップ${currentIndex + 1}。${stripHtml(
-              currentStep.text
-            )}`
-          );
-        }
-      }
-    },
-    [steps, currentIndex, speak]
-  );
-
-  const { isListening, error } = useVoiceCommands({
-    onCommand: handleVoiceCommand,
-    active: isVoiceActive,
+  // Voice dialogue session (auto-starts)
+  const {
+    dialogueState,
+    conversationHistory,
+    lastResponse,
+    processUserInput,
+    interrupt,
+    stopSpeaking,
+    setListeningResume,
+  } = useVoiceDialogue({
+    steps,
+    tasks: gantt.tasks,
+    recipeName: recipe?.name ?? "",
+    currentIndex,
+    outputDeviceId: selectedOutputId,
+    onChangeIndex: setCurrentIndex,
+    onSessionEnd: () => router.back(),
   });
 
+  // Voice recognition – always active (even during speaking for barge-in)
+  const handleTranscript = useCallback(
+    (text: string) => {
+      if (dialogueState === "speaking") {
+        interrupt();
+      }
+      processUserInput(text);
+    },
+    [processUserInput, dialogueState, interrupt]
+  );
+
+  const { isListening, startListening } = useVoiceCommands({
+    onCommand: () => {},
+    onTranscript: handleTranscript,
+    active: dialogueState !== "processing",
+  });
+
+  // Let dialogue hook resume listening after TTS finishes
   useEffect(() => {
-    setTimerNotice("");
+    setListeningResume(() => {
+      if (!isListening) startListening();
+    });
+  }, [setListeningResume, isListening, startListening]);
+
+  // Timer countdown
+  useEffect(() => {
     const task = gantt.tasks[currentIndex];
     if (!task?.requires_timer || !task.timer_minutes) {
       setCountdown(null);
       return;
     }
 
-    const timerMinutes = task.timer_minutes;
-
-    let remaining = timerMinutes * 60;
+    let remaining = task.timer_minutes * 60;
     setCountdown(remaining);
 
     const interval = setInterval(() => {
       remaining -= 1;
       setCountdown(Math.max(0, remaining));
-      if (remaining <= 0) {
-        const notice = makeTimerNotice(timerMinutes);
-        setTimerNotice(notice);
-        speak(notice);
-      }
+      if (remaining <= 0) clearInterval(interval);
     }, 1000);
 
-    const timeout = setTimeout(() => {
-      const notice = makeTimerNotice(timerMinutes);
-      setTimerNotice(notice);
-      setCountdown(0);
-      speak(notice);
-    }, timerMinutes * 60 * 1000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, [currentIndex, gantt.tasks, speak]);
+    return () => clearInterval(interval);
+  }, [currentIndex, gantt.tasks]);
 
   if (!recipe) return <SafeAreaView style={styles.safeArea} />;
 
@@ -142,7 +132,7 @@ export default function CookInteractiveScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.back}>← 買い出しへ</Text>
+          <Text style={styles.back}>← 戻る</Text>
         </Pressable>
         <Text style={styles.title}>調理ナビ</Text>
       </View>
@@ -154,6 +144,7 @@ export default function CookInteractiveScreen() {
           </Text>
         </View>
 
+        {/* Current step card */}
         <View style={styles.card}>
           <View style={styles.stepHeader}>
             <View style={styles.stepBadge}>
@@ -167,13 +158,7 @@ export default function CookInteractiveScreen() {
           </Text>
         </View>
 
-        {timerNotice ? (
-          <View style={styles.timerNotice}>
-            <Text style={styles.timerNoticeIcon}>⏰</Text>
-            <Text style={styles.timerNoticeText}>{timerNotice}</Text>
-          </View>
-        ) : null}
-
+        {/* Countdown timer */}
         {countdownLabel ? (
           <View style={styles.countdown}>
             <Text style={styles.countdownLabel}>タイマー</Text>
@@ -181,18 +166,35 @@ export default function CookInteractiveScreen() {
           </View>
         ) : null}
 
+        {/* Voice dialogue panel */}
+        <VoiceDialoguePanel
+          dialogueState={dialogueState}
+          conversationHistory={conversationHistory}
+          lastResponse={lastResponse}
+          inputDevices={inputDevices}
+          outputDevices={outputDevices}
+          selectedInputId={selectedInputId}
+          selectedOutputId={selectedOutputId}
+          onSelectInput={selectInput}
+          onSelectOutput={selectOutput}
+        />
+
+        {/* Gantt chart */}
         <View style={styles.card}>
-          <Text style={styles.subTitle}>工程ガントチャート</Text>
+          <Text style={styles.subTitle}>工程チャート</Text>
           {gantt.tasks.map((task) => {
             const total = Math.max(1, gantt.total_estimated_minutes);
             const left = `${(task.start_min / total) * 100}%`;
             const width = `${Math.max(8, (task.duration_min / total) * 100)}%`;
+            const isActive = task.step_index - 1 === currentIndex;
+            const isDone = task.step_index - 1 < currentIndex;
             return (
               <View key={task.task_id} style={styles.ganttRow}>
                 <Text
                   style={[
                     styles.ganttLabel,
-                    task.step_index - 1 === currentIndex && styles.active,
+                    isActive && styles.activeLabel,
+                    isDone && styles.doneLabel,
                   ]}
                 >
                   {task.step_index}. {task.label}
@@ -202,65 +204,14 @@ export default function CookInteractiveScreen() {
                     style={[
                       styles.bar,
                       { left: left as any, width: width as any },
+                      isActive && styles.activeBar,
+                      isDone && styles.doneBar,
                     ]}
                   />
                 </View>
               </View>
             );
           })}
-        </View>
-
-        <View style={styles.card}>
-          <View style={styles.voiceHeader}>
-            <Text style={styles.subTitle}>音声ナビゲーション</Text>
-            <Pressable
-              style={[
-                styles.voiceToggleBtn,
-                isVoiceActive && styles.voiceToggleActive,
-              ]}
-              onPress={() => setIsVoiceActive(!isVoiceActive)}
-            >
-              <Text
-                style={[
-                  styles.voiceToggleText,
-                  isVoiceActive && styles.voiceToggleTextActive,
-                ]}
-              >
-                {isVoiceActive ? "マイクON 🎤" : "マイクOFF 🔇"}
-              </Text>
-            </Pressable>
-          </View>
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          {isVoiceActive && (
-            <Text style={styles.voiceHelperText}>
-              {isListening
-                ? "🗣️ 音声コマンドを待機中..."
-                : "⏳ マイクを準備中..."}
-              {"\n"}「次」「戻って」「もう一回」と話しかけてください。
-            </Text>
-          )}
-
-          <View style={styles.voiceRow}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.voiceBtn,
-                styles.voicePrimary,
-                pressed && { opacity: 0.8 },
-              ]}
-              onPress={() => handleVoiceCommand("NEXT")}
-            >
-              <Text style={styles.voicePrimaryText}>次へ</Text>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                styles.voiceBtn,
-                pressed && { opacity: 0.8 },
-              ]}
-              onPress={() => handleVoiceCommand("REPEAT")}
-            >
-              <Text style={styles.voiceBtnText}>もう一回言って</Text>
-            </Pressable>
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -318,12 +269,10 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     padding: 20,
     gap: 16,
-    // iOS Shadow
     shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
-    // Android Shadow
     elevation: 4,
   },
   stepHeader: {
@@ -345,25 +294,6 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontSize: 18,
     fontFamily: "M PLUS Rounded 1c",
-  },
-  timerNotice: {
-    backgroundColor: "#FFF1E9",
-    borderColor: "#FFBF9E",
-    borderWidth: 1,
-    padding: 16,
-    borderRadius: theme.radius.md,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  timerNoticeIcon: {
-    fontSize: 24,
-  },
-  timerNoticeText: {
-    color: "#8A3D1E",
-    fontWeight: "700",
-    flex: 1,
-    lineHeight: 22,
   },
   countdown: {
     backgroundColor: theme.colors.primary,
@@ -391,65 +321,10 @@ const styles = StyleSheet.create({
     fontFamily: "M PLUS Rounded 1c",
     marginBottom: 4,
   },
-  voiceHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  voiceToggleBtn: {
-    backgroundColor: theme.colors.bg,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: theme.radius.pill,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  voiceToggleActive: {
-    backgroundColor: "#EAF6FF", // Light blue background indicating active
-    borderColor: theme.colors.blue,
-  },
-  voiceToggleText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: theme.colors.subText,
-  },
-  voiceToggleTextActive: {
-    color: theme.colors.blue,
-  },
-  voiceHelperText: {
-    fontSize: 13,
-    color: theme.colors.subText,
-    lineHeight: 20,
-    backgroundColor: theme.colors.bg,
-    padding: 12,
-    borderRadius: theme.radius.md,
-  },
-  errorText: {
-    color: theme.colors.primary,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  voiceRow: { flexDirection: "row", gap: 12 },
-  voiceBtn: {
-    flex: 1,
-    minHeight: 48,
-    borderRadius: theme.radius.pill,
-    backgroundColor: theme.colors.bg,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  voicePrimary: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-  },
-  voicePrimaryText: { color: "#fff", fontWeight: "800", fontSize: 16 },
-  voiceBtnText: { color: theme.colors.text, fontWeight: "700", fontSize: 14 },
   ganttRow: { gap: 8, marginBottom: 8 },
   ganttLabel: { fontSize: 13, color: theme.colors.subText, fontWeight: "600" },
-  active: { color: theme.colors.primary, fontWeight: "800" },
+  activeLabel: { color: theme.colors.primary, fontWeight: "800" },
+  doneLabel: { color: theme.colors.success },
   track: {
     height: 16,
     backgroundColor: theme.colors.bg,
@@ -459,9 +334,15 @@ const styles = StyleSheet.create({
   },
   bar: {
     height: "100%",
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.border,
     borderRadius: 8,
     position: "absolute",
     top: 0,
+  },
+  activeBar: {
+    backgroundColor: theme.colors.primary,
+  },
+  doneBar: {
+    backgroundColor: theme.colors.success,
   },
 });
