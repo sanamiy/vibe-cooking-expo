@@ -10,6 +10,7 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "rea
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
 import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
 import { useAudioDevices } from "@/hooks/useAudioDevices";
+import type { RecipeContext } from "@/services/ai";
 
 const formatCountdownLabel = (countdown: number | null) => {
   if (countdown === null) return "";
@@ -41,6 +42,15 @@ export default function CookInteractiveScreen() {
     return prebuilt ?? buildRecipeGantt(ids[0], steps);
   }, [ids, steps]);
 
+  const recipeContext = useMemo<RecipeContext | undefined>(() => {
+    if (!recipe) return undefined;
+    return {
+      recipeName: recipe.name,
+      ingredients: recipe.ingredients ?? [],
+      allSteps: steps.map((s) => stripHtml(s.text)),
+    };
+  }, [recipe, steps]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [countdown, setCountdown] = useState<number | null>(null);
 
@@ -70,6 +80,7 @@ export default function CookInteractiveScreen() {
     outputDeviceId: selectedOutputId,
     onChangeIndex: setCurrentIndex,
     onSessionEnd: () => router.back(),
+    recipeContext,
   });
 
   // Voice recognition – always active (even during speaking for barge-in)

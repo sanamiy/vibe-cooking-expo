@@ -33,6 +33,8 @@ export interface SchedulerTask {
   task_type: string;
   /** 汚染カテゴリ for hygiene logic */
   contamination: string;
+  /** 工程の注意点・コツ */
+  tips: string;
 }
 
 export interface MultiRecipeSchedule {
@@ -78,6 +80,7 @@ interface StepResource {
   uses_stove: boolean;
   uses_cutting_board: boolean;
   requires_attention: boolean;
+  tips?: string;
 }
 
 /**
@@ -127,6 +130,7 @@ ${stepsText}
 ## 出力形式
 
 step_indexは分割後の連番（0から開始）にしてください。
+各工程にtipsフィールドを追加し、その工程での注意点・コツ・失敗しやすいポイントを短く記載してください。
 JSONの配列のみを出力してください。マークダウンのコードブロックは不要です。
 
 [
@@ -136,7 +140,8 @@ JSONの配列のみを出力してください。マークダウンのコード�
     "duration": 分数,
     "uses_stove": true/false,
     "uses_cutting_board": true/false,
-    "requires_attention": true/false
+    "requires_attention": true/false,
+    "tips": "この工程の注意点やコツ（1文で簡潔に）"
   }
 ]`;
 
@@ -393,6 +398,7 @@ function applyHygieneCorrection(tasks: SchedulerTask[]): SchedulerTask[] {
         color: task.color,
         task_type: "wash",
         contamination: "none",
+        tips: "食中毒防止のため、しっかり洗いましょう",
       });
       totalDelay += WASH_DURATION_MIN;
     }
@@ -445,6 +451,7 @@ function buildTasksFromGantt(
       contamination: classified.uses_cutting_board
         ? classifyContamination(description)
         : "none",
+      tips: "",
     };
   });
 }
@@ -489,6 +496,7 @@ async function buildTasksFromLLM(
       contamination: sr.uses_cutting_board
         ? classifyContamination(sr.step_description)
         : "none",
+      tips: sr.tips ?? "",
     };
   });
 }
