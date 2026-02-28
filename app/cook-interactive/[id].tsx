@@ -5,15 +5,8 @@ import { buildRecipeGantt, RecipeGanttData } from "@/utils/gantt";
 import { stripHtml } from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import {
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { useVoiceCommands } from "@/hooks/useVoiceCommands";
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+// import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
 import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
 import { useAudioDevices } from "@/hooks/useAudioDevices";
@@ -25,9 +18,7 @@ const formatCountdownLabel = (countdown: number | null) => {
   return `${mm}:${ss}`;
 };
 
-const toSteps = (
-  recipe: ReturnType<ReturnType<typeof useRecipes>["getRecipeById"]>
-) => {
+const toSteps = (recipe: ReturnType<ReturnType<typeof useRecipes>["getRecipeById"]>) => {
   if (!recipe) return [] as Array<{ text: string }>;
   if (recipe.instruction_steps?.length)
     return recipe.instruction_steps.map((s) => ({ text: s.text }));
@@ -42,9 +33,9 @@ export default function CookInteractiveScreen() {
   const steps = useMemo(() => toSteps(recipe), [recipe]);
 
   const gantt = useMemo<RecipeGanttData>(() => {
-    const prebuilt = (
-      prebuiltGantt as { recipes?: RecipeGanttData[] }
-    ).recipes?.find((r) => r.recipe_id === String(id));
+    const prebuilt = (prebuiltGantt as { recipes?: RecipeGanttData[] }).recipes?.find(
+      (r) => r.recipe_id === String(id),
+    );
     return prebuilt ?? buildRecipeGantt(String(id), steps);
   }, [id, steps]);
 
@@ -87,21 +78,21 @@ export default function CookInteractiveScreen() {
       }
       processUserInput(text);
     },
-    [processUserInput, dialogueState, interrupt]
+    [processUserInput, dialogueState, interrupt],
   );
 
-  const { isListening, startListening } = useVoiceCommands({
-    onCommand: () => {},
-    onTranscript: handleTranscript,
-    active: dialogueState !== "processing",
-  });
+  // TODO: restore useVoiceCommands after debug
+  // const { isListening, startListening } = useVoiceCommands({
+  //   onCommand: () => {},
+  //   onTranscript: handleTranscript,
+  //   active: dialogueState !== "processing",
+  // });
 
-  // Let dialogue hook resume listening after TTS finishes
-  useEffect(() => {
-    setListeningResume(() => {
-      if (!isListening) startListening();
-    });
-  }, [setListeningResume, isListening, startListening]);
+  // useEffect(() => {
+  //   setListeningResume(() => {
+  //     if (!isListening) startListening();
+  //   });
+  // }, [setListeningResume, isListening, startListening]);
 
   // Timer countdown
   useEffect(() => {
@@ -153,9 +144,7 @@ export default function CookInteractiveScreen() {
               </Text>
             </View>
           </View>
-          <Text style={styles.stepText}>
-            {stripHtml(currentStep?.text ?? "手順がありません")}
-          </Text>
+          <Text style={styles.stepText}>{stripHtml(currentStep?.text ?? "手順がありません")}</Text>
         </View>
 
         {/* Countdown timer */}
