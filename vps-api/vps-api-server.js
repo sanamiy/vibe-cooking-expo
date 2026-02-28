@@ -16,6 +16,24 @@ function setCors(res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 }
 
+async function readRaw(req, maxBytes) {
+  return await new Promise((resolve, reject) => {
+    const chunks = [];
+    let total = 0;
+    req.on("data", (c) => {
+      const buf = Buffer.isBuffer(c) ? c : Buffer.from(c);
+      chunks.push(buf);
+      total += buf.length;
+      if (total > maxBytes) {
+        reject(new Error("payload too large"));
+        req.destroy();
+      }
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks)));
+    req.on("error", reject);
+  });
+}
+
 async function readJson(req) {
   return await new Promise((resolve, reject) => {
     let raw = "";
@@ -143,6 +161,51 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method !== "POST") {
       json(res, 404, { error: "not found" });
+      return;
+    }
+
+    if (path === "/vps/asr/transcribe") {
+      const key = requireEnv("MISTRAL_API_KEY");
+      const contentType = req.headers["content-type"];
+      if (
+        !contentType ||
+        !String(contentType).startsWith("multipart/form-data")
+      ) {
+        json(res, 400, { error: "Expected multipart/form-data" });
+        return;
+      }
+
+      const raw = await readRaw(req, 25_000_000);
+      const upstream = await fetch(
+        "https://api.mistral.ai/v1/audio/transcriptions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": String(contentType),
+            Authorization: `Bearer ${key}`,
+          },
+          body: raw,
+        },
+      );
+
+      res.writeHead(upstream.status, {
+        "Content-Type":
+          upstream.headers.get("content-type") || "application/octet-stream",
+        "Cache-Control": "no-store",
+      });
+
+      if (!upstream.body) {
+        res.end();
+        return;
+      }
+
+      const reader = upstream.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (value) res.write(Buffer.from(value));
+      }
+      res.end();
       return;
     }
 

@@ -1,3 +1,4 @@
 {
-  "tts": "online_elevenlabs"
+  "tts": "online_elevenlabs",
+  "apiMode": "direct_client"
 }

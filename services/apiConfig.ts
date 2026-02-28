@@ -1,0 +1,97 @@
+import Constants from "expo-constants";
+
+type ApiMode = "vps_proxy" | "direct_client";
+
+const config = require("@/config.json") as {
+  apiMode?: ApiMode;
+};
+
+function requireApiMode(): ApiMode {
+  const mode = config?.apiMode;
+  if (mode !== "vps_proxy" && mode !== "direct_client") {
+    throw new Error(
+      "Missing or invalid config.json apiMode (expected vps_proxy or direct_client)",
+    );
+  }
+  return mode;
+}
+
+export function getApiMode(): ApiMode {
+  return requireApiMode();
+}
+
+export function requireVpsBaseUrl(): string {
+  const base =
+    (Constants.expoConfig?.extra as any)?.VPS_API_BASE_URL ??
+    process.env.EXPO_PUBLIC_VPS_API_BASE_URL ??
+    "";
+  if (!base) throw new Error("Missing VPS API base URL");
+  return base.replace(/\/$/, "");
+}
+
+export function requireMistralApiKey(): string {
+  if (requireApiMode() === "vps_proxy") {
+    throw new Error(
+      "Mistral API key should not be used on client in vps_proxy mode",
+    );
+  }
+
+  const key =
+    (Constants.expoConfig?.extra as any)?.MISTRAL_API_KEY ??
+    process.env.EXPO_PUBLIC_MISTRAL_API_KEY ??
+    process.env.MISTRAL_API_KEY ??
+    "";
+
+  if (!key) throw new Error("Missing Mistral API key");
+  return key;
+}
+
+export function requireClaudeApiKey(): string {
+  if (requireApiMode() === "vps_proxy") {
+    throw new Error(
+      "Claude API key should not be used on client in vps_proxy mode",
+    );
+  }
+
+  const key =
+    (Constants.expoConfig?.extra as any)?.CLAUDE_API_KEY ??
+    process.env.EXPO_PUBLIC_CLAUDE_API_KEY ??
+    process.env.CLAUDE_API_KEY ??
+    "";
+  if (!key) throw new Error("Missing Claude API key");
+  return key;
+}
+
+export function requireElevenLabsApiKey(): string {
+  if (requireApiMode() === "vps_proxy") {
+    throw new Error(
+      "ElevenLabs API key should not be used on client in vps_proxy mode",
+    );
+  }
+
+  const key =
+    (Constants.expoConfig?.extra as any)?.ELEVENLABS_API_KEY ??
+    process.env.EXPO_PUBLIC_ELEVENLABS_API_KEY ??
+    process.env.ELEVENLABS_API_KEY ??
+    "";
+  if (!key) throw new Error("Missing ElevenLabs API key");
+  return key;
+}
+
+export function getElevenLabsVoiceId(): string {
+  return (
+    (Constants.expoConfig?.extra as any)?.ELEVENLABS_VOICE_ID ??
+    process.env.EXPO_PUBLIC_ELEVENLABS_VOICE_ID ??
+    process.env.ELEVENLABS_VOICE_ID ??
+    "aFDSnmXyFHr0IRaw35mG"
+  );
+}
+
+export function getElevenLabsModelId(): string {
+  return (
+    (Constants.expoConfig?.extra as any)?.ELEVENLABS_MODEL ??
+    process.env.EXPO_PUBLIC_ELEVENLABS_MODEL ??
+    process.env.ELEVENLABS_MODEL ??
+    "eleven_multilingual_v2"
+  );
+}

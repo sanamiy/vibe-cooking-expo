@@ -9,6 +9,8 @@
     "android": "node scripts/start-expo-auto-port.js -- --android",
     "web": "node scripts/start-expo-auto-port.js -- --web",
     "deploy:vps": "node scripts/deploy-vps.js",
+    "api:vps": "node scripts/set-api-mode.js vps_proxy",
+    "api:direct": "node scripts/set-api-mode.js direct_client",
     "build:web": "npx expo export --platform web",
     "e2e:server": "CI=1 npx expo start --web --port 19006",
     "e2e:offline": "node scripts/set-tts-config.js offline_expospeech && CI=1 playwright test",

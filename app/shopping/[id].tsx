@@ -1,13 +1,16 @@
-import { AppButton } from '@/components/AppButton';
-import { theme } from '@/constants/theme';
-import { useAppSettings } from '@/contexts/AppSettingsContext';
-import { useRecipes } from '@/hooks/useRecipes';
-import { multiplierForRecipe, scaleIngredient } from '@/utils/recipe';
-import { RECIPE_COLORS } from '@/utils/scheduler';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AppButton } from "@/components/AppButton";
+import { theme } from "@/constants/theme";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useRecipes } from "@/hooks/useRecipes";
+import { multiplierForRecipe, scaleIngredient } from "@/utils/recipe";
+import { RECIPE_COLORS } from "@/utils/scheduler";
+import { router, useLocalSearchParams } from "expo-router";
+import { useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function ShoppingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -15,18 +18,23 @@ export default function ShoppingScreen() {
   const { settings } = useAppSettings();
   const insets = useSafeAreaInsets();
 
-  const ids = useMemo(() => String(id).split(','), [id]);
-  const recipes = useMemo(() => ids.map((i) => getRecipeById(i)).filter(Boolean), [ids, getRecipeById]);
+  const ids = useMemo(() => String(id).split(","), [id]);
+  const recipes = useMemo(
+    () => ids.map((i) => getRecipeById(i)).filter(Boolean),
+    [ids, getRecipeById],
+  );
   const isMulti = recipes.length > 1;
 
   // レシピごとの材料リスト
   const recipeItems = useMemo(() => {
     return recipes.map((recipe) => {
-      if (!recipe) return { name: '', items: [], color: '' };
+      if (!recipe) return { name: "", items: [], color: "" };
       const multiplier = multiplierForRecipe(recipe, settings.servingsPerMeal);
       return {
         name: recipe.name,
-        items: (recipe.ingredients ?? []).map((ing) => scaleIngredient(ing, multiplier)),
+        items: (recipe.ingredients ?? []).map((ing) =>
+          scaleIngredient(ing, multiplier),
+        ),
       };
     });
   }, [recipes, settings.servingsPerMeal]);
@@ -44,15 +52,24 @@ export default function ShoppingScreen() {
         <Text style={styles.title}>買い出しリスト</Text>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 + insets.bottom }]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: 120 + insets.bottom },
+        ]}
+      >
         {recipeItems.map((group, rIdx) => {
           const color = RECIPE_COLORS[rIdx % RECIPE_COLORS.length];
           return (
             <View key={rIdx}>
               <View style={styles.sectionHeader}>
                 {isMulti && (
-                  <View style={[styles.recipeLabel, { backgroundColor: color }]}>
-                    <Text style={styles.recipeLabelText}>レシピ {rIdx + 1}</Text>
+                  <View
+                    style={[styles.recipeLabel, { backgroundColor: color }]}
+                  >
+                    <Text style={styles.recipeLabelText}>
+                      レシピ {rIdx + 1}
+                    </Text>
                   </View>
                 )}
                 <Text style={styles.recipe}>{group.name}</Text>
@@ -67,12 +84,28 @@ export default function ShoppingScreen() {
                     <Pressable
                       key={key}
                       style={[styles.item, isLast && styles.itemLast]}
-                      onPress={() => setChecked((p) => ({ ...p, [key]: !p[key] }))}
+                      onPress={() =>
+                        setChecked((p) => ({ ...p, [key]: !p[key] }))
+                      }
                     >
-                      <View style={[styles.checkbox, checked[key] && styles.checkboxChecked]}>
-                        {checked[key] && <Text style={styles.checkIcon}>✓</Text>}
+                      <View
+                        style={[
+                          styles.checkbox,
+                          checked[key] && styles.checkboxChecked,
+                        ]}
+                      >
+                        {checked[key] && (
+                          <Text style={styles.checkIcon}>✓</Text>
+                        )}
                       </View>
-                      <Text style={[styles.itemText, checked[key] && styles.itemTextDone]}>{item}</Text>
+                      <Text
+                        style={[
+                          styles.itemText,
+                          checked[key] && styles.itemTextDone,
+                        ]}
+                      >
+                        {item}
+                      </Text>
                     </Pressable>
                   );
                 })}
@@ -83,7 +116,10 @@ export default function ShoppingScreen() {
       </ScrollView>
 
       <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
-        <AppButton label="スケジュールを作成" onPress={() => router.push(`/schedule/${ids.join(',')}`)} />
+        <AppButton
+          label="スケジュールを作成"
+          onPress={() => router.push(`/schedule/${ids.join(",")}`)}
+        />
       </View>
     </SafeAreaView>
   );
@@ -98,48 +134,48 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.card,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   backBtn: {
-    position: 'absolute',
+    position: "absolute",
     left: 20,
     top: 20,
     zIndex: 1,
   },
   back: {
     color: theme.colors.subText,
-    fontWeight: '700',
+    fontWeight: "700",
     fontSize: 14,
   },
   title: {
     color: theme.colors.primary,
-    fontWeight: '800',
+    fontWeight: "800",
     fontSize: 20,
-    fontFamily: 'M PLUS Rounded 1c',
+    fontFamily: "M PLUS Rounded 1c",
   },
   content: { padding: 20 },
   sectionHeader: {
     marginBottom: 16,
   },
   recipeLabel: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: theme.radius.pill,
     marginBottom: 8,
   },
   recipeLabelText: {
-    color: '#fff',
-    fontWeight: '800',
+    color: "#fff",
+    fontWeight: "800",
     fontSize: 12,
   },
   recipe: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     color: theme.colors.text,
-    fontFamily: 'M PLUS Rounded 1c',
+    fontFamily: "M PLUS Rounded 1c",
     marginBottom: 8,
   },
   divider: {
@@ -151,21 +187,21 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 24,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
   item: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 16,
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border
+    borderBottomColor: theme.colors.border,
   },
   itemLast: {
     borderBottomWidth: 0,
@@ -176,18 +212,18 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: theme.colors.border,
     borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
   },
   checkboxChecked: {
     backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
   },
   checkIcon: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: "800",
     marginTop: -2,
   },
   itemText: {
@@ -197,18 +233,18 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   itemTextDone: {
-    textDecorationLine: 'line-through',
-    color: theme.colors.subText
+    textDecorationLine: "line-through",
+    color: theme.colors.subText,
   },
   bottomBar: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: theme.colors.card,
     paddingHorizontal: 20,
     paddingTop: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: -4 },

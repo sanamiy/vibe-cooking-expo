@@ -1,10 +1,8 @@
-import Constants from "expo-constants";
-
-const MISTRAL_API_KEY =
-  Constants.expoConfig?.extra?.MISTRAL_API_KEY ??
-  process.env.EXPO_PUBLIC_MISTRAL_API_KEY ??
-  process.env.MISTRAL_API_KEY ??
-  "";
+import {
+  getApiMode,
+  requireMistralApiKey,
+  requireVpsBaseUrl,
+} from "@/services/apiConfig";
 
 /**
  * Build a WAV file from PCM S16LE samples at 16kHz mono.
@@ -134,7 +132,6 @@ export class VoxtralRealtimeClient {
     }
 
     const wav = buildWav(merged);
-    const apiKey = this.config.apiKey || MISTRAL_API_KEY;
     const model = this.config.model ?? "voxtral-mini-2507";
 
     try {
@@ -144,14 +141,23 @@ export class VoxtralRealtimeClient {
       formData.append("language", "ja");
       formData.append("stream", "true");
 
-      const resp = await (globalThis as any).fetch(
-        "https://api.mistral.ai/v1/audio/transcriptions",
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${apiKey}` },
-          body: formData,
-        }
-      ) as Response;
+      const mode = getApiMode();
+      const url =
+        mode === "vps_proxy"
+          ? `${requireVpsBaseUrl()}/vps/asr/transcribe`
+          : "https://api.mistral.ai/v1/audio/transcriptions";
+
+      const apiKey =
+        this.config.apiKey ||
+        (mode === "direct_client" ? requireMistralApiKey() : "");
+      const headers: Record<string, string> =
+        mode === "direct_client" ? { Authorization: `Bearer ${apiKey}` } : {};
+
+      const resp = (await (globalThis as any).fetch(url, {
+        method: "POST",
+        headers,
+        body: formData,
+      })) as Response;
 
       if (!resp.ok) {
         const errBody = await resp.text();
