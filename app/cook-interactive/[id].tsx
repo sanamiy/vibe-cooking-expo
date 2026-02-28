@@ -6,7 +6,7 @@ import { stripHtml } from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-// import { useVoiceCommands } from "@/hooks/useVoiceCommands";
+import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
 import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
 import { useAudioDevices } from "@/hooks/useAudioDevices";
@@ -97,18 +97,18 @@ export default function CookInteractiveScreen() {
     [processUserInput, dialogueState, interrupt],
   );
 
-  // TODO: restore useVoiceCommands after debug
-  // const { isListening, startListening } = useVoiceCommands({
-  //   onCommand: () => {},
-  //   onTranscript: handleTranscript,
-  //   active: dialogueState !== "processing",
-  // });
+  const { isListening, startListening } = useVoiceCommands({
+    onCommand: () => {},
+    onTranscript: handleTranscript,
+    active: dialogueState !== "processing",
+    inputDeviceId: selectedInputId,
+  });
 
-  // useEffect(() => {
-  //   setListeningResume(() => {
-  //     if (!isListening) startListening();
-  //   });
-  // }, [setListeningResume, isListening, startListening]);
+  useEffect(() => {
+    setListeningResume(() => {
+      if (!isListening) startListening();
+    });
+  }, [setListeningResume, isListening, startListening]);
 
   // Timer countdown
   useEffect(() => {
