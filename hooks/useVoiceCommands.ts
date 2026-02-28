@@ -6,12 +6,14 @@ export type VoiceCommand = 'NEXT' | 'PREVIOUS' | 'REPEAT' | 'UNKNOWN';
 
 interface UseVoiceCommandsProps {
   onCommand: (command: VoiceCommand) => void;
+  onTranscript?: (text: string) => void;
   active?: boolean;
 }
 
-export function useVoiceCommands({ onCommand, active = true }: UseVoiceCommandsProps) {
+export function useVoiceCommands({ onCommand, onTranscript, active = true }: UseVoiceCommandsProps) {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
 
   const parseCommand = useCallback((text: string): VoiceCommand => {
     const normalized = text.toLowerCase().replace(/\s+/g, '');
@@ -57,9 +59,11 @@ export function useVoiceCommands({ onCommand, active = true }: UseVoiceCommandsP
     
     const transcript = event.results[0]?.transcript;
     if (!transcript) return;
-    
+
+    onTranscript?.(transcript);
+
     const command = parseCommand(transcript);
-    
+
     if (command !== 'UNKNOWN') {
       onCommand(command);
     }
@@ -69,6 +73,9 @@ export function useVoiceCommands({ onCommand, active = true }: UseVoiceCommandsP
     console.error('Speech recognition error:', event.error, event.message);
     setError(event.message);
     setIsListening(false);
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      setPermissionDenied(true);
+    }
   });
 
   useSpeechRecognitionEvent('start', () => {
@@ -79,8 +86,8 @@ export function useVoiceCommands({ onCommand, active = true }: UseVoiceCommandsP
   useSpeechRecognitionEvent('end', () => {
     setIsListening(false);
     
-    // Auto-restart if still active
-    if (active) {
+    // Auto-restart if still active and permission not denied
+    if (active && !permissionDenied) {
       setTimeout(() => {
         startListening();
       }, 500);
@@ -88,7 +95,7 @@ export function useVoiceCommands({ onCommand, active = true }: UseVoiceCommandsP
   });
 
   const startListening = useCallback(async () => {
-    if (!active) return;
+    if (!active || permissionDenied) return;
     
     try {
       if (Platform.OS !== 'web') {
@@ -110,7 +117,7 @@ export function useVoiceCommands({ onCommand, active = true }: UseVoiceCommandsP
       setError(e instanceof Error ? e.message : '音声認識の開始に失敗しました');
       setIsListening(false);
     }
-  }, [active]);
+  }, [active, permissionDenied]);
 
   const stopListening = useCallback(async () => {
     try {
