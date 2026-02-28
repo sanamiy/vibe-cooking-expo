@@ -11,6 +11,7 @@ import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
 import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
 import { useAudioDevices } from "@/hooks/useAudioDevices";
 import type { RecipeContext } from "@/services/ai";
+import { getScheduleTips } from "@/utils/scheduleStore";
 
 const formatCountdownLabel = (countdown: number | null) => {
   if (countdown === null) return "";
@@ -44,12 +45,14 @@ export default function CookInteractiveScreen() {
 
   const recipeContext = useMemo<RecipeContext | undefined>(() => {
     if (!recipe) return undefined;
+    const tips = getScheduleTips(ids[0]);
     return {
       recipeName: recipe.name,
       ingredients: recipe.ingredients ?? [],
       allSteps: steps.map((s) => stripHtml(s.text)),
+      ...(tips.length > 0 ? { stepTips: tips } : {}),
     };
-  }, [recipe, steps]);
+  }, [recipe, steps, ids]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [countdown, setCountdown] = useState<number | null>(null);
