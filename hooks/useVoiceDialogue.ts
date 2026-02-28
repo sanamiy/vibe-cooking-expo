@@ -333,6 +333,12 @@ export function useVoiceDialogue({
     setDialogueState("interrupted");
   }, [stopSpeaking]);
 
+  // Called when speech ends but no transcript was produced (noise/echo)
+  // Reset from interrupted state back to listening
+  const resetFromInterrupted = useCallback(() => {
+    setDialogueState((prev) => (prev === "interrupted" ? "listening" : prev));
+  }, []);
+
   const processUserInput = useCallback(
     async (transcript: string) => {
       const prevState = dialogueState;
@@ -506,5 +512,6 @@ export function useVoiceDialogue({
     interrupt,
     stopSpeaking,
     setListeningResume,
+    resetFromInterrupted,
   };
 }

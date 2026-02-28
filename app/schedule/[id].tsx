@@ -8,7 +8,7 @@ import {
   type MultiRecipeSchedule,
   type SchedulerTask,
 } from '@/utils/scheduler';
-import { setScheduleTips } from '@/utils/scheduleStore';
+import { setScheduleTips, setScheduleTasks } from '@/utils/scheduleStore';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -50,12 +50,13 @@ export default function ScheduleScreen() {
       try {
         const result = await scheduleMultipleRecipes(recipes, settings.stoveBurners);
         if (!cancelled) {
-          // Store per-step tips for each recipe so cook-interactive can use them
+          // Store scheduler tasks for each recipe so cook-interactive can use them
           for (const rid of ids) {
             const recipeTasks = result.tasks
               .filter((t) => t.recipe_id === rid)
               .sort((a, b) => a.step_index - b.step_index);
             setScheduleTips(rid, recipeTasks.map((t) => t.tips));
+            setScheduleTasks(rid, recipeTasks);
           }
           setSchedule(result);
           setLoading(false);
