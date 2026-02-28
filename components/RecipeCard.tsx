@@ -1,7 +1,7 @@
-import { theme } from '@/constants/theme';
-import { Recipe } from '@/types/recipe';
-import { formatTime } from '@/utils/recipe';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { theme } from "@/constants/theme";
+import { Recipe } from "@/types/recipe";
+import { formatTime } from "@/utils/recipe";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface Props {
   recipe: Recipe;
@@ -10,7 +10,10 @@ interface Props {
 }
 
 export const RecipeCard = ({ recipe, isSelected, onToggle }: Props) => (
-  <Pressable onPress={() => onToggle(recipe.id)} style={[styles.card, isSelected && styles.selected]}>
+  <Pressable
+    onPress={() => onToggle(recipe.id)}
+    style={[styles.card, isSelected && styles.selected]}
+  >
     <View style={styles.imageContainer}>
       <Image source={{ uri: recipe.image_url }} style={styles.img} resizeMode="cover" />
     </View>
@@ -40,11 +43,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     borderWidth: 2,
-    borderColor: 'transparent',
-    overflow: 'hidden',
-    marginBottom: 20,
+    borderColor: "transparent",
+    overflow: "hidden",
     // iOS Shadow
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
@@ -55,10 +57,10 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary,
   },
   imageContainer: {
-    position: 'relative',
+    position: "relative",
   },
   img: {
-    width: '100%',
+    width: "100%",
     height: 180,
   },
   body: {
@@ -66,8 +68,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   title: {
-    fontFamily: 'M PLUS Rounded 1c',
-    fontWeight: '700',
+    fontFamily: "M PLUS Rounded 1c",
+    fontWeight: "700",
     fontSize: 20,
     color: theme.colors.text,
   },
@@ -77,13 +79,13 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   metaRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
     marginTop: 4,
   },
   metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
     backgroundColor: theme.colors.bg,
     paddingHorizontal: 8,
@@ -96,6 +98,6 @@ const styles = StyleSheet.create({
   meta: {
     color: theme.colors.subText,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
