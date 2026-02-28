@@ -70,8 +70,11 @@ export function useVoiceCommands({ onCommand, onTranscript, active = true }: Use
   });
 
   useSpeechRecognitionEvent('error', (event) => {
-    console.error('Speech recognition error:', event.error, event.message);
-    setError(event.message);
+    const benign = ['no-speech', 'aborted'];
+    if (!benign.includes(event.error)) {
+      console.error('Speech recognition error:', event.error, event.message);
+      setError(event.message);
+    }
     setIsListening(false);
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
       setPermissionDenied(true);
