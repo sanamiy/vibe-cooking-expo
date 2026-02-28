@@ -25,7 +25,10 @@ export interface RecipeGanttData {
   };
 }
 
-const MINUTE_PATTERNS: RegExp[] = [/([\d]+)\s*[〜~\-]\s*([\d]+)\s*分/g, /([\d]+)\s*分(?:間)?/g];
+const MINUTE_PATTERNS: RegExp[] = [
+  /([\d]+)\s*[〜~\-]\s*([\d]+)\s*分/g,
+  /([\d]+)\s*分(?:間)?/g,
+];
 const SECOND_PATTERN = /([\d]+)\s*秒/g;
 const FALLBACK_BY_ACTION: Array<{ pattern: RegExp; minutes: number }> = [
   { pattern: /(切る|刻む|むく|下ごしらえ|準備)/, minutes: 4 },
@@ -36,7 +39,9 @@ const FALLBACK_BY_ACTION: Array<{ pattern: RegExp; minutes: number }> = [
 ];
 
 const toHalfWidth = (text: string) =>
-  text.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
+  text.replace(/[０-９]/g, (s) =>
+    String.fromCharCode(s.charCodeAt(0) - 0xfee0),
+  );
 
 const parseStepDuration = (rawText: string) => {
   const text = toHalfWidth(stripHtmlInline(rawText));
@@ -49,7 +54,10 @@ const parseStepDuration = (rawText: string) => {
   rangePattern.lastIndex = 0;
   let match = rangePattern.exec(text);
   while (match) {
-    const avg = Math.max(1, Math.round((Number(match[1]) + Number(match[2])) / 2));
+    const avg = Math.max(
+      1,
+      Math.round((Number(match[1]) + Number(match[2])) / 2),
+    );
     totalMinutes += avg;
     timerMinutes += avg;
     matchedRanges.push([match.index, match.index + match[0].length]);

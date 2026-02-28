@@ -92,23 +92,24 @@ export class AudioCapture {
       this.mediaStream = await nav.mediaDevices.getUserMedia(constraints);
     } catch (e: any) {
       config.onError(
-        e instanceof Error ? e.message : "マイクへのアクセスに失敗しました"
+        e instanceof Error ? e.message : "マイクへのアクセスに失敗しました",
       );
       return;
     }
 
-    const AudioContextCtor = (globalThis as any).AudioContext ??
+    const AudioContextCtor =
+      (globalThis as any).AudioContext ??
       (globalThis as any).webkitAudioContext;
     this.audioContext = new AudioContextCtor();
     await this.audioContext.audioWorklet.addModule(pcmWorkletUrl);
 
     this.sourceNode = this.audioContext.createMediaStreamSource(
-      this.mediaStream
+      this.mediaStream,
     );
     const AudioWorkletNodeCtor = (globalThis as any).AudioWorkletNode;
     this.workletNode = new AudioWorkletNodeCtor(
       this.audioContext,
-      "pcm16-processor"
+      "pcm16-processor",
     );
 
     this.workletNode.port.onmessage = (event: any) => {

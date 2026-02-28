@@ -3,6 +3,7 @@
 `vibe-cooking-nuxt` をベースに Expo + React Native へ移植した iPhone 向けアプリです。
 
 ## 目的
+
 料理中に手がふさがっていても、できるだけハンズフリーでレシピ手順を理解し、次の行動に進める体験を作ることが目的です。
 
 - 献立選択までは手操作
@@ -11,6 +12,7 @@
 - タイマーが必要な工程（例: 煮込み）では時間経過を通知
 
 ## 実装済み（MVP）
+
 - 献立選択（1〜5件、下部固定アクション）
 - レシピ詳細（分量スケール、手順表示）
 - 買い出しリスト（チェック管理）
@@ -19,12 +21,14 @@
 - Safe Area 対応（iPhone ノッチ/ホームインジケータ考慮）
 
 ## セットアップ
+
 ```bash
 npm install
 npm run ios
 ```
 
 ### 複数アプリを同一PCで起動する（自動ポート探索）
+
 このリポジトリの `start/ios/android/web` は、起動時に空いているポートを自動探索して Expo を起動します。  
 既定では `8081` から順に探索するため、ポート衝突時も別ポートで立ち上がります。
 
@@ -45,6 +49,7 @@ EXPO_PORT_START=19000 npm run start
 ```
 
 ## スクレイピング/データ更新
+
 Nuxt から移植した Python スクリプトでレシピデータと画像を更新できます。
 
 ```bash
@@ -58,10 +63,12 @@ npm run validate:recipes
 - 画像保存先: `data/recipe-img/`
 
 ## デザインシステム
+
 - 移植ドキュメント: `DESIGN_SYSTEM.md`
 - テーマトークン: `constants/theme.ts`
 
 ## 主要ファイル
+
 - `app/index.tsx` ホーム
 - `app/recipe/[id].tsx` レシピ詳細
 - `app/shopping/[id].tsx` 買い出し
@@ -72,6 +79,7 @@ npm run validate:recipes
 - `utils/recipe.ts` 分量スケール等
 
 ## 移行済み資産
+
 - スクレイピングコード: `scripts/scraping-ajinomoto.py`
 - 補助スクリプト: `scripts/validate_recipe_json.py`
 - レシピデータ: `data/recipe.json`
@@ -81,5 +89,6 @@ npm run validate:recipes
 - デザインシステム文書: `DESIGN_SYSTEM.md`
 
 ## Nuxt版からの差分
+
 - 複数料理選択後の画面は未実装（1件選択導線を優先）
 - 音声認識は未実装（疑似ボタン入力）

@@ -31,9 +31,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "701794-s1"
-          ]
+          "depends_on": ["701794-s1"]
         },
         {
           "task_id": "701794-s3",
@@ -46,9 +44,7 @@
           "requires_timer": true,
           "timer_minutes": 10,
           "confidence": 0.9,
-          "depends_on": [
-            "701794-s2"
-          ]
+          "depends_on": ["701794-s2"]
         }
       ],
       "generation": {
@@ -86,9 +82,7 @@
           "requires_timer": true,
           "timer_minutes": 3,
           "confidence": 0.9,
-          "depends_on": [
-            "703024-s1"
-          ]
+          "depends_on": ["703024-s1"]
         },
         {
           "task_id": "703024-s3",
@@ -101,9 +95,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "703024-s2"
-          ]
+          "depends_on": ["703024-s2"]
         }
       ],
       "generation": {
@@ -141,9 +133,7 @@
           "requires_timer": true,
           "timer_minutes": 20,
           "confidence": 0.9,
-          "depends_on": [
-            "703164-s1"
-          ]
+          "depends_on": ["703164-s1"]
         },
         {
           "task_id": "703164-s3",
@@ -156,9 +146,7 @@
           "requires_timer": true,
           "timer_minutes": 65,
           "confidence": 0.9,
-          "depends_on": [
-            "703164-s2"
-          ]
+          "depends_on": ["703164-s2"]
         }
       ],
       "generation": {
@@ -196,9 +184,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704422-s1"
-          ]
+          "depends_on": ["704422-s1"]
         },
         {
           "task_id": "704422-s3",
@@ -211,9 +197,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704422-s2"
-          ]
+          "depends_on": ["704422-s2"]
         },
         {
           "task_id": "704422-s4",
@@ -226,9 +210,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "704422-s3"
-          ]
+          "depends_on": ["704422-s3"]
         },
         {
           "task_id": "704422-s5",
@@ -241,9 +223,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704422-s4"
-          ]
+          "depends_on": ["704422-s4"]
         },
         {
           "task_id": "704422-s6",
@@ -256,9 +236,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704422-s5"
-          ]
+          "depends_on": ["704422-s5"]
         },
         {
           "task_id": "704422-s7",
@@ -271,9 +249,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704422-s6"
-          ]
+          "depends_on": ["704422-s6"]
         }
       ],
       "generation": {
@@ -311,9 +287,7 @@
           "requires_timer": true,
           "timer_minutes": 35,
           "confidence": 0.9,
-          "depends_on": [
-            "704642-s1"
-          ]
+          "depends_on": ["704642-s1"]
         },
         {
           "task_id": "704642-s3",
@@ -326,9 +300,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704642-s2"
-          ]
+          "depends_on": ["704642-s2"]
         },
         {
           "task_id": "704642-s4",
@@ -341,9 +313,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704642-s3"
-          ]
+          "depends_on": ["704642-s3"]
         },
         {
           "task_id": "704642-s5",
@@ -356,9 +326,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704642-s4"
-          ]
+          "depends_on": ["704642-s4"]
         },
         {
           "task_id": "704642-s6",
@@ -371,9 +339,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704642-s5"
-          ]
+          "depends_on": ["704642-s5"]
         },
         {
           "task_id": "704642-s7",
@@ -386,9 +352,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "704642-s6"
-          ]
+          "depends_on": ["704642-s6"]
         },
         {
           "task_id": "704642-s8",
@@ -401,9 +365,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "704642-s7"
-          ]
+          "depends_on": ["704642-s7"]
         },
         {
           "task_id": "704642-s9",
@@ -416,9 +378,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "704642-s8"
-          ]
+          "depends_on": ["704642-s8"]
         }
       ],
       "generation": {
@@ -456,9 +416,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "705346-s1"
-          ]
+          "depends_on": ["705346-s1"]
         },
         {
           "task_id": "705346-s3",
@@ -471,9 +429,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "705346-s2"
-          ]
+          "depends_on": ["705346-s2"]
         }
       ],
       "generation": {
@@ -511,9 +467,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "705645-s1"
-          ]
+          "depends_on": ["705645-s1"]
         },
         {
           "task_id": "705645-s3",
@@ -526,9 +480,7 @@
           "requires_timer": true,
           "timer_minutes": 20,
           "confidence": 0.9,
-          "depends_on": [
-            "705645-s2"
-          ]
+          "depends_on": ["705645-s2"]
         },
         {
           "task_id": "705645-s4",
@@ -541,9 +493,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "705645-s3"
-          ]
+          "depends_on": ["705645-s3"]
         }
       ],
       "generation": {
@@ -581,9 +531,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "705646-s1"
-          ]
+          "depends_on": ["705646-s1"]
         },
         {
           "task_id": "705646-s3",
@@ -596,9 +544,7 @@
           "requires_timer": true,
           "timer_minutes": 5,
           "confidence": 0.9,
-          "depends_on": [
-            "705646-s2"
-          ]
+          "depends_on": ["705646-s2"]
         },
         {
           "task_id": "705646-s4",
@@ -611,9 +557,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "705646-s3"
-          ]
+          "depends_on": ["705646-s3"]
         },
         {
           "task_id": "705646-s5",
@@ -626,9 +570,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "705646-s4"
-          ]
+          "depends_on": ["705646-s4"]
         },
         {
           "task_id": "705646-s6",
@@ -641,9 +583,7 @@
           "requires_timer": true,
           "timer_minutes": 30,
           "confidence": 0.9,
-          "depends_on": [
-            "705646-s5"
-          ]
+          "depends_on": ["705646-s5"]
         },
         {
           "task_id": "705646-s7",
@@ -656,9 +596,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "705646-s6"
-          ]
+          "depends_on": ["705646-s6"]
         }
       ],
       "generation": {
@@ -696,9 +634,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "705648-s1"
-          ]
+          "depends_on": ["705648-s1"]
         },
         {
           "task_id": "705648-s3",
@@ -711,9 +647,7 @@
           "requires_timer": true,
           "timer_minutes": 10,
           "confidence": 0.9,
-          "depends_on": [
-            "705648-s2"
-          ]
+          "depends_on": ["705648-s2"]
         },
         {
           "task_id": "705648-s4",
@@ -726,9 +660,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "705648-s3"
-          ]
+          "depends_on": ["705648-s3"]
         }
       ],
       "generation": {
@@ -766,9 +698,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "705936-s1"
-          ]
+          "depends_on": ["705936-s1"]
         },
         {
           "task_id": "705936-s3",
@@ -781,9 +711,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "705936-s2"
-          ]
+          "depends_on": ["705936-s2"]
         },
         {
           "task_id": "705936-s4",
@@ -796,9 +724,7 @@
           "requires_timer": true,
           "timer_minutes": 3,
           "confidence": 0.9,
-          "depends_on": [
-            "705936-s3"
-          ]
+          "depends_on": ["705936-s3"]
         },
         {
           "task_id": "705936-s5",
@@ -811,9 +737,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "705936-s4"
-          ]
+          "depends_on": ["705936-s4"]
         },
         {
           "task_id": "705936-s6",
@@ -826,9 +750,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "705936-s5"
-          ]
+          "depends_on": ["705936-s5"]
         },
         {
           "task_id": "705936-s7",
@@ -841,9 +763,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "705936-s6"
-          ]
+          "depends_on": ["705936-s6"]
         }
       ],
       "generation": {
@@ -881,9 +801,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706119-s1"
-          ]
+          "depends_on": ["706119-s1"]
         },
         {
           "task_id": "706119-s3",
@@ -896,9 +814,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "706119-s2"
-          ]
+          "depends_on": ["706119-s2"]
         },
         {
           "task_id": "706119-s4",
@@ -911,9 +827,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "706119-s3"
-          ]
+          "depends_on": ["706119-s3"]
         },
         {
           "task_id": "706119-s5",
@@ -926,9 +840,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706119-s4"
-          ]
+          "depends_on": ["706119-s4"]
         },
         {
           "task_id": "706119-s6",
@@ -941,9 +853,7 @@
           "requires_timer": true,
           "timer_minutes": 5,
           "confidence": 0.9,
-          "depends_on": [
-            "706119-s5"
-          ]
+          "depends_on": ["706119-s5"]
         },
         {
           "task_id": "706119-s7",
@@ -956,9 +866,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706119-s6"
-          ]
+          "depends_on": ["706119-s6"]
         },
         {
           "task_id": "706119-s8",
@@ -971,9 +879,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "706119-s7"
-          ]
+          "depends_on": ["706119-s7"]
         }
       ],
       "generation": {
@@ -1011,9 +917,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706281-s1"
-          ]
+          "depends_on": ["706281-s1"]
         },
         {
           "task_id": "706281-s3",
@@ -1026,9 +930,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706281-s2"
-          ]
+          "depends_on": ["706281-s2"]
         },
         {
           "task_id": "706281-s4",
@@ -1041,9 +943,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "706281-s3"
-          ]
+          "depends_on": ["706281-s3"]
         }
       ],
       "generation": {
@@ -1081,9 +981,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706369-s1"
-          ]
+          "depends_on": ["706369-s1"]
         },
         {
           "task_id": "706369-s3",
@@ -1096,9 +994,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706369-s2"
-          ]
+          "depends_on": ["706369-s2"]
         },
         {
           "task_id": "706369-s4",
@@ -1111,9 +1007,7 @@
           "requires_timer": true,
           "timer_minutes": 20,
           "confidence": 0.9,
-          "depends_on": [
-            "706369-s3"
-          ]
+          "depends_on": ["706369-s3"]
         },
         {
           "task_id": "706369-s5",
@@ -1126,9 +1020,7 @@
           "requires_timer": true,
           "timer_minutes": 5,
           "confidence": 0.9,
-          "depends_on": [
-            "706369-s4"
-          ]
+          "depends_on": ["706369-s4"]
         }
       ],
       "generation": {
@@ -1166,9 +1058,7 @@
           "requires_timer": true,
           "timer_minutes": 8,
           "confidence": 0.9,
-          "depends_on": [
-            "706796-s1"
-          ]
+          "depends_on": ["706796-s1"]
         },
         {
           "task_id": "706796-s3",
@@ -1181,9 +1071,7 @@
           "requires_timer": true,
           "timer_minutes": 8,
           "confidence": 0.9,
-          "depends_on": [
-            "706796-s2"
-          ]
+          "depends_on": ["706796-s2"]
         }
       ],
       "generation": {
@@ -1221,9 +1109,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706807-s1"
-          ]
+          "depends_on": ["706807-s1"]
         },
         {
           "task_id": "706807-s3",
@@ -1236,9 +1122,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "706807-s2"
-          ]
+          "depends_on": ["706807-s2"]
         }
       ],
       "generation": {
@@ -1276,9 +1160,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "706981-s1"
-          ]
+          "depends_on": ["706981-s1"]
         },
         {
           "task_id": "706981-s3",
@@ -1291,9 +1173,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "706981-s2"
-          ]
+          "depends_on": ["706981-s2"]
         },
         {
           "task_id": "706981-s4",
@@ -1306,9 +1186,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "706981-s3"
-          ]
+          "depends_on": ["706981-s3"]
         }
       ],
       "generation": {
@@ -1346,9 +1224,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "707201-s1"
-          ]
+          "depends_on": ["707201-s1"]
         },
         {
           "task_id": "707201-s3",
@@ -1361,9 +1237,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "707201-s2"
-          ]
+          "depends_on": ["707201-s2"]
         },
         {
           "task_id": "707201-s4",
@@ -1376,9 +1250,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "707201-s3"
-          ]
+          "depends_on": ["707201-s3"]
         },
         {
           "task_id": "707201-s5",
@@ -1391,9 +1263,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "707201-s4"
-          ]
+          "depends_on": ["707201-s4"]
         }
       ],
       "generation": {
@@ -1431,9 +1301,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "707350-s1"
-          ]
+          "depends_on": ["707350-s1"]
         },
         {
           "task_id": "707350-s3",
@@ -1446,9 +1314,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "707350-s2"
-          ]
+          "depends_on": ["707350-s2"]
         },
         {
           "task_id": "707350-s4",
@@ -1461,9 +1327,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "707350-s3"
-          ]
+          "depends_on": ["707350-s3"]
         }
       ],
       "generation": {
@@ -1501,9 +1365,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "708304-s1"
-          ]
+          "depends_on": ["708304-s1"]
         },
         {
           "task_id": "708304-s3",
@@ -1516,9 +1378,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "708304-s2"
-          ]
+          "depends_on": ["708304-s2"]
         }
       ],
       "generation": {
@@ -1556,9 +1416,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "709692-s1"
-          ]
+          "depends_on": ["709692-s1"]
         }
       ],
       "generation": {
@@ -1596,9 +1454,7 @@
           "requires_timer": true,
           "timer_minutes": 10,
           "confidence": 0.9,
-          "depends_on": [
-            "800912-s1"
-          ]
+          "depends_on": ["800912-s1"]
         },
         {
           "task_id": "800912-s3",
@@ -1611,9 +1467,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "800912-s2"
-          ]
+          "depends_on": ["800912-s2"]
         },
         {
           "task_id": "800912-s4",
@@ -1626,9 +1480,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "800912-s3"
-          ]
+          "depends_on": ["800912-s3"]
         }
       ],
       "generation": {
@@ -1666,9 +1518,7 @@
           "requires_timer": true,
           "timer_minutes": 1,
           "confidence": 0.9,
-          "depends_on": [
-            "801030-s1"
-          ]
+          "depends_on": ["801030-s1"]
         },
         {
           "task_id": "801030-s3",
@@ -1681,9 +1531,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "801030-s2"
-          ]
+          "depends_on": ["801030-s2"]
         }
       ],
       "generation": {
@@ -1721,9 +1569,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805253-s1"
-          ]
+          "depends_on": ["805253-s1"]
         },
         {
           "task_id": "805253-s3",
@@ -1736,9 +1582,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805253-s2"
-          ]
+          "depends_on": ["805253-s2"]
         }
       ],
       "generation": {
@@ -1776,9 +1620,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805264-s1"
-          ]
+          "depends_on": ["805264-s1"]
         },
         {
           "task_id": "805264-s3",
@@ -1791,9 +1633,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805264-s2"
-          ]
+          "depends_on": ["805264-s2"]
         },
         {
           "task_id": "805264-s4",
@@ -1806,9 +1646,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805264-s3"
-          ]
+          "depends_on": ["805264-s3"]
         },
         {
           "task_id": "805264-s5",
@@ -1821,9 +1659,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805264-s4"
-          ]
+          "depends_on": ["805264-s4"]
         }
       ],
       "generation": {
@@ -1861,9 +1697,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805265-s1"
-          ]
+          "depends_on": ["805265-s1"]
         },
         {
           "task_id": "805265-s3",
@@ -1876,9 +1710,7 @@
           "requires_timer": true,
           "timer_minutes": 2,
           "confidence": 0.9,
-          "depends_on": [
-            "805265-s2"
-          ]
+          "depends_on": ["805265-s2"]
         },
         {
           "task_id": "805265-s4",
@@ -1891,9 +1723,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805265-s3"
-          ]
+          "depends_on": ["805265-s3"]
         }
       ],
       "generation": {
@@ -1931,9 +1761,7 @@
           "requires_timer": true,
           "timer_minutes": 2,
           "confidence": 0.9,
-          "depends_on": [
-            "805266-s1"
-          ]
+          "depends_on": ["805266-s1"]
         },
         {
           "task_id": "805266-s3",
@@ -1946,9 +1774,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805266-s2"
-          ]
+          "depends_on": ["805266-s2"]
         },
         {
           "task_id": "805266-s4",
@@ -1961,9 +1787,7 @@
           "requires_timer": true,
           "timer_minutes": 1,
           "confidence": 0.9,
-          "depends_on": [
-            "805266-s3"
-          ]
+          "depends_on": ["805266-s3"]
         },
         {
           "task_id": "805266-s5",
@@ -1976,9 +1800,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805266-s4"
-          ]
+          "depends_on": ["805266-s4"]
         }
       ],
       "generation": {
@@ -2016,9 +1838,7 @@
           "requires_timer": true,
           "timer_minutes": 4,
           "confidence": 0.9,
-          "depends_on": [
-            "805269-s1"
-          ]
+          "depends_on": ["805269-s1"]
         },
         {
           "task_id": "805269-s3",
@@ -2031,9 +1851,7 @@
           "requires_timer": true,
           "timer_minutes": 8,
           "confidence": 0.9,
-          "depends_on": [
-            "805269-s2"
-          ]
+          "depends_on": ["805269-s2"]
         },
         {
           "task_id": "805269-s4",
@@ -2046,9 +1864,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805269-s3"
-          ]
+          "depends_on": ["805269-s3"]
         },
         {
           "task_id": "805269-s5",
@@ -2061,9 +1877,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805269-s4"
-          ]
+          "depends_on": ["805269-s4"]
         }
       ],
       "generation": {
@@ -2101,9 +1915,7 @@
           "requires_timer": true,
           "timer_minutes": 6,
           "confidence": 0.9,
-          "depends_on": [
-            "805279-s1"
-          ]
+          "depends_on": ["805279-s1"]
         },
         {
           "task_id": "805279-s3",
@@ -2116,9 +1928,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805279-s2"
-          ]
+          "depends_on": ["805279-s2"]
         },
         {
           "task_id": "805279-s4",
@@ -2131,9 +1941,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805279-s3"
-          ]
+          "depends_on": ["805279-s3"]
         },
         {
           "task_id": "805279-s5",
@@ -2146,9 +1954,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805279-s4"
-          ]
+          "depends_on": ["805279-s4"]
         }
       ],
       "generation": {
@@ -2186,9 +1992,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805281-s1"
-          ]
+          "depends_on": ["805281-s1"]
         },
         {
           "task_id": "805281-s3",
@@ -2201,9 +2005,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805281-s2"
-          ]
+          "depends_on": ["805281-s2"]
         },
         {
           "task_id": "805281-s4",
@@ -2216,9 +2018,7 @@
           "requires_timer": true,
           "timer_minutes": 5,
           "confidence": 0.9,
-          "depends_on": [
-            "805281-s3"
-          ]
+          "depends_on": ["805281-s3"]
         }
       ],
       "generation": {
@@ -2256,9 +2056,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805282-s1"
-          ]
+          "depends_on": ["805282-s1"]
         },
         {
           "task_id": "805282-s3",
@@ -2271,9 +2069,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805282-s2"
-          ]
+          "depends_on": ["805282-s2"]
         },
         {
           "task_id": "805282-s4",
@@ -2286,9 +2082,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805282-s3"
-          ]
+          "depends_on": ["805282-s3"]
         }
       ],
       "generation": {
@@ -2326,9 +2120,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805283-s1"
-          ]
+          "depends_on": ["805283-s1"]
         }
       ],
       "generation": {
@@ -2366,9 +2158,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805285-s1"
-          ]
+          "depends_on": ["805285-s1"]
         },
         {
           "task_id": "805285-s3",
@@ -2381,9 +2171,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805285-s2"
-          ]
+          "depends_on": ["805285-s2"]
         },
         {
           "task_id": "805285-s4",
@@ -2396,9 +2184,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805285-s3"
-          ]
+          "depends_on": ["805285-s3"]
         }
       ],
       "generation": {
@@ -2436,9 +2222,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805286-s1"
-          ]
+          "depends_on": ["805286-s1"]
         },
         {
           "task_id": "805286-s3",
@@ -2451,9 +2235,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805286-s2"
-          ]
+          "depends_on": ["805286-s2"]
         },
         {
           "task_id": "805286-s4",
@@ -2466,9 +2248,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805286-s3"
-          ]
+          "depends_on": ["805286-s3"]
         }
       ],
       "generation": {
@@ -2506,9 +2286,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805289-s1"
-          ]
+          "depends_on": ["805289-s1"]
         },
         {
           "task_id": "805289-s3",
@@ -2521,9 +2299,7 @@
           "requires_timer": true,
           "timer_minutes": 5,
           "confidence": 0.9,
-          "depends_on": [
-            "805289-s2"
-          ]
+          "depends_on": ["805289-s2"]
         },
         {
           "task_id": "805289-s4",
@@ -2536,9 +2312,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805289-s3"
-          ]
+          "depends_on": ["805289-s3"]
         }
       ],
       "generation": {
@@ -2576,9 +2350,7 @@
           "requires_timer": true,
           "timer_minutes": 2,
           "confidence": 0.9,
-          "depends_on": [
-            "805290-s1"
-          ]
+          "depends_on": ["805290-s1"]
         },
         {
           "task_id": "805290-s3",
@@ -2591,9 +2363,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805290-s2"
-          ]
+          "depends_on": ["805290-s2"]
         }
       ],
       "generation": {
@@ -2631,9 +2401,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805291-s1"
-          ]
+          "depends_on": ["805291-s1"]
         },
         {
           "task_id": "805291-s3",
@@ -2646,9 +2414,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805291-s2"
-          ]
+          "depends_on": ["805291-s2"]
         }
       ],
       "generation": {
@@ -2686,9 +2452,7 @@
           "requires_timer": true,
           "timer_minutes": 2,
           "confidence": 0.9,
-          "depends_on": [
-            "805292-s1"
-          ]
+          "depends_on": ["805292-s1"]
         },
         {
           "task_id": "805292-s3",
@@ -2701,9 +2465,7 @@
           "requires_timer": true,
           "timer_minutes": 5,
           "confidence": 0.9,
-          "depends_on": [
-            "805292-s2"
-          ]
+          "depends_on": ["805292-s2"]
         },
         {
           "task_id": "805292-s4",
@@ -2716,9 +2478,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805292-s3"
-          ]
+          "depends_on": ["805292-s3"]
         }
       ],
       "generation": {
@@ -2756,9 +2516,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805293-s1"
-          ]
+          "depends_on": ["805293-s1"]
         }
       ],
       "generation": {
@@ -2796,9 +2554,7 @@
           "requires_timer": true,
           "timer_minutes": 1,
           "confidence": 0.9,
-          "depends_on": [
-            "805294-s1"
-          ]
+          "depends_on": ["805294-s1"]
         },
         {
           "task_id": "805294-s3",
@@ -2811,9 +2567,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805294-s2"
-          ]
+          "depends_on": ["805294-s2"]
         }
       ],
       "generation": {
@@ -2851,9 +2605,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805310-s1"
-          ]
+          "depends_on": ["805310-s1"]
         },
         {
           "task_id": "805310-s3",
@@ -2866,9 +2618,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805310-s2"
-          ]
+          "depends_on": ["805310-s2"]
         },
         {
           "task_id": "805310-s4",
@@ -2881,9 +2631,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805310-s3"
-          ]
+          "depends_on": ["805310-s3"]
         }
       ],
       "generation": {
@@ -2921,9 +2669,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805326-s1"
-          ]
+          "depends_on": ["805326-s1"]
         },
         {
           "task_id": "805326-s3",
@@ -2936,9 +2682,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805326-s2"
-          ]
+          "depends_on": ["805326-s2"]
         }
       ],
       "generation": {
@@ -2976,9 +2720,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "805327-s1"
-          ]
+          "depends_on": ["805327-s1"]
         },
         {
           "task_id": "805327-s3",
@@ -2991,9 +2733,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "805327-s2"
-          ]
+          "depends_on": ["805327-s2"]
         }
       ],
       "generation": {
@@ -3031,9 +2771,7 @@
           "requires_timer": true,
           "timer_minutes": 20,
           "confidence": 0.9,
-          "depends_on": [
-            "002290-s1"
-          ]
+          "depends_on": ["002290-s1"]
         },
         {
           "task_id": "002290-s3",
@@ -3046,9 +2784,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "002290-s2"
-          ]
+          "depends_on": ["002290-s2"]
         },
         {
           "task_id": "002290-s4",
@@ -3061,9 +2797,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "002290-s3"
-          ]
+          "depends_on": ["002290-s3"]
         },
         {
           "task_id": "002290-s5",
@@ -3076,9 +2810,7 @@
           "requires_timer": true,
           "timer_minutes": 25,
           "confidence": 0.9,
-          "depends_on": [
-            "002290-s4"
-          ]
+          "depends_on": ["002290-s4"]
         },
         {
           "task_id": "002290-s6",
@@ -3091,9 +2823,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "002290-s5"
-          ]
+          "depends_on": ["002290-s5"]
         },
         {
           "task_id": "002290-s7",
@@ -3106,9 +2836,7 @@
           "requires_timer": true,
           "timer_minutes": 15,
           "confidence": 0.9,
-          "depends_on": [
-            "002290-s6"
-          ]
+          "depends_on": ["002290-s6"]
         }
       ],
       "generation": {
@@ -3146,9 +2874,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "010132-s1"
-          ]
+          "depends_on": ["010132-s1"]
         },
         {
           "task_id": "010132-s3",
@@ -3161,9 +2887,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "010132-s2"
-          ]
+          "depends_on": ["010132-s2"]
         },
         {
           "task_id": "010132-s4",
@@ -3176,9 +2900,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "010132-s3"
-          ]
+          "depends_on": ["010132-s3"]
         },
         {
           "task_id": "010132-s5",
@@ -3191,9 +2913,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "010132-s4"
-          ]
+          "depends_on": ["010132-s4"]
         },
         {
           "task_id": "010132-s6",
@@ -3206,9 +2926,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "010132-s5"
-          ]
+          "depends_on": ["010132-s5"]
         }
       ],
       "generation": {
@@ -3246,9 +2964,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "010660-s1"
-          ]
+          "depends_on": ["010660-s1"]
         },
         {
           "task_id": "010660-s3",
@@ -3261,9 +2977,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "010660-s2"
-          ]
+          "depends_on": ["010660-s2"]
         },
         {
           "task_id": "010660-s4",
@@ -3276,9 +2990,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "010660-s3"
-          ]
+          "depends_on": ["010660-s3"]
         },
         {
           "task_id": "010660-s5",
@@ -3291,9 +3003,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "010660-s4"
-          ]
+          "depends_on": ["010660-s4"]
         }
       ],
       "generation": {
@@ -3331,9 +3041,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "701486-s1"
-          ]
+          "depends_on": ["701486-s1"]
         }
       ],
       "generation": {
@@ -3371,9 +3079,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "702595-s1"
-          ]
+          "depends_on": ["702595-s1"]
         },
         {
           "task_id": "702595-s3",
@@ -3386,9 +3092,7 @@
           "requires_timer": true,
           "timer_minutes": 30,
           "confidence": 0.9,
-          "depends_on": [
-            "702595-s2"
-          ]
+          "depends_on": ["702595-s2"]
         },
         {
           "task_id": "702595-s4",
@@ -3401,9 +3105,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "702595-s3"
-          ]
+          "depends_on": ["702595-s3"]
         },
         {
           "task_id": "702595-s5",
@@ -3416,9 +3118,7 @@
           "requires_timer": true,
           "timer_minutes": 1,
           "confidence": 0.9,
-          "depends_on": [
-            "702595-s4"
-          ]
+          "depends_on": ["702595-s4"]
         },
         {
           "task_id": "702595-s6",
@@ -3431,9 +3131,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.6,
-          "depends_on": [
-            "702595-s5"
-          ]
+          "depends_on": ["702595-s5"]
         },
         {
           "task_id": "702595-s7",
@@ -3446,9 +3144,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "702595-s6"
-          ]
+          "depends_on": ["702595-s6"]
         },
         {
           "task_id": "702595-s8",
@@ -3461,9 +3157,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "702595-s7"
-          ]
+          "depends_on": ["702595-s7"]
         },
         {
           "task_id": "702595-s9",
@@ -3476,9 +3170,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "702595-s8"
-          ]
+          "depends_on": ["702595-s8"]
         }
       ],
       "generation": {
@@ -3516,9 +3208,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "703205-s1"
-          ]
+          "depends_on": ["703205-s1"]
         },
         {
           "task_id": "703205-s3",
@@ -3531,9 +3221,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "703205-s2"
-          ]
+          "depends_on": ["703205-s2"]
         },
         {
           "task_id": "703205-s4",
@@ -3546,9 +3234,7 @@
           "requires_timer": true,
           "timer_minutes": 2,
           "confidence": 0.9,
-          "depends_on": [
-            "703205-s3"
-          ]
+          "depends_on": ["703205-s3"]
         },
         {
           "task_id": "703205-s5",
@@ -3561,9 +3247,7 @@
           "requires_timer": true,
           "timer_minutes": 3,
           "confidence": 0.9,
-          "depends_on": [
-            "703205-s4"
-          ]
+          "depends_on": ["703205-s4"]
         },
         {
           "task_id": "703205-s6",
@@ -3576,9 +3260,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "703205-s5"
-          ]
+          "depends_on": ["703205-s5"]
         }
       ],
       "generation": {
@@ -3616,9 +3298,7 @@
           "requires_timer": true,
           "timer_minutes": 5,
           "confidence": 0.9,
-          "depends_on": [
-            "704604-s1"
-          ]
+          "depends_on": ["704604-s1"]
         },
         {
           "task_id": "704604-s3",
@@ -3631,9 +3311,7 @@
           "requires_timer": false,
           "timer_minutes": null,
           "confidence": 0.45,
-          "depends_on": [
-            "704604-s2"
-          ]
+          "depends_on": ["704604-s2"]
         }
       ],
       "generation": {
@@ -3671,9 +3349,7 @@
           "requires_timer": true,
           "timer_minutes": 10,
           "confidence": 0.9,
-          "depends_on": [
-            "704622-s1"
-          ]
+          "depends_on": ["704622-s1"]
         }
       ],
       "generation": {

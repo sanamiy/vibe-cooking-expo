@@ -19,7 +19,9 @@ function parseCliArgs(argv) {
 }
 
 function printHelp() {
-  console.log("Usage: node scripts/start-expo-auto-port.js -- [expo start args]");
+  console.log(
+    "Usage: node scripts/start-expo-auto-port.js -- [expo start args]",
+  );
   console.log("");
   console.log("Examples:");
   console.log("  npm run start");
@@ -69,7 +71,7 @@ async function main() {
 
   if (!selectedPort) {
     console.error(
-      `[auto-port] Failed to find an available port in range ${DEFAULT_START_PORT}-${DEFAULT_START_PORT + MAX_TRIES - 1}`
+      `[auto-port] Failed to find an available port in range ${DEFAULT_START_PORT}-${DEFAULT_START_PORT + MAX_TRIES - 1}`,
     );
     process.exit(1);
   }
@@ -80,7 +82,7 @@ async function main() {
   const child = spawn(
     npxCmd,
     ["expo", "start", "--port", String(selectedPort), ...extraArgs],
-    { stdio: "inherit", env: process.env }
+    { stdio: "inherit", env: process.env },
   );
 
   child.on("exit", (code, signal) => {

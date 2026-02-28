@@ -1,8 +1,14 @@
-import { theme } from '@/constants/theme';
-import { Pressable, StyleSheet, Text, ViewStyle, TextStyle } from 'react-native';
+import { theme } from "@/constants/theme";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
 
-type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = "primary" | "secondary" | "accent" | "outline" | "ghost";
+type ButtonSize = "sm" | "md" | "lg";
 
 interface Props {
   label: string;
@@ -13,32 +19,34 @@ interface Props {
   style?: ViewStyle;
 }
 
-export const AppButton = ({ 
-  label, 
-  onPress, 
-  disabled, 
-  variant = 'primary',
-  size = 'md',
-  style
+export const AppButton = ({
+  label,
+  onPress,
+  disabled,
+  variant = "primary",
+  size = "md",
+  style,
 }: Props) => {
   return (
-    <Pressable 
-      onPress={onPress} 
-      disabled={disabled} 
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
       style={({ pressed }) => [
         styles.base,
         styles[`${size}Size`],
         styles[`${variant}Variant`],
         pressed && styles.pressed,
         disabled && styles.disabled,
-        style
+        style,
       ]}
     >
-      <Text style={[
-        styles.textBase,
-        styles[`${size}Text`],
-        styles[`${variant}Text`],
-      ]}>
+      <Text
+        style={[
+          styles.textBase,
+          styles[`${size}Text`],
+          styles[`${variant}Text`],
+        ]}
+      >
         {label}
       </Text>
     </Pressable>
@@ -48,8 +56,8 @@ export const AppButton = ({
 const styles = StyleSheet.create({
   base: {
     borderRadius: theme.radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   pressed: {
     opacity: 0.9,
@@ -81,16 +89,16 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.accent,
   },
   outlineVariant: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: theme.colors.primary,
   },
   ghostVariant: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   // Text
   textBase: {
-    fontWeight: '700',
+    fontWeight: "700",
   },
   smText: {
     fontSize: 12,
@@ -102,10 +110,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   primaryText: {
-    color: '#fff',
+    color: "#fff",
   },
   secondaryText: {
-    color: '#fff',
+    color: "#fff",
   },
   accentText: {
     color: theme.colors.text,

@@ -1,5 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 interface AppSettings {
   servingsPerMeal: number;
@@ -12,15 +18,21 @@ interface AppSettingsContextValue {
   isReady: boolean;
 }
 
-const SETTINGS_KEY = 'app-settings';
+const SETTINGS_KEY = "app-settings";
 const defaultSettings: AppSettings = {
   servingsPerMeal: 4,
   stoveBurners: 2,
 };
 
-const AppSettingsContext = createContext<AppSettingsContextValue | undefined>(undefined);
+const AppSettingsContext = createContext<AppSettingsContextValue | undefined>(
+  undefined,
+);
 
-export const AppSettingsProvider = ({ children }: { children: React.ReactNode }) => {
+export const AppSettingsProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [isReady, setIsReady] = useState(false);
 
@@ -29,7 +41,10 @@ export const AppSettingsProvider = ({ children }: { children: React.ReactNode })
       try {
         const stored = await AsyncStorage.getItem(SETTINGS_KEY);
         if (stored) {
-          setSettings({ ...defaultSettings, ...(JSON.parse(stored) as Partial<AppSettings>) });
+          setSettings({
+            ...defaultSettings,
+            ...(JSON.parse(stored) as Partial<AppSettings>),
+          });
         }
       } finally {
         setIsReady(true);
@@ -40,25 +55,32 @@ export const AppSettingsProvider = ({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!isReady) return;
-    AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)).catch(() => undefined);
+    AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)).catch(
+      () => undefined,
+    );
   }, [isReady, settings]);
 
   const value = useMemo(
     () => ({
       settings,
-      updateSettings: (next: Partial<AppSettings>) => setSettings((prev) => ({ ...prev, ...next })),
+      updateSettings: (next: Partial<AppSettings>) =>
+        setSettings((prev) => ({ ...prev, ...next })),
       isReady,
     }),
-    [isReady, settings]
+    [isReady, settings],
   );
 
-  return <AppSettingsContext.Provider value={value}>{children}</AppSettingsContext.Provider>;
+  return (
+    <AppSettingsContext.Provider value={value}>
+      {children}
+    </AppSettingsContext.Provider>
+  );
 };
 
 export const useAppSettings = () => {
   const ctx = useContext(AppSettingsContext);
   if (!ctx) {
-    throw new Error('useAppSettings must be used within AppSettingsProvider');
+    throw new Error("useAppSettings must be used within AppSettingsProvider");
   }
   return ctx;
 };
