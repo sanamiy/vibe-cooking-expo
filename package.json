@@ -11,6 +11,8 @@
     "deploy:vps": "node scripts/deploy-vps.js",
     "api:vps": "node scripts/set-api-mode.js vps_proxy",
     "api:direct": "node scripts/set-api-mode.js direct_client",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "build:web": "npx expo export --platform web",
     "e2e:server": "CI=1 npx expo start --web --port 19006",
     "e2e:offline": "node scripts/set-tts-config.js offline_expospeech && CI=1 playwright test",
@@ -50,6 +52,7 @@
     "@babel/core": "^7.24.0",
     "@playwright/test": "^1.46.0",
     "@types/react": "~19.1.10",
+    "prettier": "^3.3.3",
     "typescript": "^5.5.4"
   },
   "engines": {
