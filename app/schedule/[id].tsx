@@ -1,26 +1,28 @@
-import { AppButton } from '@/components/AppButton';
-import { theme } from '@/constants/theme';
-import { useAppSettings } from '@/contexts/AppSettingsContext';
-import { useRecipes } from '@/hooks/useRecipes';
+import { AppButton } from "@/components/AppButton";
+import { theme } from "@/constants/theme";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useRecipes } from "@/hooks/useRecipes";
 import {
   RECIPE_COLORS,
   scheduleMultipleRecipes,
   type MultiRecipeSchedule,
   type SchedulerTask,
-} from '@/utils/scheduler';
-import { setScheduleTips, setScheduleTasks } from '@/utils/scheduleStore';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+} from "@/utils/scheduler";
+import { setScheduleTips, setScheduleTasks } from "@/utils/scheduleStore";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function ScheduleScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,9 +30,12 @@ export default function ScheduleScreen() {
   const { settings } = useAppSettings();
   const insets = useSafeAreaInsets();
 
-  const ids = useMemo(() => String(id).split(','), [id]);
+  const ids = useMemo(() => String(id).split(","), [id]);
   const recipes = useMemo(
-    () => ids.map((i) => getRecipeById(i)).filter(Boolean) as NonNullable<ReturnType<ReturnType<typeof useRecipes>['getRecipeById']>>[],
+    () =>
+      ids.map((i) => getRecipeById(i)).filter(Boolean) as NonNullable<
+        ReturnType<ReturnType<typeof useRecipes>["getRecipeById"]>
+      >[],
     [ids, getRecipeById],
   );
 
@@ -48,14 +53,20 @@ export default function ScheduleScreen() {
 
     (async () => {
       try {
-        const result = await scheduleMultipleRecipes(recipes, settings.stoveBurners);
+        const result = await scheduleMultipleRecipes(
+          recipes,
+          settings.stoveBurners,
+        );
         if (!cancelled) {
           // Store scheduler tasks for each recipe so cook-interactive can use them
           for (const rid of ids) {
             const recipeTasks = result.tasks
               .filter((t) => t.recipe_id === rid)
               .sort((a, b) => a.step_index - b.step_index);
-            setScheduleTips(rid, recipeTasks.map((t) => t.tips));
+            setScheduleTips(
+              rid,
+              recipeTasks.map((t) => t.tips),
+            );
             setScheduleTasks(rid, recipeTasks);
           }
           setSchedule(result);
@@ -63,20 +74,27 @@ export default function ScheduleScreen() {
         }
       } catch (e) {
         if (!cancelled) {
-          setError(e instanceof Error ? e.message : 'スケジュール作成に失敗しました');
+          setError(
+            e instanceof Error ? e.message : "スケジュール作成に失敗しました",
+          );
           setLoading(false);
         }
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [recipes, settings.stoveBurners]);
 
   // レシピ名 → 色のマップ
   const recipeColorMap = useMemo(() => {
     const map = new Map<string, { color: string; name: string }>();
     recipes.forEach((r, idx) => {
-      map.set(r.id, { color: RECIPE_COLORS[idx % RECIPE_COLORS.length], name: r.name });
+      map.set(r.id, {
+        color: RECIPE_COLORS[idx % RECIPE_COLORS.length],
+        name: r.name,
+      });
     });
     return map;
   }, [recipes]);
@@ -100,7 +118,12 @@ export default function ScheduleScreen() {
         <Text style={styles.title}>スケジュール</Text>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 + insets.bottom }]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: 120 + insets.bottom },
+        ]}
+      >
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -136,7 +159,9 @@ export default function ScheduleScreen() {
                   <Text style={styles.summaryLabel}>レシピ数</Text>
                 </View>
                 <View style={styles.summaryItem}>
-                  <Text style={styles.summaryValue}>{settings.stoveBurners}</Text>
+                  <Text style={styles.summaryValue}>
+                    {settings.stoveBurners}
+                  </Text>
                   <Text style={styles.summaryLabel}>コンロ口数</Text>
                 </View>
               </View>
@@ -146,7 +171,15 @@ export default function ScheduleScreen() {
             <View style={styles.legendCard}>
               {recipes.map((r, idx) => (
                 <View key={r.id} style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: RECIPE_COLORS[idx % RECIPE_COLORS.length] }]} />
+                  <View
+                    style={[
+                      styles.legendDot,
+                      {
+                        backgroundColor:
+                          RECIPE_COLORS[idx % RECIPE_COLORS.length],
+                      },
+                    ]}
+                  />
                   <Text style={styles.legendText}>{r.name}</Text>
                 </View>
               ))}
@@ -155,7 +188,10 @@ export default function ScheduleScreen() {
             {/* タイムラインガントチャート */}
             <View style={styles.card}>
               <Text style={styles.subTitle}>タイムライン</Text>
-              <GanttChart tasks={schedule.tasks} totalTime={schedule.total_time} />
+              <GanttChart
+                tasks={schedule.tasks}
+                totalTime={schedule.total_time}
+              />
             </View>
 
             {/* タスク一覧 */}
@@ -176,7 +212,7 @@ export default function ScheduleScreen() {
         <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
           <AppButton
             label="調理を開始する"
-            onPress={() => router.push(`/cook-interactive/${ids.join(',')}`)}
+            onPress={() => router.push(`/cook-interactive/${ids.join(",")}`)}
           />
         </View>
       )}
@@ -186,7 +222,13 @@ export default function ScheduleScreen() {
 
 /* ─── ガントチャート ─────────────────────────── */
 
-function GanttChart({ tasks, totalTime }: { tasks: SchedulerTask[]; totalTime: number }) {
+function GanttChart({
+  tasks,
+  totalTime,
+}: {
+  tasks: SchedulerTask[];
+  totalTime: number;
+}) {
   if (totalTime === 0) return null;
 
   // 5分刻みの目盛り
@@ -203,7 +245,10 @@ function GanttChart({ tasks, totalTime }: { tasks: SchedulerTask[]; totalTime: n
         {ticks.map((t) => (
           <Text
             key={t}
-            style={[ganttStyles.tickLabel, { left: `${(t / totalTime) * 100}%` as any }]}
+            style={[
+              ganttStyles.tickLabel,
+              { left: `${(t / totalTime) * 100}%` as any },
+            ]}
           >
             {t}分
           </Text>
@@ -217,7 +262,7 @@ function GanttChart({ tasks, totalTime }: { tasks: SchedulerTask[]; totalTime: n
         .map((task, idx) => {
           const leftPct = (task.start_time / totalTime) * 100;
           const widthPct = Math.max(2, (task.duration / totalTime) * 100);
-          const isWash = task.task_type === 'wash';
+          const isWash = task.task_type === "wash";
 
           return (
             <View key={idx} style={ganttStyles.row}>
@@ -228,14 +273,16 @@ function GanttChart({ tasks, totalTime }: { tasks: SchedulerTask[]; totalTime: n
                     {
                       left: `${leftPct}%` as any,
                       width: `${widthPct}%` as any,
-                      backgroundColor: isWash ? theme.colors.border : task.color,
+                      backgroundColor: isWash
+                        ? theme.colors.border
+                        : task.color,
                     },
                     isWash && ganttStyles.washBar,
                   ]}
                 />
               </View>
               <Text style={ganttStyles.label} numberOfLines={1}>
-                {isWash ? '🧼' : ''} {task.step_description}
+                {isWash ? "🧼" : ""} {task.step_description}
               </Text>
             </View>
           );
@@ -247,7 +294,7 @@ function GanttChart({ tasks, totalTime }: { tasks: SchedulerTask[]; totalTime: n
 /* ─── タスク行 ─────────────────────────────── */
 
 function TaskRow({ task, index }: { task: SchedulerTask; index: number }) {
-  const isWash = task.task_type === 'wash';
+  const isWash = task.task_type === "wash";
   const endTime = task.start_time + task.duration;
 
   return (
@@ -257,11 +304,16 @@ function TaskRow({ task, index }: { task: SchedulerTask; index: number }) {
           {task.start_time}〜{endTime}分
         </Text>
       </View>
-      <View style={[taskStyles.colorBar, { backgroundColor: isWash ? theme.colors.border : task.color }]} />
+      <View
+        style={[
+          taskStyles.colorBar,
+          { backgroundColor: isWash ? theme.colors.border : task.color },
+        ]}
+      />
       <View style={taskStyles.descCol}>
         <Text style={taskStyles.recipeName}>{task.recipe_name}</Text>
         <Text style={taskStyles.desc}>
-          {isWash ? '🧼 ' : ''}
+          {isWash ? "🧼 " : ""}
           {task.step_description}
         </Text>
         <View style={taskStyles.tags}>
@@ -297,42 +349,42 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.card,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   backBtn: {
-    position: 'absolute',
+    position: "absolute",
     left: 20,
     top: 20,
     zIndex: 1,
   },
   back: {
     color: theme.colors.subText,
-    fontWeight: '700',
+    fontWeight: "700",
     fontSize: 14,
   },
   title: {
     color: theme.colors.primary,
-    fontWeight: '800',
+    fontWeight: "800",
     fontSize: 20,
-    fontFamily: 'M PLUS Rounded 1c',
+    fontFamily: "M PLUS Rounded 1c",
   },
   content: { padding: 20, gap: 20 },
-  notFound: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
 
   // Loading
   loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 80,
     gap: 16,
   },
   loadingText: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: theme.colors.text,
-    fontFamily: 'M PLUS Rounded 1c',
+    fontFamily: "M PLUS Rounded 1c",
   },
   loadingSubText: {
     fontSize: 14,
@@ -341,15 +393,15 @@ const styles = StyleSheet.create({
 
   // Error
   errorContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 80,
     gap: 16,
   },
   errorText: {
     fontSize: 16,
     color: theme.colors.primary,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   // Summary
@@ -357,7 +409,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
@@ -365,29 +417,29 @@ const styles = StyleSheet.create({
   },
   summaryTitle: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: "800",
     color: theme.colors.text,
-    fontFamily: 'M PLUS Rounded 1c',
+    fontFamily: "M PLUS Rounded 1c",
     marginBottom: 16,
   },
   summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   summaryItem: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 4,
   },
   summaryValue: {
     fontSize: 32,
-    fontWeight: '800',
+    fontWeight: "800",
     color: theme.colors.primary,
-    fontFamily: 'Quicksand',
+    fontFamily: "Quicksand",
   },
   summaryLabel: {
     fontSize: 13,
     color: theme.colors.subText,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   // Legend
@@ -395,18 +447,18 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     padding: 16,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
   legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   legendDot: {
@@ -416,7 +468,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: theme.colors.text,
   },
 
@@ -426,29 +478,29 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     padding: 20,
     gap: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
   subTitle: {
-    fontWeight: '800',
+    fontWeight: "800",
     color: theme.colors.text,
     fontSize: 18,
-    fontFamily: 'M PLUS Rounded 1c',
+    fontFamily: "M PLUS Rounded 1c",
   },
 
   // Bottom bar
   bottomBar: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: theme.colors.card,
     paddingHorizontal: 20,
     paddingTop: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: -4 },
@@ -459,14 +511,14 @@ const styles = StyleSheet.create({
 const ganttStyles = StyleSheet.create({
   tickRow: {
     height: 24,
-    position: 'relative',
+    position: "relative",
     marginBottom: 8,
   },
   tickLabel: {
-    position: 'absolute',
+    position: "absolute",
     fontSize: 11,
     color: theme.colors.subText,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   row: {
     marginBottom: 6,
@@ -475,19 +527,19 @@ const ganttStyles = StyleSheet.create({
     height: 20,
     backgroundColor: theme.colors.bg,
     borderRadius: 10,
-    overflow: 'hidden',
-    position: 'relative',
+    overflow: "hidden",
+    position: "relative",
   },
   bar: {
-    height: '100%',
+    height: "100%",
     borderRadius: 10,
-    position: 'absolute',
+    position: "absolute",
     top: 0,
   },
   washBar: {
     borderWidth: 1,
     borderColor: theme.colors.subText,
-    borderStyle: 'dashed',
+    borderStyle: "dashed",
   },
   label: {
     fontSize: 11,
@@ -498,7 +550,7 @@ const ganttStyles = StyleSheet.create({
 
 const taskStyles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -509,11 +561,11 @@ const taskStyles = StyleSheet.create({
   },
   timeCol: {
     width: 70,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   time: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
     color: theme.colors.subText,
   },
   colorBar: {
@@ -526,7 +578,7 @@ const taskStyles = StyleSheet.create({
   },
   recipeName: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: "800",
     color: theme.colors.subText,
   },
   desc: {
@@ -535,7 +587,7 @@ const taskStyles = StyleSheet.create({
     lineHeight: 22,
   },
   tags: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 6,
     marginTop: 4,
   },
@@ -546,8 +598,8 @@ const taskStyles = StyleSheet.create({
   },
   tagText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   stoveTag: {
     backgroundColor: theme.colors.primary,

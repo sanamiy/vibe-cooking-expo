@@ -13,21 +13,22 @@
 import { stripHtmlInline } from "@/utils/recipe";
 import type { Recipe } from "@/types/recipe";
 import { buildRecipeGantt, type GanttTask } from "@/utils/gantt";
-import Constants from "expo-constants";
+import {
+  getApiMode,
+  requireClaudeApiKey,
+  requireVpsBaseUrl,
+} from "@/services/apiConfig";
 
-const VPS_API_BASE_URL =
-  (Constants.expoConfig?.extra as any)?.VPS_API_BASE_URL ??
-  process.env.EXPO_PUBLIC_VPS_API_BASE_URL ??
-  "";
+const IS_WEB =
+  typeof (globalThis as any).window !== "undefined" &&
+  typeof (globalThis as any).document !== "undefined";
 
-function requireVpsBaseUrl() {
-  if (!VPS_API_BASE_URL) {
-    throw new Error("Missing VPS API base URL");
-  }
-  return VPS_API_BASE_URL.replace(/\/$/, "");
+function shouldUseVpsProxy(): boolean {
+  const mode = getApiMode();
+  return mode === "vps_proxy" || (mode === "direct_client" && IS_WEB);
 }
 
-async function postJson<T>(path: string, body: any): Promise<T> {
+async function postJsonVps<T>(path: string, body: any): Promise<T> {
   const base = requireVpsBaseUrl();
   const res = await fetch(`${base}${path}`, {
     method: "POST",
@@ -41,6 +42,29 @@ async function postJson<T>(path: string, body: any): Promise<T> {
     throw new Error(`VPS API error ${res.status}: ${text}`);
   }
   return (await res.json()) as T;
+}
+
+async function callAnthropicMessages(params: {
+  messages: any[];
+  maxTokens: number;
+}) {
+  const apiKey = requireClaudeApiKey();
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: params.maxTokens,
+      messages: params.messages,
+    }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Anthropic API error ${res.status}: ${text}`);
+  return JSON.parse(text);
 }
 
 // ─── Types ──────────────────────────────────────────
@@ -134,7 +158,7 @@ async function analyzeRecipeWithLLM(
   ingredients: string[],
   steps: Array<{ text: string }>,
 ): Promise<StepResource[]> {
-  if (!VPS_API_BASE_URL) throw new Error("No VPS API base URL");
+  const useVps = shouldUseVpsProxy();
 
   const stepsText = steps
     .map((s, i) => `${i + 1}. ${stripHtmlInline(s.text)}`)
@@ -189,11 +213,26 @@ JSONの配列のみを出力してください。マークダウンのコード�
   }
 ]`;
 
-  const data = await postJson<{ steps: StepResource[] }>(
-    "/vps/scheduler/analyze-recipe",
-    { prompt },
-  );
-  return data.steps;
+  if (useVps) {
+    const data = await postJsonVps<{ steps: StepResource[] }>(
+      "/vps/scheduler/analyze-recipe",
+      { prompt },
+    );
+    return data.steps;
+  }
+
+  const data = await callAnthropicMessages({
+    maxTokens: 2048,
+    messages: [{ role: "user", content: String(prompt ?? "") }],
+  });
+
+  const text = data.content?.[0]?.text ?? "";
+  const start = text.indexOf("[");
+  const end = text.lastIndexOf("]");
+  if (start === -1 || end === -1) {
+    throw new Error("No JSON array in response");
+  }
+  return JSON.parse(text.slice(start, end + 1)) as StepResource[];
 }
 
 // ─── Step Classification ────────────────────────────
@@ -545,7 +584,7 @@ export async function scheduleMultipleRecipes(
   stoveBurners: number,
 ): Promise<MultiRecipeSchedule> {
   const allTasks: SchedulerTask[] = [];
-  const useLLM = !!VPS_API_BASE_URL;
+  const useLLM = true;
 
   for (let rIdx = 0; rIdx < recipes.length; rIdx++) {
     const recipe = recipes[rIdx];

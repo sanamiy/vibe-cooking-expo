@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
-import Constants from "expo-constants";
+import {
+  getApiMode,
+  requireMistralApiKey,
+  requireVpsBaseUrl,
+} from "@/services/apiConfig";
 
 interface UseVoiceCommandsProps {
   onTranscript: (text: string) => void;
@@ -12,40 +16,44 @@ interface UseVoiceCommandsProps {
   isSpeaking?: boolean;
 }
 
-const MISTRAL_API_KEY =
-  Constants.expoConfig?.extra?.MISTRAL_API_KEY ??
-  process.env.EXPO_PUBLIC_MISTRAL_API_KEY ??
-  process.env.MISTRAL_API_KEY ??
-  "";
-
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
+    const doc = (globalThis as any).document as any;
+    if (!doc) {
+      reject(new Error("document is not available"));
+      return;
+    }
+    if (doc.querySelector(`script[src="${src}"]`)) {
       resolve();
       return;
     }
-    const script = document.createElement("script");
+    const script = doc.createElement("script");
     script.src = src;
     script.onload = () => resolve();
     script.onerror = () => reject(new Error(`Failed to load ${src}`));
-    document.head.appendChild(script);
+    doc.head.appendChild(script);
   });
 }
 
 async function loadVAD(): Promise<any> {
-  const win = window as any;
+  const win = globalThis as any;
 
   if (win.vad?.MicVAD) {
     return win.vad;
   }
 
-  await loadScript("https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/ort.min.js");
+  await loadScript(
+    "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/ort.min.js",
+  );
 
   if (win.ort) {
-    win.ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/";
+    win.ort.env.wasm.wasmPaths =
+      "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/";
   }
 
-  await loadScript("https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.19/dist/bundle.min.js");
+  await loadScript(
+    "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.19/dist/bundle.min.js",
+  );
 
   if (!win.vad?.MicVAD) {
     throw new Error("VAD library not loaded");
@@ -59,7 +67,7 @@ async function transcribeStream(
   audioChunks: Int16Array[],
   onInterim: (text: string) => void,
   onFinal: (text: string) => void,
-  onError: (error: string) => void
+  onError: (error: string) => void,
 ): Promise<void> {
   // Build WAV from chunks
   const totalSamples = audioChunks.reduce((sum, c) => sum + c.length, 0);
@@ -111,10 +119,21 @@ async function transcribeStream(
   formData.append("stream", "true");
 
   try {
-    const resp = await fetch("https://api.mistral.ai/v1/audio/transcriptions", {
+    const mode = getApiMode();
+    const url =
+      mode === "vps_proxy"
+        ? `${requireVpsBaseUrl()}/vps/asr/transcribe`
+        : "https://api.mistral.ai/v1/audio/transcriptions";
+
+    const headers: Record<string, string> =
+      mode === "direct_client"
+        ? { Authorization: `Bearer ${requireMistralApiKey()}` }
+        : {};
+
+    const resp = await fetch(url, {
       method: "POST",
-      headers: { Authorization: `Bearer ${MISTRAL_API_KEY}` },
-      body: formData,
+      headers,
+      body: formData as any,
     });
 
     if (!resp.ok) {
@@ -214,15 +233,18 @@ export function useVoiceCommands({
         preSpeechPadFrames: 3,
         minSpeechFrames: 3,
         additionalAudioConstraints: {
-          deviceId: inputDeviceId && inputDeviceId !== "default"
-            ? { exact: inputDeviceId }
-            : undefined,
+          deviceId:
+            inputDeviceId && inputDeviceId !== "default"
+              ? { exact: inputDeviceId }
+              : undefined,
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
         },
-        workletURL: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.19/dist/vad.worklet.bundle.min.js",
-        modelURL: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.19/dist/silero_vad.onnx",
+        workletURL:
+          "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.19/dist/vad.worklet.bundle.min.js",
+        modelURL:
+          "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.19/dist/silero_vad.onnx",
         onSpeechStart: () => {
           console.log("Speech started, isSpeaking:", isSpeakingRef.current);
           isRecordingRef.current = true;
@@ -233,7 +255,10 @@ export function useVoiceCommands({
             onSpeechStartRef.current?.();
           }
         },
-        onFrameProcessed: (probs: { isSpeech: number }, frame: Float32Array) => {
+        onFrameProcessed: (
+          probs: { isSpeech: number },
+          frame: Float32Array,
+        ) => {
           // Collect audio chunks while recording
           if (isRecordingRef.current && frame) {
             const pcm16 = new Int16Array(frame.length);
@@ -255,7 +280,11 @@ export function useVoiceCommands({
             pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
           }
 
-          console.log("Speech ended, streaming transcription...", audio.length, "samples");
+          console.log(
+            "Speech ended, streaming transcription...",
+            audio.length,
+            "samples",
+          );
 
           let gotTranscript = false;
 
@@ -274,12 +303,14 @@ export function useVoiceCommands({
             (err) => {
               console.error("Transcription error:", err);
               setError(err);
-            }
+            },
           );
 
           // If no transcript was produced (noise/echo), notify with empty to reset state
           if (!gotTranscript) {
-            console.log("No transcript produced, signaling speech end without content");
+            console.log(
+              "No transcript produced, signaling speech end without content",
+            );
             onSpeechEndRef.current?.();
           }
         },
