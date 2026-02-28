@@ -5,4 +5,5 @@
 expo-env.d.ts
 # @end expo-cli
 node_modules
+dist
 data/recipe-img

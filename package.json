@@ -8,6 +8,7 @@
     "ios": "node scripts/start-expo-auto-port.js -- --ios",
     "android": "node scripts/start-expo-auto-port.js -- --android",
     "web": "node scripts/start-expo-auto-port.js -- --web",
+    "build:web": "npx expo export --platform web",
     "typecheck": "tsc --noEmit",
     "scrape:recipes": "python3 scripts/scraping-ajinomoto.py",
     "validate:recipes": "python3 scripts/validate_recipe_json.py"
