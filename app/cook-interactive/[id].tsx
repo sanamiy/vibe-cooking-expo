@@ -28,16 +28,18 @@ const toSteps = (recipe: ReturnType<ReturnType<typeof useRecipes>["getRecipeById
 export default function CookInteractiveScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getRecipeById } = useRecipes();
-  const recipe = getRecipeById(String(id));
+
+  const ids = useMemo(() => String(id).split(","), [id]);
+  const recipe = getRecipeById(ids[0]);
 
   const steps = useMemo(() => toSteps(recipe), [recipe]);
 
   const gantt = useMemo<RecipeGanttData>(() => {
     const prebuilt = (prebuiltGantt as { recipes?: RecipeGanttData[] }).recipes?.find(
-      (r) => r.recipe_id === String(id),
+      (r) => r.recipe_id === ids[0],
     );
-    return prebuilt ?? buildRecipeGantt(String(id), steps);
-  }, [id, steps]);
+    return prebuilt ?? buildRecipeGantt(ids[0], steps);
+  }, [ids, steps]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [countdown, setCountdown] = useState<number | null>(null);
