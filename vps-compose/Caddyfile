@@ -1,0 +1,4 @@
+temp.synome.jp {
+  encode gzip
+  reverse_proxy vps-api:8080
+}
