@@ -8,3 +8,5 @@ node_modules
 dist
 data/recipe-img
 .env
+data/*.mp3
+scripts/download_*.sh
