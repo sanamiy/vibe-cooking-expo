@@ -28,11 +28,7 @@ export default function HomeScreen() {
   };
 
   const onConfirm = () => {
-    if (selectedCount === 1) {
-      router.push(`/recipe/${selectedIds[0]}`);
-      return;
-    }
-    Alert.alert('複数料理は後日対応', `${selectedCount}件を選択中です。まずは1件選択で進んでください。`);
+    router.push(`/recipe/${selectedIds.join(',')}`);
   };
 
   return (
