@@ -15,11 +15,22 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.sanami.vibecooking"
+      "bundleIdentifier": "com.sanami.vibecooking",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "音声で調理ナビゲーションを操作するためにマイクを使用します。",
+        "NSSpeechRecognitionUsageDescription": "音声で調理手順を進めるために音声認識を使用します。"
+      }
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "音声で調理ナビゲーションを操作するためにマイクを使用します。",
+          "speechRecognitionPermission": "音声で調理手順を進めるために音声認識を使用します。"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
