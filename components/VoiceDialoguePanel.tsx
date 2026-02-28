@@ -1,7 +1,14 @@
 import { theme } from "@/constants/theme";
 import { DialogueState } from "@/hooks/useVoiceDialogue";
 import { AudioDevice } from "@/hooks/useAudioDevices";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useState } from "react";
 
 interface ConversationEntry {

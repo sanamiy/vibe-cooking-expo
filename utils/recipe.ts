@@ -24,7 +24,7 @@ export const stripHtmlInline = (text: string) =>
 
 const toHalfWidth = (text: string) =>
   text.replace(/[０-９]/g, (s) =>
-    String.fromCharCode(s.charCodeAt(0) - 0xfee0)
+    String.fromCharCode(s.charCodeAt(0) - 0xfee0),
   );
 
 export const scaleIngredient = (ingredient: string, mult: number) => {
@@ -43,13 +43,13 @@ export const scaleIngredient = (ingredient: string, mult: number) => {
       } catch {
         return match;
       }
-    }
+    },
   );
 };
 
 export const multiplierForRecipe = (
   recipe: Recipe | null,
-  servingsPerMeal: number
+  servingsPerMeal: number,
 ) => {
   if (!recipe?.recipe_servings) return 1;
   return servingsPerMeal / recipe.recipe_servings;

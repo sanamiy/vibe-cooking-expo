@@ -45,7 +45,8 @@
 推奨フォールバック:
 
 ```css
-font-family: "Quicksand", "M PLUS Rounded 1c", "Hiragino Kaku Gothic ProN", sans-serif;
+font-family:
+  "Quicksand", "M PLUS Rounded 1c", "Hiragino Kaku Gothic ProN", sans-serif;
 ```
 
 ### 3.2 タイプスケール（推奨）
@@ -134,22 +135,22 @@ font-family: "Quicksand", "M PLUS Rounded 1c", "Hiragino Kaku Gothic ProN", sans
 
 ```css
 :root {
-  --color-primary: #FF6B6B;
-  --color-secondary: #4ECDC4;
-  --color-accent: #F7E06E;
+  --color-primary: #ff6b6b;
+  --color-secondary: #4ecdc4;
+  --color-accent: #f7e06e;
 
-  --color-purple: #A29DE4;
-  --color-orange: #FFA16D;
-  --color-blue: #5BB7EA;
-  --color-success: #6BD89D;
-  --color-warning: #FFD166;
+  --color-purple: #a29de4;
+  --color-orange: #ffa16d;
+  --color-blue: #5bb7ea;
+  --color-success: #6bd89d;
+  --color-warning: #ffd166;
 
-  --color-bg: #F5F3EF;
-  --color-surface: #FFFFFF;
-  --color-text-main: #2F2F2F;
-  --color-text-sub: #7A7A7A;
-  --color-border-soft: #E6E6E6;
-  --color-divider: #FF6B6B;
+  --color-bg: #f5f3ef;
+  --color-surface: #ffffff;
+  --color-text-main: #2f2f2f;
+  --color-text-sub: #7a7a7a;
+  --color-border-soft: #e6e6e6;
+  --color-divider: #ff6b6b;
 
   --radius-sm: 8px;
   --radius-md: 12px;

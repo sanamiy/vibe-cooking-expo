@@ -15,7 +15,11 @@ export const RecipeCard = ({ recipe, isSelected, onToggle }: Props) => (
     style={[styles.card, isSelected && styles.selected]}
   >
     <View style={styles.imageContainer}>
-      <Image source={{ uri: recipe.image_url }} style={styles.img} resizeMode="cover" />
+      <Image
+        source={{ uri: recipe.image_url }}
+        style={styles.img}
+        resizeMode="cover"
+      />
     </View>
     <View style={styles.body}>
       <Text style={styles.title}>{recipe.name}</Text>

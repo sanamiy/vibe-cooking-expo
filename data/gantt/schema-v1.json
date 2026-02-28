@@ -3,7 +3,13 @@
   "$id": "https://vibe-cooking.local/gantt/schema-v1.json",
   "title": "Vibe Cooking Recipe Gantt v1",
   "type": "object",
-  "required": ["version", "recipe_id", "total_estimated_minutes", "tasks", "generation"],
+  "required": [
+    "version",
+    "recipe_id",
+    "total_estimated_minutes",
+    "tasks",
+    "generation"
+  ],
   "properties": {
     "version": { "const": 1 },
     "recipe_id": { "type": "string" },

@@ -20,7 +20,8 @@ function main() {
   const host = process.env.VPS_SSH_HOST || "temp";
   const remoteDir = process.env.VPS_REMOTE_DIR || "/opt/vibe-cooking-expo";
   const remoteComposeDir = `${remoteDir}/vps-compose`;
-  const remoteEnvFile = process.env.VPS_ENV_FILE || "/opt/vps-secrets/vibe-cooking-vps.env";
+  const remoteEnvFile =
+    process.env.VPS_ENV_FILE || "/opt/vps-secrets/vibe-cooking-vps.env";
 
   const root = repoRoot();
 
