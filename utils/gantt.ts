@@ -25,10 +25,7 @@ export interface RecipeGanttData {
   };
 }
 
-const MINUTE_PATTERNS: RegExp[] = [
-  /([\d]+)\s*[〜~\-]\s*([\d]+)\s*分/g,
-  /([\d]+)\s*分(?:間)?/g,
-];
+const MINUTE_PATTERNS: RegExp[] = [/([\d]+)\s*[〜~\-]\s*([\d]+)\s*分/g, /([\d]+)\s*分(?:間)?/g];
 const SECOND_PATTERN = /([\d]+)\s*秒/g;
 const FALLBACK_BY_ACTION: Array<{ pattern: RegExp; minutes: number }> = [
   { pattern: /(切る|刻む|むく|下ごしらえ|準備)/, minutes: 4 },
@@ -39,33 +36,39 @@ const FALLBACK_BY_ACTION: Array<{ pattern: RegExp; minutes: number }> = [
 ];
 
 const toHalfWidth = (text: string) =>
-  text.replace(/[０-９]/g, (s) =>
-    String.fromCharCode(s.charCodeAt(0) - 0xfee0)
-  );
+  text.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
 
 const parseStepDuration = (rawText: string) => {
   const text = toHalfWidth(stripHtmlInline(rawText));
   let totalMinutes = 0;
   let timerMinutes = 0;
 
-  for (const pattern of MINUTE_PATTERNS) {
-    pattern.lastIndex = 0;
-    let match = pattern.exec(text);
-    while (match) {
-      if (match[2]) {
-        const avg = Math.max(
-          1,
-          Math.round((Number(match[1]) + Number(match[2])) / 2)
-        );
-        totalMinutes += avg;
-        timerMinutes += avg;
-      } else if (match[1]) {
-        const minutes = Number(match[1]);
-        totalMinutes += minutes;
-        timerMinutes += minutes;
-      }
-      match = pattern.exec(text);
+  const matchedRanges: Array<[number, number]> = [];
+
+  const rangePattern = MINUTE_PATTERNS[0];
+  rangePattern.lastIndex = 0;
+  let match = rangePattern.exec(text);
+  while (match) {
+    const avg = Math.max(1, Math.round((Number(match[1]) + Number(match[2])) / 2));
+    totalMinutes += avg;
+    timerMinutes += avg;
+    matchedRanges.push([match.index, match.index + match[0].length]);
+    match = rangePattern.exec(text);
+  }
+
+  const simplePattern = MINUTE_PATTERNS[1];
+  simplePattern.lastIndex = 0;
+  match = simplePattern.exec(text);
+  while (match) {
+    const overlaps = matchedRanges.some(
+      ([start, end]) => match!.index >= start && match!.index < end,
+    );
+    if (!overlaps) {
+      const minutes = Number(match[1]);
+      totalMinutes += minutes;
+      timerMinutes += minutes;
     }
+    match = simplePattern.exec(text);
   }
 
   SECOND_PATTERN.lastIndex = 0;
@@ -108,7 +111,7 @@ const makeStepLabel = (text: string) =>
 
 export const buildRecipeGantt = (
   recipeId: string,
-  steps: Array<{ text: string }>
+  steps: Array<{ text: string }>,
 ): RecipeGanttData => {
   let cursor = 0;
   const tasks: GanttTask[] = steps.map((step, index) => {
