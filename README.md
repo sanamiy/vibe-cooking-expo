@@ -24,6 +24,26 @@ npm install
 npm run ios
 ```
 
+### 複数アプリを同一PCで起動する（自動ポート探索）
+このリポジトリの `start/ios/android/web` は、起動時に空いているポートを自動探索して Expo を起動します。  
+既定では `8081` から順に探索するため、ポート衝突時も別ポートで立ち上がります。
+
+```bash
+# 通常起動（空きポートを自動選択）
+npm run start
+
+# iOS/Android/Web も同様に自動選択
+npm run ios
+npm run android
+npm run web
+```
+
+探索開始ポートを変えたい場合:
+
+```bash
+EXPO_PORT_START=19000 npm run start
+```
+
 ## スクレイピング/データ更新
 Nuxt から移植した Python スクリプトでレシピデータと画像を更新できます。
 
