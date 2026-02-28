@@ -5,7 +5,8 @@ import { buildRecipeGantt, RecipeGanttData } from "@/utils/gantt";
 import { stripHtml } from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 // import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
 import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
@@ -20,7 +21,9 @@ const formatCountdownLabel = (countdown: number | null) => {
   return `${mm}:${ss}`;
 };
 
-const toSteps = (recipe: ReturnType<ReturnType<typeof useRecipes>["getRecipeById"]>) => {
+const toSteps = (
+  recipe: ReturnType<ReturnType<typeof useRecipes>["getRecipeById"]>,
+) => {
   if (!recipe) return [] as Array<{ text: string }>;
   if (recipe.instruction_steps?.length)
     return recipe.instruction_steps.map((s) => ({ text: s.text }));
@@ -37,9 +40,9 @@ export default function CookInteractiveScreen() {
   const steps = useMemo(() => toSteps(recipe), [recipe]);
 
   const gantt = useMemo<RecipeGanttData>(() => {
-    const prebuilt = (prebuiltGantt as { recipes?: RecipeGanttData[] }).recipes?.find(
-      (r) => r.recipe_id === ids[0],
-    );
+    const prebuilt = (
+      prebuiltGantt as { recipes?: RecipeGanttData[] }
+    ).recipes?.find((r) => r.recipe_id === ids[0]);
     return prebuilt ?? buildRecipeGantt(ids[0], steps);
   }, [ids, steps]);
 
@@ -81,6 +84,7 @@ export default function CookInteractiveScreen() {
     recipeName: recipe?.name ?? "",
     currentIndex,
     outputDeviceId: selectedOutputId,
+    startBgmUri: process.env.EXPO_PUBLIC_MUSIC_LINK,
     onChangeIndex: setCurrentIndex,
     onSessionEnd: () => router.back(),
     recipeContext,
@@ -160,7 +164,9 @@ export default function CookInteractiveScreen() {
               </Text>
             </View>
           </View>
-          <Text style={styles.stepText}>{stripHtml(currentStep?.text ?? "手順がありません")}</Text>
+          <Text style={styles.stepText}>
+            {stripHtml(currentStep?.text ?? "手順がありません")}
+          </Text>
         </View>
 
         {/* Countdown timer */}
