@@ -9,6 +9,9 @@
     "android": "node scripts/start-expo-auto-port.js -- --android",
     "web": "node scripts/start-expo-auto-port.js -- --web",
     "build:web": "npx expo export --platform web",
+    "e2e:server": "CI=1 npx expo start --web --port 19006",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit",
     "scrape:recipes": "python3 scripts/scraping-ajinomoto.py",
     "validate:recipes": "python3 scripts/validate_recipe_json.py"
@@ -37,6 +40,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
+    "@playwright/test": "^1.46.0",
     "@types/react": "~19.1.10",
     "typescript": "^5.5.4"
   },
