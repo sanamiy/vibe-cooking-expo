@@ -13,8 +13,13 @@
 import { stripHtmlInline } from "@/utils/recipe";
 import type { Recipe } from "@/types/recipe";
 import { buildRecipeGantt, type GanttTask } from "@/utils/gantt";
+import Constants from "expo-constants";
 
-const CLAUDE_API_KEY = process.env.EXPO_PUBLIC_CLAUDE_API_KEY ?? "";
+const CLAUDE_API_KEY =
+  Constants.expoConfig?.extra?.CLAUDE_API_KEY ??
+  process.env.EXPO_PUBLIC_CLAUDE_API_KEY ??
+  process.env.CLAUDE_API_KEY ??
+  "";
 
 // ─── Types ──────────────────────────────────────────
 
@@ -55,17 +60,22 @@ export const RECIPE_COLORS = [
 ];
 
 const CONTAMINATION_KEYWORDS: Record<string, string[]> = {
-  raw_meat: [
-    "肉", "牛肉", "豚肉", "鶏肉", "ひき肉", "合いびき",
-    "バラ肉", "ロース", "もも肉",
-  ],
-  raw_fish: [
-    "魚", "刺身", "サーモン", "マグロ", "エビ", "イカ", "貝",
-  ],
+  raw_meat: ["肉", "牛肉", "豚肉", "鶏肉", "ひき肉", "合いびき", "バラ肉", "ロース", "もも肉"],
+  raw_fish: ["魚", "刺身", "サーモン", "マグロ", "エビ", "イカ", "貝"],
   vegetables: [
-    "野菜", "じゃがいも", "にんじん", "玉ねぎ", "キャベツ",
-    "レタス", "トマト", "きゅうり", "ピーマン", "ネギ",
-    "長ネギ", "ほうれん草", "人参",
+    "野菜",
+    "じゃがいも",
+    "にんじん",
+    "玉ねぎ",
+    "キャベツ",
+    "レタス",
+    "トマト",
+    "きゅうり",
+    "ピーマン",
+    "ネギ",
+    "長ネギ",
+    "ほうれん草",
+    "人参",
   ],
 };
 
@@ -90,7 +100,7 @@ interface StepResource {
 async function analyzeRecipeWithLLM(
   recipeName: string,
   ingredients: string[],
-  steps: Array<{ text: string }>
+  steps: Array<{ text: string }>,
 ): Promise<StepResource[]> {
   if (!CLAUDE_API_KEY) throw new Error("No API key");
 
@@ -189,12 +199,9 @@ function classifyStep(text: string): {
 } {
   const clean = stripHtmlInline(text);
   return {
-    uses_stove:
-      /[焼炒煮沸茹蒸]/.test(clean) || /コンロ|火にかけ|フライパン|鍋/.test(clean),
-    uses_cutting_board:
-      /[切刻]/.test(clean) || /みじん/.test(clean),
-    requires_attention:
-      !/煮込|蒸らし|放置|浸[しけ]|冷ま/.test(clean),
+    uses_stove: /[焼炒煮沸茹蒸]/.test(clean) || /コンロ|火にかけ|フライパン|鍋/.test(clean),
+    uses_cutting_board: /[切刻]/.test(clean) || /みじん/.test(clean),
+    requires_attention: !/煮込|蒸らし|放置|浸[しけ]|冷ま/.test(clean),
   };
 }
 
@@ -219,7 +226,7 @@ function isResourceAvailable(
   usageList: TimeRange[],
   start: number,
   end: number,
-  limit: number
+  limit: number,
 ): boolean {
   let count = 0;
   for (const [s, e] of usageList) {
@@ -231,10 +238,7 @@ function isResourceAvailable(
 /**
  * 貪欲法スケジューリング (scheduler.py:130-232)
  */
-function greedySchedule(
-  allTasks: SchedulerTask[],
-  stoveBurners: number
-): SchedulerTask[] {
+function greedySchedule(allTasks: SchedulerTask[], stoveBurners: number): SchedulerTask[] {
   // レシピごとにグループ化
   const tasksByRecipe = new Map<string, SchedulerTask[]>();
   for (const task of allTasks) {
@@ -329,7 +333,7 @@ function greedySchedule(
  * 洗い物タスクを挿入すべき位置を特定 (hygiene.py:54-98)
  */
 function findWashInsertions(
-  tasks: SchedulerTask[]
+  tasks: SchedulerTask[],
 ): Array<{ beforeIndex: number; reason: string }> {
   const sorted = [...tasks].sort((a, b) => a.start_time - b.start_time);
   const insertions: Array<{ beforeIndex: number; reason: string }> = [];
@@ -350,7 +354,9 @@ function findWashInsertions(
 
     const needsWash =
       (currentContamination === "raw_meat" || currentContamination === "raw_fish") &&
-      category !== "raw_meat" && category !== "raw_fish" && category !== "none";
+      category !== "raw_meat" &&
+      category !== "raw_fish" &&
+      category !== "none";
 
     if (needsWash) {
       insertions.push({
@@ -418,14 +424,10 @@ function applyHygieneCorrection(tasks: SchedulerTask[]): SchedulerTask[] {
 /**
  * ルールベースでタスクを構築（LLMフォールバック用）
  */
-function buildTasksFromGantt(
-  recipe: Recipe,
-  color: string
-): SchedulerTask[] {
-  const steps: Array<{ text: string }> =
-    recipe.instruction_steps?.length
-      ? recipe.instruction_steps.map((s) => ({ text: s.text }))
-      : (recipe.instructions ?? []).map((text) => ({ text }));
+function buildTasksFromGantt(recipe: Recipe, color: string): SchedulerTask[] {
+  const steps: Array<{ text: string }> = recipe.instruction_steps?.length
+    ? recipe.instruction_steps.map((s) => ({ text: s.text }))
+    : (recipe.instructions ?? []).map((text) => ({ text }));
 
   const gantt = buildRecipeGantt(recipe.id, steps);
 
@@ -448,9 +450,7 @@ function buildTasksFromGantt(
           ? "cook_active"
           : "cook_passive"
         : "prep",
-      contamination: classified.uses_cutting_board
-        ? classifyContamination(description)
-        : "none",
+      contamination: classified.uses_cutting_board ? classifyContamination(description) : "none",
       tips: "",
     };
   });
@@ -459,21 +459,13 @@ function buildTasksFromGantt(
 /**
  * LLMでタスクを構築
  */
-async function buildTasksFromLLM(
-  recipe: Recipe,
-  color: string
-): Promise<SchedulerTask[]> {
+async function buildTasksFromLLM(recipe: Recipe, color: string): Promise<SchedulerTask[]> {
   const ingredients = recipe.ingredients ?? [];
-  const steps: Array<{ text: string }> =
-    recipe.instruction_steps?.length
-      ? recipe.instruction_steps.map((s) => ({ text: s.text }))
-      : (recipe.instructions ?? []).map((text) => ({ text }));
+  const steps: Array<{ text: string }> = recipe.instruction_steps?.length
+    ? recipe.instruction_steps.map((s) => ({ text: s.text }))
+    : (recipe.instructions ?? []).map((text) => ({ text }));
 
-  const stepResources = await analyzeRecipeWithLLM(
-    recipe.name,
-    ingredients,
-    steps
-  );
+  const stepResources = await analyzeRecipeWithLLM(recipe.name, ingredients, steps);
 
   return stepResources.map((sr) => {
     const needsAttention = sr.requires_attention || sr.step_index === 0;
@@ -488,14 +480,8 @@ async function buildTasksFromLLM(
       requires_attention: needsAttention,
       start_time: 0,
       color,
-      task_type: sr.uses_stove
-        ? needsAttention
-          ? "cook_active"
-          : "cook_passive"
-        : "prep",
-      contamination: sr.uses_cutting_board
-        ? classifyContamination(sr.step_description)
-        : "none",
+      task_type: sr.uses_stove ? (needsAttention ? "cook_active" : "cook_passive") : "prep",
+      contamination: sr.uses_cutting_board ? classifyContamination(sr.step_description) : "none",
       tips: sr.tips ?? "",
     };
   });
@@ -511,7 +497,7 @@ async function buildTasksFromLLM(
  */
 export async function scheduleMultipleRecipes(
   recipes: Recipe[],
-  stoveBurners: number
+  stoveBurners: number,
 ): Promise<MultiRecipeSchedule> {
   const allTasks: SchedulerTask[] = [];
   const useLLM = !!CLAUDE_API_KEY;
@@ -540,9 +526,7 @@ export async function scheduleMultipleRecipes(
   const corrected = applyHygieneCorrection(scheduled);
 
   const totalTime =
-    corrected.length > 0
-      ? Math.max(...corrected.map((t) => t.start_time + t.duration))
-      : 0;
+    corrected.length > 0 ? Math.max(...corrected.map((t) => t.start_time + t.duration)) : 0;
 
   return {
     tasks: corrected,
