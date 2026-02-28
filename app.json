@@ -10,9 +10,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#FFF7F2"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.sanami.vibecooking",
@@ -21,17 +19,7 @@
         "NSSpeechRecognitionUsageDescription": "音声で調理手順を進めるために音声認識を使用します。"
       }
     },
-    "plugins": [
-      "expo-router",
-      "expo-font",
-      [
-        "expo-speech-recognition",
-        {
-          "microphonePermission": "音声で調理ナビゲーションを操作するためにマイクを使用します。",
-          "speechRecognitionPermission": "音声で調理手順を進めるために音声認識を使用します。"
-        }
-      ]
-    ],
+    "plugins": ["expo-router", "expo-font"],
     "experiments": {
       "typedRoutes": true
     }
