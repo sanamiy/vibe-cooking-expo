@@ -40,7 +40,8 @@ export async function classifyIntent(
   userText: string,
   currentStep: string,
   prevStep: string | null,
-  nextStep: string | null
+  nextStep: string | null,
+  recipeName?: string
 ): Promise<Intent> {
   const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
     method: "POST",
@@ -57,6 +58,7 @@ export async function classifyIntent(
 ユーザーの発話を以下のラベルのいずれかに分類してください。
 ラベル: next_step, previous_step, question, timer_status, end_session
 
+${recipeName ? `料理名: ${recipeName}` : ""}
 現在の工程: ${currentStep}
 ${prevStep ? `前の工程: ${prevStep}` : "（最初の工程です）"}
 ${nextStep ? `次の工程: ${nextStep}` : "（最後の工程です）"}
@@ -85,17 +87,38 @@ JSON形式で返してください: {"intent": "ラベル"}`,
 
 // ---------- Mistral: Question answering ----------
 
+export interface RecipeContext {
+  recipeName: string;
+  ingredients: string[];
+  allSteps: string[];
+  stepTips?: string[];
+}
+
 export async function answerQuestion(
   userText: string,
   currentStep: string,
   stepProgress: string,
-  history: ConversationEntry[]
+  history: ConversationEntry[],
+  recipeContext?: RecipeContext
 ): Promise<string> {
+  const recipeInfo = recipeContext
+    ? `
+料理名: ${recipeContext.recipeName}
+
+【材料】
+${recipeContext.ingredients.map((ing) => `- ${ing}`).join("\n")}
+
+【全工程】
+${recipeContext.allSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")}
+${recipeContext.stepTips?.length ? `\n【各工程の注意点・コツ】\n${recipeContext.stepTips.map((t, i) => `${i + 1}. ${t}`).join("\n")}` : ""}`
+    : "";
+
   const messages = [
     {
       role: "system" as const,
       content: `あなたは料理中のユーザーを助ける調理アシスタントです。
 手が塞がっているので、簡潔に（1-2文で）答えてください。
+${recipeInfo}
 
 現在の工程: ${currentStep}
 進捗: ${stepProgress}`,
@@ -136,8 +159,13 @@ export async function handleBargeIn(
   interruptedSpeech: string,
   currentStep: string,
   stepProgress: string,
-  history: ConversationEntry[]
+  history: ConversationEntry[],
+  recipeContext?: RecipeContext
 ): Promise<BargeInResult> {
+  const recipeInfo = recipeContext
+    ? `\n料理名: ${recipeContext.recipeName}\n材料: ${recipeContext.ingredients.join("、")}`
+    : "";
+
   const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -150,7 +178,7 @@ export async function handleBargeIn(
         {
           role: "system",
           content: `あなたは調理アシスタントです。ユーザーがあなたの発話中に割り込みました。
-
+${recipeInfo}
 あなたが話していた内容: 「${interruptedSpeech}」
 現在の工程: ${currentStep}
 進捗: ${stepProgress}
@@ -187,8 +215,14 @@ export async function generateStepGuidance(
   stepText: string,
   stepIndex: number,
   totalSteps: number,
-  recipeName: string
+  recipeName: string,
+  recipeContext?: RecipeContext
 ): Promise<string> {
+  const tipForStep = recipeContext?.stepTips?.[stepIndex] ?? "";
+  const ingredientsInfo = recipeContext
+    ? `\n材料: ${recipeContext.ingredients.join("、")}`
+    : "";
+
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -206,8 +240,9 @@ export async function generateStepGuidance(
       messages: [
         {
           role: "user",
-          content: `料理: ${recipeName}
+          content: `料理: ${recipeName}${ingredientsInfo}
 工程 ${stepIndex + 1}/${totalSteps}: ${stepText}
+${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
 
 この工程の音声案内文を生成してください。`,
         },

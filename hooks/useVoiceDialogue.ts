@@ -7,6 +7,7 @@ import {
   generateStepGuidance,
   synthesizeSpeech,
   handleBargeIn,
+  type RecipeContext,
 } from "@/services/ai";
 import { stripHtml } from "@/utils/recipe";
 import { GanttTask } from "@/utils/gantt";
@@ -30,6 +31,7 @@ interface UseVoiceDialogueProps {
   outputDeviceId?: string;
   onChangeIndex: (index: number) => void;
   onSessionEnd: () => void;
+  recipeContext?: RecipeContext;
 }
 
 export function useVoiceDialogue({
@@ -40,6 +42,7 @@ export function useVoiceDialogue({
   outputDeviceId,
   onChangeIndex,
   onSessionEnd,
+  recipeContext,
 }: UseVoiceDialogueProps) {
   const [dialogueState, setDialogueState] =
     useState<DialogueState>("listening");
@@ -148,7 +151,8 @@ export function useVoiceDialogue({
         stepText,
         0,
         steps.length,
-        recipeName
+        recipeName,
+        recipeContext
       );
       const greeting = `${recipeName}の調理を始めましょう。${guidance}`;
       setLastResponse(greeting);
@@ -198,7 +202,8 @@ export function useVoiceDialogue({
           interruptedText,
           currentStep,
           stepProgress,
-          conversationHistory
+          conversationHistory,
+          recipeContext
         );
 
         setLastResponse(result.response);
@@ -231,7 +236,8 @@ export function useVoiceDialogue({
         transcript,
         currentStep,
         prevStep,
-        nextStep
+        nextStep,
+        recipeName
       );
 
       let response = "";
@@ -255,7 +261,8 @@ export function useVoiceDialogue({
             stripHtml(steps[nextIdx].text),
             nextIdx,
             steps.length,
-            recipeName
+            recipeName,
+            recipeContext
           );
           response = `次の工程です。${guidance}`;
           break;
@@ -271,7 +278,8 @@ export function useVoiceDialogue({
               stripHtml(steps[prevIdx].text),
               prevIdx,
               steps.length,
-              recipeName
+              recipeName,
+              recipeContext
             );
             response = `前の工程に戻ります。${guidance}`;
           }
@@ -284,7 +292,8 @@ export function useVoiceDialogue({
             transcript,
             currentStep,
             stepProgress,
-            conversationHistory
+            conversationHistory,
+            recipeContext
           );
           break;
         }
@@ -330,6 +339,7 @@ export function useVoiceDialogue({
       onSessionEnd,
       speakText,
       stopSpeaking,
+      recipeContext,
     ]
   );
 
