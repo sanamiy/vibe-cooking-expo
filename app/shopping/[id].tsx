@@ -83,7 +83,7 @@ export default function ShoppingScreen() {
       </ScrollView>
 
       <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
-        <AppButton label="調理に進む" onPress={() => router.push(`/cook-interactive/${ids.join(',')}`)} />
+        <AppButton label="スケジュールを作成" onPress={() => router.push(`/schedule/${ids.join(',')}`)} />
       </View>
     </SafeAreaView>
   );
