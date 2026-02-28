@@ -1,18 +1,19 @@
 import prebuiltGantt from "@/data/gantt/recipes-gantt.json";
 import { theme } from "@/constants/theme";
 import { useRecipes } from "@/hooks/useRecipes";
-import { buildRecipeGantt, RecipeGanttData } from "@/utils/gantt";
+import { buildRecipeGantt, RecipeGanttData, GanttTask } from "@/utils/gantt";
 import { stripHtml } from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import { useVoiceCommands } from "@/hooks/useVoiceCommands";
+import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
 import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
 import { useAudioDevices } from "@/hooks/useAudioDevices";
 import type { RecipeContext } from "@/services/ai";
-import { getScheduleTips } from "@/utils/scheduleStore";
+import { getScheduleTips, getScheduleTasks } from "@/utils/scheduleStore";
+import type { SchedulerTask } from "@/utils/scheduler";
 
 const formatCountdownLabel = (countdown: number | null) => {
   if (countdown === null) return "";
@@ -21,41 +22,154 @@ const formatCountdownLabel = (countdown: number | null) => {
   return `${mm}:${ss}`;
 };
 
-const toSteps = (
-  recipe: ReturnType<ReturnType<typeof useRecipes>["getRecipeById"]>,
-) => {
-  if (!recipe) return [] as Array<{ text: string }>;
-  if (recipe.instruction_steps?.length)
-    return recipe.instruction_steps.map((s) => ({ text: s.text }));
-  return (recipe.instructions ?? []).map((text) => ({ text }));
+const getTaskTypeLabel = (taskType: string) => {
+  switch (taskType) {
+    case "prep": return "下準備";
+    case "cook_active": return "加熱中";
+    case "cook_passive": return "待機";
+    case "wash": return "洗い物";
+    default: return taskType;
+  }
 };
+
+const getTaskTypeColor = (taskType: string) => {
+  switch (taskType) {
+    case "prep": return "#4ECDC4";
+    case "cook_active": return "#FF6B6B";
+    case "cook_passive": return "#FFE66D";
+    case "wash": return "#95E1D3";
+    default: return theme.colors.subText;
+  }
+};
+
+interface CombinedStep {
+  recipeId: string;
+  recipeName: string;
+  text: string;
+  schedulerTask?: SchedulerTask;
+  color: string;
+}
+
+const RECIPE_COLORS = [
+  "#FF6B6B", "#4ECDC4", "#FFE66D", "#95E1D3", "#F38181",
+];
 
 export default function CookInteractiveScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getRecipeById } = useRecipes();
 
   const ids = useMemo(() => String(id).split(","), [id]);
-  const recipe = getRecipeById(ids[0]);
+  const recipes = useMemo(
+    () => ids.map((rid) => getRecipeById(rid)).filter(Boolean),
+    [ids, getRecipeById]
+  );
 
-  const steps = useMemo(() => toSteps(recipe), [recipe]);
+  // Combine all scheduled tasks from all recipes, sorted by start_time
+  const allScheduledTasks = useMemo(() => {
+    const tasks: SchedulerTask[] = [];
+    for (const rid of ids) {
+      const recipeTasks = getScheduleTasks(rid);
+      tasks.push(...recipeTasks);
+    }
+    // Sort by start_time for proper ordering
+    return tasks.sort((a, b) => a.start_time - b.start_time);
+  }, [ids]);
 
+  // Build combined steps from all recipes
+  const combinedSteps = useMemo<CombinedStep[]>(() => {
+    if (allScheduledTasks.length > 0) {
+      // Use scheduled tasks (already sorted)
+      return allScheduledTasks.map((t) => ({
+        recipeId: t.recipe_id,
+        recipeName: t.recipe_name,
+        text: t.step_description,
+        schedulerTask: t,
+        color: t.color || RECIPE_COLORS[ids.indexOf(t.recipe_id) % RECIPE_COLORS.length],
+      }));
+    }
+    // Fallback: interleave original recipe steps
+    const steps: CombinedStep[] = [];
+    for (let i = 0; i < ids.length; i++) {
+      const recipe = recipes.find((r) => r?.id === ids[i]);
+      if (!recipe) continue;
+      const recipeSteps = recipe.instruction_steps?.length
+        ? recipe.instruction_steps.map((s) => s.text)
+        : recipe.instructions ?? [];
+      for (const text of recipeSteps) {
+        steps.push({
+          recipeId: recipe.id,
+          recipeName: recipe.name,
+          text,
+          color: RECIPE_COLORS[i % RECIPE_COLORS.length],
+        });
+      }
+    }
+    return steps;
+  }, [allScheduledTasks, ids, recipes]);
+
+  // For voice dialogue, use simple steps array
+  const steps = useMemo(
+    () => combinedSteps.map((s) => ({ text: s.text })),
+    [combinedSteps]
+  );
+
+  // Build combined gantt chart
   const gantt = useMemo<RecipeGanttData>(() => {
+    if (allScheduledTasks.length > 0) {
+      // Note: scheduler duration and start_time are already in MINUTES
+      const totalTime = Math.max(...allScheduledTasks.map((t) => t.start_time + t.duration));
+      return {
+        version: 1 as const,
+        recipe_id: ids.join(","),
+        total_estimated_minutes: totalTime,
+        generation: {
+          method: "llm-assisted-rule-based" as const,
+          generated_at: new Date().toISOString(),
+        },
+        tasks: allScheduledTasks.map((t, idx) => {
+          // duration and start_time are already in minutes from scheduler
+          const durationMin = t.duration;
+          const startMin = t.start_time;
+          return {
+            task_id: `${t.recipe_id}-${idx}`,
+            step_index: idx + 1,
+            label: t.step_description.slice(0, 25) + (t.step_description.length > 25 ? "…" : ""),
+            source_text: t.step_description,
+            duration_min: durationMin,
+            start_min: startMin,
+            end_min: startMin + durationMin,
+            requires_timer: t.task_type === "cook_passive",
+            timer_minutes: t.task_type === "cook_passive" ? durationMin : null,
+            confidence: 1,
+            depends_on: [],
+          };
+        }),
+      };
+    }
+    // Fallback to first recipe's prebuilt gantt
     const prebuilt = (
       prebuiltGantt as { recipes?: RecipeGanttData[] }
     ).recipes?.find((r) => r.recipe_id === ids[0]);
     return prebuilt ?? buildRecipeGantt(ids[0], steps);
-  }, [ids, steps]);
+  }, [ids, steps, allScheduledTasks]);
 
+  // Recipe context for AI (combine all recipes)
   const recipeContext = useMemo<RecipeContext | undefined>(() => {
-    if (!recipe) return undefined;
-    const tips = getScheduleTips(ids[0]);
+    if (recipes.length === 0) return undefined;
+    const allIngredients: string[] = [];
+    const allTips: string[] = [];
+    for (const recipe of recipes) {
+      if (recipe?.ingredients) allIngredients.push(...recipe.ingredients);
+      const tips = getScheduleTips(recipe?.id ?? "");
+      if (tips.length > 0) allTips.push(...tips);
+    }
     return {
-      recipeName: recipe.name,
-      ingredients: recipe.ingredients ?? [],
-      allSteps: steps.map((s) => stripHtml(s.text)),
-      ...(tips.length > 0 ? { stepTips: tips } : {}),
+      recipeName: recipes.map((r) => r?.name).filter(Boolean).join("、"),
+      ingredients: allIngredients,
+      allSteps: combinedSteps.map((s) => stripHtml(s.text)),
+      ...(allTips.length > 0 ? { stepTips: allTips } : {}),
     };
-  }, [recipe, steps, ids]);
+  }, [recipes, combinedSteps]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -78,10 +192,11 @@ export default function CookInteractiveScreen() {
     interrupt,
     stopSpeaking,
     setListeningResume,
+    resetFromInterrupted,
   } = useVoiceDialogue({
     steps,
     tasks: gantt.tasks,
-    recipeName: recipe?.name ?? "",
+    recipeName: recipes.map((r) => r?.name).filter(Boolean).join("、"),
     currentIndex,
     outputDeviceId: selectedOutputId,
     startBgmUri: process.env.EXPO_PUBLIC_MUSIC_LINK,
@@ -101,18 +216,34 @@ export default function CookInteractiveScreen() {
     [processUserInput, dialogueState, interrupt],
   );
 
-  // TODO: restore useVoiceCommands after debug
-  // const { isListening, startListening } = useVoiceCommands({
-  //   onCommand: () => {},
-  //   onTranscript: handleTranscript,
-  //   active: dialogueState !== "processing",
-  // });
+  const { isListening, startListening } = useVoiceCommands({
+    onTranscript: handleTranscript,
+    onSpeechStart: interrupt,
+    onSpeechEnd: resetFromInterrupted,
+    active: dialogueState !== "processing",
+    inputDeviceId: selectedInputId,
+    isSpeaking: dialogueState === "speaking",
+  });
 
-  // useEffect(() => {
-  //   setListeningResume(() => {
-  //     if (!isListening) startListening();
-  //   });
-  // }, [setListeningResume, isListening, startListening]);
+  useEffect(() => {
+    setListeningResume(() => {
+      if (!isListening) startListening();
+    });
+  }, [setListeningResume, isListening, startListening]);
+
+  // Debug: keyboard navigation (dev only)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" || e.key === "n") {
+        setCurrentIndex((prev) => Math.min(prev + 1, combinedSteps.length - 1));
+      } else if (e.key === "ArrowLeft" || e.key === "p") {
+        setCurrentIndex((prev) => Math.max(prev - 1, 0));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [combinedSteps.length]);
 
   // Timer countdown
   useEffect(() => {
@@ -134,10 +265,37 @@ export default function CookInteractiveScreen() {
     return () => clearInterval(interval);
   }, [currentIndex, gantt.tasks]);
 
-  if (!recipe) return <SafeAreaView style={styles.safeArea} />;
+  if (recipes.length === 0) return <SafeAreaView style={styles.safeArea} />;
 
-  const currentStep = steps[currentIndex];
+  const currentStep = combinedSteps[currentIndex];
   const countdownLabel = formatCountdownLabel(countdown);
+
+  // Calculate progress percentage
+  const progressPercent = combinedSteps.length > 0
+    ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100)
+    : 0;
+
+  // Calculate per-recipe progress
+  const recipeProgress = useMemo(() => {
+    const progress: Record<string, { done: number; total: number; name: string; color: string }> = {};
+    for (let i = 0; i < combinedSteps.length; i++) {
+      const step = combinedSteps[i];
+      if (!progress[step.recipeId]) {
+        progress[step.recipeId] = { done: 0, total: 0, name: step.recipeName, color: step.color };
+      }
+      progress[step.recipeId].total += 1;
+      if (i < currentIndex) {
+        progress[step.recipeId].done += 1;
+      } else if (i === currentIndex) {
+        progress[step.recipeId].done += 0.5; // Current step is half done
+      }
+    }
+    return Object.entries(progress).map(([id, p]) => ({
+      recipeId: id,
+      ...p,
+      percent: Math.round((p.done / p.total) * 100),
+    }));
+  }, [combinedSteps, currentIndex]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -148,25 +306,64 @@ export default function CookInteractiveScreen() {
         <Text style={styles.title}>調理ナビ</Text>
       </View>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.recipeHeader}>
-          <Text style={styles.recipe}>{recipe.name}</Text>
+        {/* Overall progress */}
+        <View style={styles.card}>
+          <Text style={styles.subTitle}>全体の進捗</Text>
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+            </View>
+            <Text style={styles.progressText}>{progressPercent}%</Text>
+          </View>
           <Text style={styles.meta}>
-            ⏱ 推定 {gantt.total_estimated_minutes}分 / ステップ {steps.length}
+            ⏱ 推定 {gantt.total_estimated_minutes}分 / 全{combinedSteps.length}ステップ
           </Text>
+
+          {/* Per-recipe progress */}
+          {recipeProgress.length > 1 && (
+            <View style={styles.recipeProgressList}>
+              {recipeProgress.map((rp) => (
+                <View key={rp.recipeId} style={styles.recipeProgressRow}>
+                  <View style={[styles.recipeColorDot, { backgroundColor: rp.color }]} />
+                  <Text style={styles.recipeProgressName} numberOfLines={1}>{rp.name}</Text>
+                  <View style={styles.recipeProgressBarContainer}>
+                    <View style={styles.recipeProgressBar}>
+                      <View style={[styles.recipeProgressFill, { width: `${rp.percent}%`, backgroundColor: rp.color }]} />
+                    </View>
+                  </View>
+                  <Text style={styles.recipeProgressPercent}>{rp.percent}%</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Current step card */}
-        <View style={styles.card}>
+        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: currentStep?.color }]}>
           <View style={styles.stepHeader}>
             <View style={styles.stepBadge}>
               <Text style={styles.stepBadgeText}>
-                STEP {currentIndex + 1} / {steps.length}
+                STEP {currentIndex + 1} / {combinedSteps.length}
               </Text>
             </View>
+            {currentStep?.schedulerTask?.task_type && (
+              <View style={[styles.typeBadge, { backgroundColor: getTaskTypeColor(currentStep.schedulerTask.task_type) }]}>
+                <Text style={styles.typeBadgeText}>
+                  {getTaskTypeLabel(currentStep.schedulerTask.task_type)}
+                </Text>
+              </View>
+            )}
           </View>
+          <Text style={styles.recipeLabel}>📖 {currentStep?.recipeName}</Text>
           <Text style={styles.stepText}>
             {stripHtml(currentStep?.text ?? "手順がありません")}
           </Text>
+          {currentStep?.schedulerTask?.tips && (
+            <View style={styles.tipsContainer}>
+              <Text style={styles.tipsLabel}>💡 コツ</Text>
+              <Text style={styles.tipsText}>{currentStep.schedulerTask.tips}</Text>
+            </View>
+          )}
         </View>
 
         {/* Countdown timer */}
@@ -193,30 +390,33 @@ export default function CookInteractiveScreen() {
         {/* Gantt chart */}
         <View style={styles.card}>
           <Text style={styles.subTitle}>工程チャート</Text>
-          {gantt.tasks.map((task) => {
+          {gantt.tasks.map((task, idx) => {
             const total = Math.max(1, gantt.total_estimated_minutes);
             const left = `${(task.start_min / total) * 100}%`;
             const width = `${Math.max(8, (task.duration_min / total) * 100)}%`;
-            const isActive = task.step_index - 1 === currentIndex;
-            const isDone = task.step_index - 1 < currentIndex;
+            const isActive = idx === currentIndex;
+            const isDone = idx < currentIndex;
+            const stepColor = combinedSteps[idx]?.color ?? theme.colors.border;
             return (
               <View key={task.task_id} style={styles.ganttRow}>
-                <Text
-                  style={[
-                    styles.ganttLabel,
-                    isActive && styles.activeLabel,
-                    isDone && styles.doneLabel,
-                  ]}
-                >
-                  {task.step_index}. {task.label}
-                </Text>
+                <View style={styles.ganttLabelRow}>
+                  <View style={[styles.ganttColorDot, { backgroundColor: stepColor }]} />
+                  <Text
+                    style={[
+                      styles.ganttLabel,
+                      isActive && styles.activeLabel,
+                      isDone && styles.doneLabel,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {idx + 1}. {task.label}
+                  </Text>
+                </View>
                 <View style={styles.track}>
                   <View
                     style={[
                       styles.bar,
-                      { left: left as any, width: width as any },
-                      isActive && styles.activeBar,
-                      isDone && styles.doneBar,
+                      { left: left as any, width: width as any, backgroundColor: isDone ? theme.colors.success : isActive ? stepColor : theme.colors.border },
                     ]}
                   />
                 </View>
@@ -260,26 +460,81 @@ const styles = StyleSheet.create({
     fontFamily: "M PLUS Rounded 1c",
   },
   content: { padding: 20, gap: 20 },
-  recipeHeader: {
-    marginBottom: 4,
-  },
-  recipe: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: theme.colors.text,
-    fontFamily: "M PLUS Rounded 1c",
-    marginBottom: 8,
-  },
   meta: {
     color: theme.colors.subText,
     fontSize: 14,
     fontWeight: "600",
+    marginTop: 8,
+  },
+  progressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  progressBar: {
+    flex: 1,
+    height: 12,
+    backgroundColor: theme.colors.border,
+    borderRadius: 6,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: theme.colors.primary,
+    borderRadius: 6,
+  },
+  progressText: {
+    color: theme.colors.primary,
+    fontSize: 18,
+    fontWeight: "800",
+    minWidth: 50,
+    textAlign: "right",
+  },
+  recipeProgressList: {
+    marginTop: 16,
+    gap: 8,
+  },
+  recipeProgressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  recipeColorDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  recipeProgressName: {
+    flex: 1,
+    fontSize: 13,
+    color: theme.colors.text,
+    fontWeight: "600",
+  },
+  recipeProgressBarContainer: {
+    width: 80,
+  },
+  recipeProgressBar: {
+    height: 6,
+    backgroundColor: theme.colors.border,
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  recipeProgressFill: {
+    height: "100%",
+    borderRadius: 3,
+  },
+  recipeProgressPercent: {
+    fontSize: 12,
+    color: theme.colors.subText,
+    fontWeight: "700",
+    minWidth: 35,
+    textAlign: "right",
   },
   card: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     padding: 20,
-    gap: 16,
+    gap: 12,
     shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 12,
@@ -288,6 +543,7 @@ const styles = StyleSheet.create({
   },
   stepHeader: {
     flexDirection: "row",
+    gap: 8,
   },
   stepBadge: {
     backgroundColor: theme.colors.info,
@@ -300,11 +556,42 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontSize: 14,
   },
+  typeBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: theme.radius.pill,
+  },
+  typeBadgeText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 12,
+  },
+  recipeLabel: {
+    fontSize: 14,
+    color: theme.colors.subText,
+    fontWeight: "700",
+  },
   stepText: {
     color: theme.colors.text,
     lineHeight: 28,
     fontSize: 18,
     fontFamily: "M PLUS Rounded 1c",
+  },
+  tipsContainer: {
+    backgroundColor: theme.colors.info,
+    borderRadius: theme.radius.md,
+    padding: 12,
+  },
+  tipsLabel: {
+    color: theme.colors.primary,
+    fontWeight: "700",
+    fontSize: 13,
+    marginBottom: 4,
+  },
+  tipsText: {
+    color: theme.colors.text,
+    fontSize: 14,
+    lineHeight: 20,
   },
   countdown: {
     backgroundColor: theme.colors.primary,
@@ -330,30 +617,32 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: 18,
     fontFamily: "M PLUS Rounded 1c",
-    marginBottom: 4,
   },
-  ganttRow: { gap: 8, marginBottom: 8 },
-  ganttLabel: { fontSize: 13, color: theme.colors.subText, fontWeight: "600" },
+  ganttRow: { gap: 6, marginBottom: 6 },
+  ganttLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  ganttColorDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  ganttLabel: { fontSize: 12, color: theme.colors.subText, fontWeight: "600", flex: 1 },
   activeLabel: { color: theme.colors.primary, fontWeight: "800" },
   doneLabel: { color: theme.colors.success },
   track: {
-    height: 16,
+    height: 14,
     backgroundColor: theme.colors.bg,
-    borderRadius: 8,
+    borderRadius: 7,
     overflow: "hidden",
     position: "relative",
   },
   bar: {
     height: "100%",
-    backgroundColor: theme.colors.border,
-    borderRadius: 8,
+    borderRadius: 7,
     position: "absolute",
     top: 0,
-  },
-  activeBar: {
-    backgroundColor: theme.colors.primary,
-  },
-  doneBar: {
-    backgroundColor: theme.colors.success,
   },
 });
