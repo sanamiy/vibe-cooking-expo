@@ -1,3 +1,5 @@
+import { stripHtmlInline } from "@/utils/recipe";
+
 export interface GanttTask {
   task_id: string;
   step_index: number;
@@ -18,12 +20,15 @@ export interface RecipeGanttData {
   total_estimated_minutes: number;
   tasks: GanttTask[];
   generation: {
-    method: 'llm-assisted-rule-based';
+    method: "llm-assisted-rule-based";
     generated_at: string;
   };
 }
 
-const MINUTE_PATTERNS: RegExp[] = [/([\d]+)\s*[〜~\-]\s*([\d]+)\s*分/g, /([\d]+)\s*分(?:間)?/g];
+const MINUTE_PATTERNS: RegExp[] = [
+  /([\d]+)\s*[〜~\-]\s*([\d]+)\s*分/g,
+  /([\d]+)\s*分(?:間)?/g,
+];
 const SECOND_PATTERN = /([\d]+)\s*秒/g;
 const FALLBACK_BY_ACTION: Array<{ pattern: RegExp; minutes: number }> = [
   { pattern: /(切る|刻む|むく|下ごしらえ|準備)/, minutes: 4 },
@@ -33,11 +38,13 @@ const FALLBACK_BY_ACTION: Array<{ pattern: RegExp; minutes: number }> = [
   { pattern: /(盛る|仕上げ|散らす)/, minutes: 2 },
 ];
 
-const stripHtml = (text: string) => text.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>/g, ' ').trim();
-const toHalfWidth = (text: string) => text.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
+const toHalfWidth = (text: string) =>
+  text.replace(/[０-９]/g, (s) =>
+    String.fromCharCode(s.charCodeAt(0) - 0xfee0)
+  );
 
-export const parseStepDuration = (rawText: string) => {
-  const text = toHalfWidth(stripHtml(rawText));
+const parseStepDuration = (rawText: string) => {
+  const text = toHalfWidth(stripHtmlInline(rawText));
   let totalMinutes = 0;
   let timerMinutes = 0;
 
@@ -46,7 +53,10 @@ export const parseStepDuration = (rawText: string) => {
     let match = pattern.exec(text);
     while (match) {
       if (match[2]) {
-        const avg = Math.max(1, Math.round((Number(match[1]) + Number(match[2])) / 2));
+        const avg = Math.max(
+          1,
+          Math.round((Number(match[1]) + Number(match[2])) / 2)
+        );
         totalMinutes += avg;
         timerMinutes += avg;
       } else if (match[1]) {
@@ -67,15 +77,39 @@ export const parseStepDuration = (rawText: string) => {
     secondMatch = SECOND_PATTERN.exec(text);
   }
 
-  if (totalMinutes > 0) return { estimatedMinutes: totalMinutes, hasTimer: true, timerMinutes, confidence: 0.9 };
+  if (totalMinutes > 0)
+    return {
+      estimatedMinutes: totalMinutes,
+      hasTimer: true,
+      timerMinutes,
+      confidence: 0.9,
+    };
   const fallback = FALLBACK_BY_ACTION.find((rule) => rule.pattern.test(text));
-  if (fallback) return { estimatedMinutes: fallback.minutes, hasTimer: false, timerMinutes: null, confidence: 0.6 };
-  return { estimatedMinutes: 3, hasTimer: false, timerMinutes: null, confidence: 0.45 };
+  if (fallback)
+    return {
+      estimatedMinutes: fallback.minutes,
+      hasTimer: false,
+      timerMinutes: null,
+      confidence: 0.6,
+    };
+  return {
+    estimatedMinutes: 3,
+    hasTimer: false,
+    timerMinutes: null,
+    confidence: 0.45,
+  };
 };
 
-const makeStepLabel = (text: string) => toHalfWidth(stripHtml(text)).replace(/^（\d+）/, '').trim().slice(0, 26) || '調理ステップ';
+const makeStepLabel = (text: string) =>
+  toHalfWidth(stripHtmlInline(text))
+    .replace(/^（\d+）/, "")
+    .trim()
+    .slice(0, 26) || "調理ステップ";
 
-export const buildRecipeGantt = (recipeId: string, steps: Array<{ text: string }>): RecipeGanttData => {
+export const buildRecipeGantt = (
+  recipeId: string,
+  steps: Array<{ text: string }>
+): RecipeGanttData => {
   let cursor = 0;
   const tasks: GanttTask[] = steps.map((step, index) => {
     const parsed = parseStepDuration(step.text);
@@ -102,6 +136,9 @@ export const buildRecipeGantt = (recipeId: string, steps: Array<{ text: string }
     recipe_id: recipeId,
     total_estimated_minutes: cursor,
     tasks,
-    generation: { method: 'llm-assisted-rule-based', generated_at: new Date().toISOString() },
+    generation: {
+      method: "llm-assisted-rule-based",
+      generated_at: new Date().toISOString(),
+    },
   };
 };
