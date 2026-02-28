@@ -3,6 +3,7 @@ import { theme } from '@/constants/theme';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useRecipes } from '@/hooks/useRecipes';
 import { multiplierForRecipe, scaleIngredient } from '@/utils/recipe';
+import { RECIPE_COLORS } from '@/utils/scheduler';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -14,12 +15,25 @@ export default function ShoppingScreen() {
   const { settings } = useAppSettings();
   const insets = useSafeAreaInsets();
 
-  const recipe = getRecipeById(String(id));
-  const multiplier = multiplierForRecipe(recipe, settings.servingsPerMeal);
-  const items = useMemo(() => (recipe?.ingredients ?? []).map((ing) => scaleIngredient(ing, multiplier)), [recipe, multiplier]);
-  const [checked, setChecked] = useState<Record<number, boolean>>({});
+  const ids = useMemo(() => String(id).split(','), [id]);
+  const recipes = useMemo(() => ids.map((i) => getRecipeById(i)).filter(Boolean), [ids, getRecipeById]);
+  const isMulti = recipes.length > 1;
 
-  if (!recipe) return <SafeAreaView style={styles.safeArea} />;
+  // レシピごとの材料リスト
+  const recipeItems = useMemo(() => {
+    return recipes.map((recipe) => {
+      if (!recipe) return { name: '', items: [], color: '' };
+      const multiplier = multiplierForRecipe(recipe, settings.servingsPerMeal);
+      return {
+        name: recipe.name,
+        items: (recipe.ingredients ?? []).map((ing) => scaleIngredient(ing, multiplier)),
+      };
+    });
+  }, [recipes, settings.servingsPerMeal]);
+
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+
+  if (recipes.length === 0) return <SafeAreaView style={styles.safeArea} />;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -29,34 +43,47 @@ export default function ShoppingScreen() {
         </Pressable>
         <Text style={styles.title}>買い出しリスト</Text>
       </View>
-      
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 + insets.bottom }]}> 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.recipe}>{recipe.name}</Text>
-          <View style={styles.divider} />
-        </View>
-        
-        <View style={styles.card}>
-          {items.map((item, idx) => {
-            const isLast = idx === items.length - 1;
-            return (
-              <Pressable 
-                key={`${idx}-${item}`} 
-                style={[styles.item, isLast && styles.itemLast]} 
-                onPress={() => setChecked((p) => ({ ...p, [idx]: !p[idx] }))}
-              >
-                <View style={[styles.checkbox, checked[idx] && styles.checkboxChecked]}>
-                  {checked[idx] && <Text style={styles.checkIcon}>✓</Text>}
-                </View>
-                <Text style={[styles.itemText, checked[idx] && styles.itemTextDone]}>{item}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 + insets.bottom }]}>
+        {recipeItems.map((group, rIdx) => {
+          const color = RECIPE_COLORS[rIdx % RECIPE_COLORS.length];
+          return (
+            <View key={rIdx}>
+              <View style={styles.sectionHeader}>
+                {isMulti && (
+                  <View style={[styles.recipeLabel, { backgroundColor: color }]}>
+                    <Text style={styles.recipeLabelText}>レシピ {rIdx + 1}</Text>
+                  </View>
+                )}
+                <Text style={styles.recipe}>{group.name}</Text>
+                <View style={styles.divider} />
+              </View>
+
+              <View style={styles.card}>
+                {group.items.map((item, idx) => {
+                  const key = `${rIdx}-${idx}`;
+                  const isLast = idx === group.items.length - 1;
+                  return (
+                    <Pressable
+                      key={key}
+                      style={[styles.item, isLast && styles.itemLast]}
+                      onPress={() => setChecked((p) => ({ ...p, [key]: !p[key] }))}
+                    >
+                      <View style={[styles.checkbox, checked[key] && styles.checkboxChecked]}>
+                        {checked[key] && <Text style={styles.checkIcon}>✓</Text>}
+                      </View>
+                      <Text style={[styles.itemText, checked[key] && styles.itemTextDone]}>{item}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          );
+        })}
       </ScrollView>
 
       <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
-        <AppButton label="調理に進む" onPress={() => router.push(`/cook-interactive/${recipe.id}`)} />
+        <AppButton label="調理に進む" onPress={() => router.push(`/cook-interactive/${ids.join(',')}`)} />
       </View>
     </SafeAreaView>
   );
@@ -64,12 +91,12 @@ export default function ShoppingScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: theme.colors.bg },
-  header: { 
+  header: {
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 16,
-    borderBottomWidth: 1, 
-    borderBottomColor: theme.colors.border, 
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.card,
     flexDirection: 'row',
     alignItems: 'center',
@@ -81,14 +108,14 @@ const styles = StyleSheet.create({
     top: 20,
     zIndex: 1,
   },
-  back: { 
-    color: theme.colors.subText, 
+  back: {
+    color: theme.colors.subText,
     fontWeight: '700',
     fontSize: 14,
   },
-  title: { 
-    color: theme.colors.primary, 
-    fontWeight: '800', 
+  title: {
+    color: theme.colors.primary,
+    fontWeight: '800',
     fontSize: 20,
     fontFamily: 'M PLUS Rounded 1c',
   },
@@ -96,9 +123,21 @@ const styles = StyleSheet.create({
   sectionHeader: {
     marginBottom: 16,
   },
-  recipe: { 
-    fontSize: 22, 
-    fontWeight: '700', 
+  recipeLabel: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: theme.radius.pill,
+    marginBottom: 8,
+  },
+  recipeLabelText: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  recipe: {
+    fontSize: 22,
+    fontWeight: '700',
     color: theme.colors.text,
     fontFamily: 'M PLUS Rounded 1c',
     marginBottom: 8,
@@ -109,41 +148,40 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 2,
   },
-  card: { 
-    backgroundColor: theme.colors.card, 
+  card: {
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
     overflow: 'hidden',
-    // iOS Shadow
+    marginBottom: 24,
     shadowColor: '#000',
     shadowOpacity: 0.06,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
-    // Android Shadow
     elevation: 4,
   },
-  item: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    gap: 16, 
-    padding: 16, 
-    borderBottomWidth: 1, 
-    borderBottomColor: theme.colors.border 
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border
   },
   itemLast: {
     borderBottomWidth: 0,
   },
-  checkbox: { 
-    width: 24, 
-    height: 24, 
-    borderWidth: 2, 
-    borderColor: theme.colors.border, 
-    borderRadius: 6, 
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',
   },
-  checkboxChecked: { 
-    backgroundColor: theme.colors.primary, 
+  checkboxChecked: {
+    backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
   },
   checkIcon: {
@@ -152,30 +190,28 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginTop: -2,
   },
-  itemText: { 
-    color: theme.colors.text, 
+  itemText: {
+    color: theme.colors.text,
     flex: 1,
     fontSize: 16,
     lineHeight: 24,
   },
-  itemTextDone: { 
-    textDecorationLine: 'line-through', 
-    color: theme.colors.subText 
+  itemTextDone: {
+    textDecorationLine: 'line-through',
+    color: theme.colors.subText
   },
-  bottomBar: { 
-    position: 'absolute', 
-    left: 0, 
-    right: 0, 
-    bottom: 0, 
-    backgroundColor: theme.colors.card, 
-    paddingHorizontal: 20, 
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: theme.colors.card,
+    paddingHorizontal: 20,
     paddingTop: 16,
-    // iOS Shadow
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: -4 },
-    // Android Shadow
     elevation: 8,
   },
 });
