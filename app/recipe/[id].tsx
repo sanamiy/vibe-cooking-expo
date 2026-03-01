@@ -76,7 +76,7 @@ export default function RecipeDetailScreen() {
             <View key={recipe.id}>
               {isMulti && (
                 <View style={[styles.recipeLabel, { backgroundColor: color }]}>
-                  <Text style={styles.recipeLabelText}>レシピ {rIdx + 1}</Text>
+                  <Text style={styles.recipeLabelText}>{rIdx + 1}品目</Text>
                 </View>
               )}
 
@@ -92,7 +92,12 @@ export default function RecipeDetailScreen() {
                 <Text style={styles.section}>
                   材料（{settings.servingsPerMeal}人前）
                 </Text>
-                <View style={styles.divider} />
+                <View
+                  style={[
+                    styles.divider,
+                    isMulti && { backgroundColor: color },
+                  ]}
+                />
               </View>
               <View style={styles.card}>
                 {ingredients.map((item, idx) => (
@@ -110,7 +115,12 @@ export default function RecipeDetailScreen() {
 
               <View style={styles.sectionHeader}>
                 <Text style={styles.section}>作り方</Text>
-                <View style={styles.divider} />
+                <View
+                  style={[
+                    styles.divider,
+                    isMulti && { backgroundColor: color },
+                  ]}
+                />
               </View>
               <View style={styles.card}>
                 {(recipe.instruction_steps ?? []).length > 0
