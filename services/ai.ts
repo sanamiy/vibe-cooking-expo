@@ -5,7 +5,6 @@ import {
   requireMistralApiKey,
 } from "@/services/apiConfig";
 import { postJsonVps, shouldUseVpsProxy } from "@/services/vpsClient";
-import { callAnthropicMessages } from "@/services/anthropicClient";
 
 async function callMistralChat(
   messages: any[],
@@ -88,24 +87,31 @@ export async function classifyIntent(
   recipeName?: string,
 ): Promise<Intent> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<{ intent: Intent }>(
-      "/vps/ai/classify-intent",
-      {
-        userText,
-        currentStep,
-        prevStep,
-        nextStep,
-        recipeName,
-      },
-    );
-    const valid: Intent[] = [
-      "next_step",
-      "previous_step",
-      "question",
-      "timer_status",
-      "end_session",
-    ];
-    return valid.includes(data.intent) ? data.intent : "question";
+    try {
+      const data = await postJsonVps<{ intent: Intent }>(
+        "/vps/ai/classify-intent",
+        {
+          userText,
+          currentStep,
+          prevStep,
+          nextStep,
+          recipeName,
+        },
+      );
+      const valid: Intent[] = [
+        "next_step",
+        "previous_step",
+        "question",
+        "timer_status",
+        "end_session",
+      ];
+      return valid.includes(data.intent) ? data.intent : "question";
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn("[ai] VPS classify-intent failed, fallback to direct:", e);
+      }
+    }
   }
 
   const system = `あなたは調理アシスタントの意図分類器です。
@@ -116,6 +122,20 @@ ${recipeName ? `料理名: ${recipeName}` : ""}
 現在の工程: ${currentStep}
 ${prevStep ? `前の工程: ${prevStep}` : "（最初の工程です）"}
 ${nextStep ? `次の工程: ${nextStep}` : "（最後の工程です）"}
+
+重要ルール:
+- 「終わりました」「終わった」「できました」「完了」などの完了報告は、質問ではありません。
+- 次の工程が存在する場合、完了報告は必ず next_step に分類してください。
+- 次の工程が存在しない（最後の工程）場合、完了報告は end_session に分類してください。
+- 疑問文・質問内容がある場合のみ question を返してください。
+
+分類例:
+- 発話: 「終わりました」 -> next_step（次工程がある場合）
+- 発話: 「終わりました」 -> end_session（次工程がない場合）
+- 発話: 「次お願いします」 -> next_step
+- 発話: 「前に戻って」 -> previous_step
+- 発話: 「タイマーあと何分？」 -> timer_status
+- 発話: 「この工程のコツは？」 -> question
 
 JSON形式で返してください: {"intent": "ラベル"}`;
 
@@ -153,19 +173,31 @@ export async function answerQuestion(
   stepProgress: string,
   history: ConversationEntry[],
   recipeContext?: RecipeContext,
+  currentStepTip?: string | null,
 ): Promise<string> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<{ answer: string }>(
-      "/vps/ai/answer-question",
-      {
-        userText,
-        currentStep,
-        stepProgress,
-        history,
-        recipeContext,
-      },
-    );
-    return data.answer;
+    try {
+      const data = await postJsonVps<{ answer: string }>(
+        "/vps/ai/answer-question",
+        {
+          userText,
+          currentStep,
+          stepProgress,
+          history,
+          recipeContext,
+          currentStepTip,
+        },
+      );
+      return data.answer;
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "[ai] VPS answer-question failed, fallback to direct:",
+          e,
+        );
+      }
+    }
   }
 
   const recipeInfo = recipeContext
@@ -173,26 +205,30 @@ export async function answerQuestion(
 料理名: ${recipeContext.recipeName}
 
 【材料】
-${(recipeContext.ingredients || []).map((ing) => `- ${ing}`).join("\n")}
-
-【全工程】
-${(recipeContext.allSteps || []).map((s, i) => `${i + 1}. ${s}`).join("\n")}
-${
-  recipeContext.stepTips?.length
-    ? `\n【各工程の注意点・コツ】\n${recipeContext.stepTips.map((t, i) => `${i + 1}. ${t}`).join("\n")}`
-    : ""
-}`
+${(recipeContext.ingredients || [])
+  .slice(0, 30)
+  .map((ing) => `- ${ing}`)
+  .join("\n")}
+`
     : "";
+  const currentTip = String(currentStepTip ?? "").trim();
 
   const messages = [
     {
       role: "system",
       content: `あなたは料理中のユーザーを助ける調理アシスタントです。
-手が塞がっているので、簡潔に（1-2文で）答えてください。
+手が塞がっているので、簡潔に（最大2文で）答えてください。
 ${recipeInfo}
 
 現在の工程: ${currentStep}
-進捗: ${stepProgress}`,
+進捗: ${stepProgress}
+${currentTip ? `この工程のコツ: ${currentTip}` : ""}
+
+厳守:
+- 現在工程の内容だけに基づいて答えること。
+- 次工程・前工程の具体的な手順を説明しないこと。
+- 「次に何をするか」を聞かれても、工程移動はせず現在工程の範囲で案内すること。
+- 関係ない工程の説明をしないこと。`,
     },
     ...((history || []).slice(-10).map((h) => ({
       role: h.role,
@@ -200,10 +236,9 @@ ${recipeInfo}
     })) || []),
     { role: "user", content: String(userText ?? "") },
   ];
-  const data = await callMistralChat(messages, { temperature: 0.7 });
-  return data.choices?.[0]?.message?.content ?? "";
+  const data = await callMistralChat(messages, { temperature: 0.2 });
+  return String(data.choices?.[0]?.message?.content ?? "").trim();
 }
-
 // ---------- Mistral: Barge-in (interruption) handling ----------
 
 export interface BargeInResult {
@@ -220,18 +255,25 @@ export async function handleBargeIn(
   recipeContext?: RecipeContext,
 ): Promise<BargeInResult> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<BargeInResult>("/vps/ai/barge-in", {
-      userText,
-      interruptedSpeech,
-      currentStep,
-      stepProgress,
-      history,
-      recipeContext,
-    });
-    return {
-      action: data.action === "continue" ? "continue" : "new_response",
-      response: data.response,
-    };
+    try {
+      const data = await postJsonVps<BargeInResult>("/vps/ai/barge-in", {
+        userText,
+        interruptedSpeech,
+        currentStep,
+        stepProgress,
+        history,
+        recipeContext,
+      });
+      return {
+        action: data.action === "continue" ? "continue" : "new_response",
+        response: data.response,
+      };
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn("[ai] VPS barge-in failed, fallback to direct:", e);
+      }
+    }
   }
 
   const recipeInfo = recipeContext
@@ -279,58 +321,32 @@ export async function generateStepGuidance(
   recipeName: string,
   recipeContext?: RecipeContext,
 ): Promise<string> {
-  if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<{ guidance: string }>(
-      "/vps/ai/generate-step-guidance",
-      {
-        stepText,
-        stepIndex,
-        totalSteps,
-        recipeName,
-        recipeContext,
-      },
-    );
-    return data.guidance;
-  }
-
   const tipForStep = recipeContext?.stepTips?.[stepIndex] ?? "";
-  const ingredientsInfo = recipeContext
-    ? `\n材料: ${(recipeContext.ingredients || []).join("、")}`
-    : "";
-
-  const system = `あなたは調理ナビゲーターです。料理の工程を、手が塞がっている人に音声で伝えるための案内文を生成してください。
-2-3文で、ポイントやコツを含めて簡潔に案内してください。「です・ます」調で。
-マークダウン記法（#、*、-など）は使わず、プレーンテキストのみで出力してください。`;
-
-  const data = await callAnthropicMessages({
-    system,
-    maxTokens: 256,
-    messages: [
-      {
-        role: "user",
-        content: `料理: ${recipeName}${ingredientsInfo}
-工程 ${stepIndex + 1}/${totalSteps}: ${stepText}
-${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
-
-この工程の音声案内文を生成してください。`,
-      },
-    ],
-  });
-
-  return data.content?.[0]?.text ?? "";
+  const normalizedStep = String(stepText ?? "").replace(/\s+/g, " ").trim();
+  return [
+    `工程${stepIndex + 1}/${totalSteps}は「${normalizedStep}」です。`,
+    tipForStep ? `コツは${tipForStep}です。` : "焦らず順番どおりに進めましょう。",
+  ].join("");
 }
 
 // ---------- ElevenLabs: TTS ----------
 
 export async function synthesizeSpeech(text: string): Promise<string> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<{ audioBase64: string }>(
-      "/vps/tts/synthesize",
-      {
-        text,
-      },
-    );
-    return data.audioBase64;
+    try {
+      const data = await postJsonVps<{ audioBase64: string }>(
+        "/vps/tts/synthesize",
+        {
+          text,
+        },
+      );
+      return data.audioBase64;
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn("[ai] VPS tts failed, fallback to direct:", e);
+      }
+    }
   }
 
   return await callElevenLabsTts(text);

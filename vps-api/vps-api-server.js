@@ -93,6 +93,69 @@ async function callMistral(messages, { temperature, responseFormat } = {}) {
   return JSON.parse(text);
 }
 
+function collectText(value) {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap((v) => collectText(v));
+  if (!value || typeof value !== "object") return [];
+
+  const out = [];
+  if (typeof value.text === "string") out.push(value.text);
+  if (typeof value.content === "string" || Array.isArray(value.content)) {
+    out.push(...collectText(value.content));
+  }
+  return out;
+}
+
+function extractAssistantText(response) {
+  const content = response?.choices?.[0]?.message?.content;
+  return collectText(content)
+    .map((s) => String(s).trim())
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+}
+
+async function callMistralAudioChat({
+  audioBase64,
+  prompt,
+  model,
+  temperature,
+}) {
+  const key = requireEnv("MISTRAL_API_KEY");
+  const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model: model || "voxtral-mini-2507",
+      temperature: temperature ?? 0,
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_audio",
+              input_audio: String(audioBase64 || ""),
+            },
+            {
+              type: "text",
+              text:
+                prompt ||
+                "音声の内容を日本語で簡潔に文字起こししてください。補足説明はせず、発話テキストのみを返してください。",
+            },
+          ],
+        },
+      ],
+    }),
+  });
+
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Mistral API error ${res.status}: ${text}`);
+  return JSON.parse(text);
+}
+
 async function callAnthropic({
   system,
   messages,
@@ -1368,6 +1431,23 @@ JSON形式で返してください: {"intent": "ラベル"}`;
       ]);
       const intent = valid.has(parsed.intent) ? parsed.intent : "question";
       json(res, 200, { intent });
+      return;
+    }
+
+    if (path === "/vps/audio/understand") {
+      const { audioBase64, prompt, model, temperature } = body;
+      if (!audioBase64 || typeof audioBase64 !== "string") {
+        json(res, 400, { error: "audioBase64 is required" });
+        return;
+      }
+      const data = await callMistralAudioChat({
+        audioBase64,
+        prompt,
+        model,
+        temperature,
+      });
+      const text = extractAssistantText(data);
+      json(res, 200, { text });
       return;
     }
 
