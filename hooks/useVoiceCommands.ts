@@ -378,6 +378,24 @@ export function useVoiceCommands({
         }
 
         let gotTranscript = false;
+        const runAsrFallback = async () => {
+          await transcribeStream(
+            recordedChunks,
+            (interim) => {
+              console.log("Interim:", interim);
+              onInterimTranscriptRef.current?.(interim);
+            },
+            (final) => {
+              console.log("Final:", final);
+              gotTranscript = true;
+              onTranscriptRef.current(final);
+            },
+            (err) => {
+              console.error("Transcription error:", err);
+              setError(err);
+            },
+          );
+        };
 
         const activeVoiceInputMode = voiceInputMode ?? config?.voiceInputMode;
         const activeVoxtralPrompt =
@@ -433,24 +451,11 @@ export function useVoiceCommands({
               e instanceof Error ? e.message : "Speech understanding failed";
             console.error("Speech understanding error:", err);
             setError(err);
+            // Auto-fallback to ASR->LLM path when Voxtral path fails.
+            await runAsrFallback();
           }
         } else {
-          await transcribeStream(
-            recordedChunks,
-            (interim) => {
-              console.log("Interim:", interim);
-              onInterimTranscriptRef.current?.(interim);
-            },
-            (final) => {
-              console.log("Final:", final);
-              gotTranscript = true;
-              onTranscriptRef.current(final);
-            },
-            (err) => {
-              console.error("Transcription error:", err);
-              setError(err);
-            },
-          );
+          await runAsrFallback();
         }
 
         if (!gotTranscript) {
