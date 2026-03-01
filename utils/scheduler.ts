@@ -43,6 +43,8 @@ export interface MultiRecipeSchedule {
   algorithm_used: string;
 }
 
+export type SchedulerAlgorithmType = "auto" | "greedy" | "genetic" | "critical_path" | "backward" | "astar";
+
 // ─── Constants ──────────────────────────────────────
 
 export const RECIPE_COLORS = [
@@ -527,13 +529,71 @@ async function buildTasksFromLLM(
  *
  * @param recipes レシピ配列
  * @param stoveBurners コンロ口数
+ * @param algorithm スケジューリングアルゴリズム
  */
 export async function scheduleMultipleRecipes(
   recipes: Recipe[],
   stoveBurners: number,
+  algorithm: SchedulerAlgorithmType = "auto",
 ): Promise<MultiRecipeSchedule> {
+  const useVps = shouldUseVpsProxy();
+
+  // VPS API経由でスケジューリング（高度なアルゴリズムを使用）
+  if (useVps && algorithm !== "greedy") {
+    try {
+      const recipeInputs = recipes.map((r) => ({
+        id: r.id,
+        name: r.name,
+        ingredients: r.ingredients ?? [],
+        steps: (r.instruction_steps?.length
+          ? r.instruction_steps.map((s) => ({ text: s.text }))
+          : (r.instructions ?? []).map((text) => ({ text }))
+        ),
+      }));
+
+      const result = await postJsonVps<{
+        schedule: { tasks: any[]; total_time: number; algorithm_used: string };
+      }>("/vps/scheduler/create-schedule", {
+        recipes: recipeInputs,
+        kitchen: {
+          stove_burners: stoveBurners,
+          cutting_boards: 1,
+          cooks: 1,
+        },
+        options: {
+          algorithm,
+          use_llm_analysis: true,
+          hygiene_correction: true,
+        },
+      });
+
+      return {
+        tasks: result.schedule.tasks.map((t) => ({
+          recipe_id: t.recipe_id,
+          recipe_name: t.recipe_name,
+          step_index: t.step_index,
+          step_description: t.description,
+          duration: t.duration,
+          uses_stove: t.uses_stove,
+          uses_cutting_board: t.uses_cutting_board,
+          requires_attention: t.requires_attention,
+          start_time: t.start_time,
+          color: t.color,
+          task_type: t.task_type,
+          contamination: "none",
+          tips: t.tips ?? "",
+        })),
+        total_time: result.schedule.total_time,
+        algorithm_used: result.schedule.algorithm_used,
+      };
+    } catch (e) {
+      console.warn("VPS scheduler API failed, using local fallback:", e);
+    }
+  }
+
+  // ローカルフォールバック: greedy のみ
   const allTasks: SchedulerTask[] = [];
-  const useLLM = true;
+  const useLLM = useVps;
 
   for (let rIdx = 0; rIdx < recipes.length; rIdx++) {
     const recipe = recipes[rIdx];

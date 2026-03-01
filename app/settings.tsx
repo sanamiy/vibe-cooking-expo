@@ -1,9 +1,21 @@
 import { AppButton } from "@/components/AppButton";
 import { theme } from "@/constants/theme";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useAppSettings, type SchedulerAlgorithm } from "@/contexts/AppSettingsContext";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+
+// Feature flag: アルゴリズム選択UIを表示するか
+const SHOW_ALGORITHM_SELECTOR = __DEV__;
+
+const ALGORITHM_OPTIONS: { value: SchedulerAlgorithm; label: string; desc: string }[] = [
+  { value: "auto", label: "自動", desc: "レシピ数に応じて最適化" },
+  { value: "greedy", label: "貪欲法", desc: "シンプルで高速" },
+  { value: "genetic", label: "遺伝的", desc: "同時完成を最適化" },
+  { value: "critical_path", label: "クリティカルパス", desc: "最長レシピ優先" },
+  { value: "backward", label: "逆算", desc: "同時完成を目指す" },
+  { value: "astar", label: "A*探索", desc: "最適解を探索" },
+];
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -16,6 +28,9 @@ export default function SettingsScreen() {
     settings.servingsPerMeal,
   );
   const [stoveBurners, setStoveBurners] = useState(settings.stoveBurners);
+  const [schedulerAlgorithm, setSchedulerAlgorithm] = useState(
+    settings.schedulerAlgorithm,
+  );
 
   const incrementBurners = () =>
     setStoveBurners((prev) => Math.min(5, prev + 1));
@@ -30,6 +45,7 @@ export default function SettingsScreen() {
     updateSettings({
       servingsPerMeal,
       stoveBurners,
+      schedulerAlgorithm,
     });
     router.back();
   };
@@ -154,6 +170,41 @@ export default function SettingsScreen() {
             レシピの分量を計算するために使用します
           </Text>
         </View>
+
+        {/* アルゴリズム選択 (開発モードのみ) */}
+        {SHOW_ALGORITHM_SELECTOR && (
+          <View style={styles.settingCard}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.icon}>🧪</Text>
+              <Text style={styles.cardTitle}>スケジューリング</Text>
+            </View>
+            <View style={styles.algorithmGrid}>
+              {ALGORITHM_OPTIONS.map((opt) => (
+                <Pressable
+                  key={opt.value}
+                  style={[
+                    styles.algorithmOption,
+                    schedulerAlgorithm === opt.value && styles.algorithmOptionSelected,
+                  ]}
+                  onPress={() => setSchedulerAlgorithm(opt.value)}
+                >
+                  <Text
+                    style={[
+                      styles.algorithmLabel,
+                      schedulerAlgorithm === opt.value && styles.algorithmLabelSelected,
+                    ]}
+                  >
+                    {opt.label}
+                  </Text>
+                  <Text style={styles.algorithmDesc}>{opt.desc}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <Text style={styles.cardCaption}>
+              調理スケジュールの最適化アルゴリズム
+            </Text>
+          </View>
+        )}
 
         <View style={styles.actions}>
           <View style={styles.saveBtnWrap}>
@@ -294,5 +345,40 @@ const styles = StyleSheet.create({
   },
   saveBtnWrap: {
     width: "100%",
+  },
+  // Algorithm selector
+  algorithmGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 16,
+    justifyContent: "center",
+  },
+  algorithmOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: theme.radius.md,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.bg,
+    minWidth: 100,
+    alignItems: "center",
+  },
+  algorithmOptionSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary + "15",
+  },
+  algorithmLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  algorithmLabelSelected: {
+    color: theme.colors.primary,
+  },
+  algorithmDesc: {
+    fontSize: 11,
+    color: theme.colors.subText,
+    marginTop: 2,
   },
 });
