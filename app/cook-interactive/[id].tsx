@@ -5,6 +5,7 @@ import { buildRecipeGantt, RecipeGanttData, GanttTask } from "@/utils/gantt";
 import { stripHtml } from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { BackButton } from "@/components/BackButton";
 import {
   Platform,
   Pressable,
@@ -341,9 +342,7 @@ export default function CookInteractiveScreen() {
     <SafeAreaView style={styles.safeArea}>
       {/* Header with prominent progress */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.back}>← 戻る</Text>
-        </Pressable>
+        <BackButton label="スケジュール" onPress={() => router.back()} />
         <Text style={styles.title}>調理ナビ</Text>
       </View>
 

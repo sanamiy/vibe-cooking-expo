@@ -1,4 +1,5 @@
 import { AppButton } from "@/components/AppButton";
+import { BackButton } from "@/components/BackButton";
 import { theme } from "@/constants/theme";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useRecipes } from "@/hooks/useRecipes";
@@ -46,9 +47,7 @@ export default function ShoppingScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.back}>← レシピへ</Text>
-        </Pressable>
+        <BackButton label="レシピ" onPress={() => router.back()} />
         <Text style={styles.title}>買い出しリスト</Text>
       </View>
 

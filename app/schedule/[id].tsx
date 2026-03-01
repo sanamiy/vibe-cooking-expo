@@ -1,4 +1,5 @@
 import { AppButton } from "@/components/AppButton";
+import { BackButton } from "@/components/BackButton";
 import { theme } from "@/constants/theme";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useRecipes } from "@/hooks/useRecipes";
@@ -113,9 +114,7 @@ export default function ScheduleScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.back}>← 買い出しリスト</Text>
-        </Pressable>
+        <BackButton label="買い出し" onPress={() => router.back()} />
         <Text style={styles.title}>スケジュール</Text>
       </View>
 

@@ -1,4 +1,5 @@
 import { AppButton } from "@/components/AppButton";
+import { BackButton } from "@/components/BackButton";
 import { theme } from "@/constants/theme";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useRecipes } from "@/hooks/useRecipes";
@@ -49,9 +50,7 @@ export default function RecipeDetailScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.back}>← 戻る</Text>
-        </Pressable>
+        <BackButton label="トップ" onPress={() => router.back()} />
         <Text style={styles.title}>Vibe Cooking 🍳</Text>
       </View>
 
