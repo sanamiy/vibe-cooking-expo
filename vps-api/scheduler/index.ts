@@ -49,6 +49,62 @@ function getTaskType(usesStove: boolean, requiresAttention: boolean): TaskType {
   return "prep";
 }
 
+function splitStepDescriptionClauses(description: string): string[] {
+  const normalized = description.replace(/<[^>]*>/g, "").replace(/[。．]+/g, "。").trim();
+  if (!normalized) return [];
+
+  const sentences = normalized
+    .split("。")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const clauses: string[] = [];
+  for (const sentence of sentences) {
+    const pieces = sentence
+      .split(/(?:してから|し終えたら|したら|して|し、| then | and )/i)
+      .map((s) => s.trim())
+      .filter((s) => s.length >= 2);
+    if (pieces.length > 0) clauses.push(...pieces);
+  }
+
+  return clauses.length > 0 ? clauses : [normalized];
+}
+
+function splitTaskConsecutively(task: SchedulerTask): SchedulerTask[] {
+  const clauses = splitStepDescriptionClauses(task.step_description);
+  const canSplit = clauses.length >= 2 && task.duration >= 2;
+  if (!canSplit) return [task];
+
+  const partCount = Math.min(clauses.length, Math.min(task.duration, 4));
+  const selected = clauses.slice(0, partCount);
+  const base = Math.floor(task.duration / partCount);
+  const remainder = task.duration % partCount;
+
+  return selected.map((description, i) => {
+    const duration = Math.max(1, base + (i < remainder ? 1 : 0));
+    return {
+      ...task,
+      step_description: description,
+      duration,
+      original_duration: duration,
+    };
+  });
+}
+
+function applySequentialSplit(tasks: SchedulerTask[]): SchedulerTask[] {
+  const ordered = [...tasks].sort((a, b) => a.step_index - b.step_index);
+  const expanded: SchedulerTask[] = [];
+
+  for (const task of ordered) {
+    expanded.push(...splitTaskConsecutively(task));
+  }
+
+  return expanded.map((task, index) => ({
+    ...task,
+    step_index: index,
+  }));
+}
+
 // ─── Build Tasks from Recipe ─────────────────────────
 
 function buildTasksFromRecipe(
@@ -66,7 +122,7 @@ function buildTasksFromRecipe(
 ): SchedulerTask[] {
   if (analyzedSteps && analyzedSteps.length > 0) {
     // Use LLM-analyzed steps
-    return analyzedSteps.map((sr) => {
+    const tasks = analyzedSteps.map((sr) => {
       const needsAttention = sr.requires_attention || sr.step_index === 0;
       const taskType = getTaskType(sr.uses_stove, needsAttention);
       return {
@@ -89,10 +145,11 @@ function buildTasksFromRecipe(
         assigned_cook: -1,
       };
     });
+    return applySequentialSplit(tasks);
   }
 
   // Fallback: rule-based classification
-  return recipe.steps.map((step, idx) => {
+  const fallbackTasks = recipe.steps.map((step, idx) => {
     const classified = classifyStep(step.text);
     const needsAttention = classified.requires_attention || idx === 0;
     const taskType = getTaskType(classified.uses_stove, needsAttention);
@@ -118,6 +175,7 @@ function buildTasksFromRecipe(
       assigned_cook: -1,
     };
   });
+  return applySequentialSplit(fallbackTasks);
 }
 
 // ─── Metrics Calculation ─────────────────────────────
@@ -193,9 +251,11 @@ export async function createSchedule(
 
   const effectiveAlgorithm: AlgorithmType =
     algorithm === "auto"
-      ? recipes.length > 1
-        ? "genetic"
-        : "greedy"
+      ? recipes.length === 3
+        ? "greedy"
+        : recipes.length > 1
+          ? "genetic"
+          : "greedy"
       : algorithm;
 
   switch (effectiveAlgorithm) {

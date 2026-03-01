@@ -731,6 +731,15 @@ function chooseAgentAlgorithm({
     };
   }
 
+  if (recipeCount === 3) {
+    const algorithm = pick("greedy", "critical_path", "auto") ?? candidates[0];
+    return {
+      algorithm,
+      reason: "3レシピのデフォルトとしてgreedyを選択",
+      candidates,
+    };
+  }
+
   if (recipeCount >= 3) {
     const algorithm = pick("genetic", "critical_path", "auto") ?? candidates[0];
     return {
