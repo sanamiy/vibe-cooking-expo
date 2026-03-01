@@ -1418,6 +1418,72 @@ function normalizeCriteriaResults(raw) {
     .filter(Boolean);
 }
 
+function buildRuleBasedFeedbackFromEvaluation(evaluation) {
+  if (!evaluation || typeof evaluation !== "object") return [];
+
+  const diagnostics = evaluation?.diagnostics ?? {};
+  const resourceViolations = Array.isArray(diagnostics?.resource_violations)
+    ? diagnostics.resource_violations
+    : [];
+  const stepOrderViolations = Array.isArray(diagnostics?.step_order_violations)
+    ? diagnostics.step_order_violations
+    : [];
+
+  const feedback = [];
+
+  const attentionViolations = resourceViolations
+    .filter((v) => String(v?.type ?? "") === "cooks_attention")
+    .slice(0, 8);
+  if (attentionViolations.length > 0) {
+    const windows = attentionViolations.map((v) => {
+      const minute = toInt(v?.minute, 0, { min: 0, max: 24 * 60 });
+      const used = toInt(v?.used, 0, { min: 0, max: 100 });
+      const limit = toInt(v?.limit, 0, { min: 0, max: 100 });
+      return `${minute}分(注意${used}/上限${limit})`;
+    });
+    feedback.push(`人数制約違反(cooks_attention): ${windows.join(", ")}`);
+    feedback.push(
+      "修正方針: requires_attention=true のタスク重なりを解消し、同時実行数を cooks 以下にする。必要なら後ろへシフトして直列化する。",
+    );
+  }
+
+  const otherResourceViolations = resourceViolations
+    .filter((v) => String(v?.type ?? "") !== "cooks_attention")
+    .slice(0, 4);
+  if (otherResourceViolations.length > 0) {
+    feedback.push(
+      `その他リソース違反: ${otherResourceViolations
+        .map((v) => {
+          const type = String(v?.type ?? "unknown");
+          const minute = toInt(v?.minute, 0, { min: 0, max: 24 * 60 });
+          const used = toInt(v?.used, 0, { min: 0, max: 100 });
+          const limit = toInt(v?.limit, 0, { min: 0, max: 100 });
+          return `${type}@${minute}分(使用${used}/上限${limit})`;
+        })
+        .join(", ")}`,
+    );
+  }
+
+  if (stepOrderViolations.length > 0) {
+    feedback.push(
+      `工程順序違反: ${stepOrderViolations
+        .slice(0, 4)
+        .map((v) => {
+          const recipeId = String(v?.recipe_id ?? "unknown");
+          const prev = String(v?.previous_range ?? "?-?");
+          const curr = String(v?.current_range ?? "?-?");
+          return `${recipeId} ${prev} -> ${curr}`;
+        })
+        .join(", ")}`,
+    );
+    feedback.push(
+      "修正方針: 同一 recipe_id では step_index の小さい工程が完了してから次工程を開始する。",
+    );
+  }
+
+  return feedback;
+}
+
 async function runScheduleEvaluationOneCall(args) {
   const scheduleId = String(args?.schedule_id ?? "");
   const providedSchedule = args?.schedule;
@@ -1631,7 +1697,9 @@ async function runScheduleEvaluationOneCall(args) {
       llm_model_primary: EVALUATOR_ANTHROPIC_MODEL,
       llm_model_fallback: EVALUATOR_ANTHROPIC_FALLBACK_MODEL,
       resource_violations_count: resourceViolations.length,
+      resource_violations: resourceViolations.slice(0, 40),
       step_order_violations_count: stepOrderViolations.length,
+      step_order_violations: stepOrderViolations.slice(0, 40),
       cutting_board: boardFlow,
     },
   };
@@ -1933,9 +2001,9 @@ async function runSchedulerAgent({
 
   const stepsLimit = toInt(maxSteps, 8, { min: 1, max: 12 });
   const autoEvaluationEnabled = toBool(evaluationEnabled, true);
-  const maxEvaluationRounds = toInt(evaluationMaxRounds, 3, {
+  const maxEvaluationRounds = toInt(evaluationMaxRounds, 5, {
     min: 1,
-    max: 6,
+    max: 8,
   });
   const normalizedEvaluationCriteria = normalizeEvaluationCriteria(
     evaluationCriteria ?? {},
@@ -1983,6 +2051,7 @@ async function runSchedulerAgent({
 
   const trace = [];
   const evaluations = [];
+  const accumulatedRuleBasedFeedback = [];
   let finalText = "";
   for (let round = 1; round <= maxEvaluationRounds; round++) {
     let roundEndedWithoutTool = false;
@@ -2107,6 +2176,12 @@ async function runSchedulerAgent({
       break;
     }
 
+    const ruleFeedback = buildRuleBasedFeedbackFromEvaluation(evaluation);
+    for (const line of ruleFeedback) {
+      if (!line || accumulatedRuleBasedFeedback.includes(line)) continue;
+      accumulatedRuleBasedFeedback.push(line);
+    }
+
     if (round >= maxEvaluationRounds) {
       if (!finalText) {
         finalText = "評価基準を満たせなかったため、現状結果で終了します。";
@@ -2118,6 +2193,12 @@ async function runSchedulerAgent({
       evaluation?.blockers?.slice(0, 6)?.join(" / ") ??
       `評価失敗: ${evaluationError ?? "unknown"}`;
     const scoreText = evaluation ? `${evaluation.score}` : "N/A";
+    const accumulatedRuleFeedbackText =
+      accumulatedRuleBasedFeedback.length > 0
+        ? accumulatedRuleBasedFeedback
+            .map((line, idx) => `${idx + 1}. ${line}`)
+            .join("\n")
+        : "なし";
     messages.push({
       role: "user",
       content: `評価フィードバック（round ${round}）:
@@ -2125,12 +2206,16 @@ pass: false
 score: ${scoreText}
 blockers: ${blockers}
 
+ルールベース検出フィードバック（累積）:
+${accumulatedRuleFeedbackText}
+
 これまでの履歴は保持したまま、このフィードバックを反映して次の作業を行ってください。
 必須改善:
-1) まな板作業は「全野菜を先に切る -> 肉/魚を後で切る」順序にする
-2) まな板洗浄回数を最小化し、改善余地がない状態にする（1回以下は目安）
-3) update_schedule または optimize_schedule を使って改善する
-4) 最後に evaluate_schedule を呼んで再判定する`,
+1) cooks_attention（1人なのに注意タスク並列）の違反をゼロにする
+2) まな板作業は「全野菜を先に切る -> 肉/魚を後で切る」順序にする
+3) まな板洗浄回数を最小化し、改善余地がない状態にする（1回以下は目安）
+4) update_schedule または optimize_schedule を使って改善する
+5) 最後に evaluate_schedule を呼んで再判定する`,
     });
 
     if (roundEndedWithoutTool) {
