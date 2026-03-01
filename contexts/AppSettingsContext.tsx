@@ -7,7 +7,14 @@ import React, {
   useState,
 } from "react";
 
-export type SchedulerAlgorithm = "auto" | "greedy" | "genetic" | "critical_path" | "backward" | "astar";
+export type SchedulerAlgorithm =
+  | "auto"
+  | "greedy"
+  | "genetic"
+  | "critical_path"
+  | "backward"
+  | "astar"
+  | "claude_e2e";
 
 interface AppSettings {
   servingsPerMeal: number;
