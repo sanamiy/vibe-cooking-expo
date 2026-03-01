@@ -43,7 +43,14 @@ export interface MultiRecipeSchedule {
   algorithm_used: string;
 }
 
-export type SchedulerAlgorithmType = "auto" | "greedy" | "genetic" | "critical_path" | "backward" | "astar";
+export type SchedulerAlgorithmType =
+  | "auto"
+  | "greedy"
+  | "genetic"
+  | "critical_path"
+  | "backward"
+  | "astar"
+  | "claude_e2e";
 
 // ─── Constants ──────────────────────────────────────
 
@@ -537,6 +544,7 @@ export async function scheduleMultipleRecipes(
   algorithm: SchedulerAlgorithmType = "auto",
 ): Promise<MultiRecipeSchedule> {
   const useVps = shouldUseVpsProxy();
+  let useLLMInLocalFallback = useVps && algorithm !== "claude_e2e";
 
   // VPS API経由でスケジューリング（高度なアルゴリズムを使用）
   if (useVps && algorithm !== "greedy") {
@@ -545,10 +553,9 @@ export async function scheduleMultipleRecipes(
         id: r.id,
         name: r.name,
         ingredients: r.ingredients ?? [],
-        steps: (r.instruction_steps?.length
+        steps: r.instruction_steps?.length
           ? r.instruction_steps.map((s) => ({ text: s.text }))
-          : (r.instructions ?? []).map((text) => ({ text }))
-        ),
+          : (r.instructions ?? []).map((text) => ({ text })),
       }));
 
       const result = await postJsonVps<{
@@ -588,12 +595,14 @@ export async function scheduleMultipleRecipes(
       };
     } catch (e) {
       console.warn("VPS scheduler API failed, using local fallback:", e);
+      // claude_e2eの失敗時は追加のLLM呼び出しをせず、ローカルルールベースへフォールバック
+      if (algorithm === "claude_e2e") useLLMInLocalFallback = false;
     }
   }
 
   // ローカルフォールバック: greedy のみ
   const allTasks: SchedulerTask[] = [];
-  const useLLM = useVps;
+  const useLLM = useLLMInLocalFallback;
 
   for (let rIdx = 0; rIdx < recipes.length; rIdx++) {
     const recipe = recipes[rIdx];
