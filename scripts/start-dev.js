@@ -57,9 +57,11 @@ function isPortAvailable(port) {
   });
 }
 
-async function findAvailablePort(startPort, maxTries) {
+async function findAvailablePort(startPort, maxTries, opts = {}) {
+  const excluded = new Set(opts.excludePorts || []);
   for (let i = 0; i < maxTries; i++) {
     const port = startPort + i;
+    if (excluded.has(port)) continue;
     if (await isPortAvailable(port)) {
       return port;
     }
@@ -103,31 +105,66 @@ function writeEnv(env) {
 }
 
 function updateConfigForLocalDev(vpsPort) {
+  const localVpsUrl = `http://localhost:${vpsPort}`;
+
   // Update config.json
   const config = readConfig();
+  const hadApiMode = Object.prototype.hasOwnProperty.call(config, "apiMode");
   const originalApiMode = config.apiMode;
   config.apiMode = "vps_proxy";
   writeConfig(config);
 
   // Update .env
   const env = readEnv();
-  const originalVpsUrl = env.EXPO_PUBLIC_VPS_API_BASE_URL;
-  env.EXPO_PUBLIC_VPS_API_BASE_URL = `http://localhost:${vpsPort}`;
+  const hadVpsUrlInEnv = Object.prototype.hasOwnProperty.call(
+    env,
+    "EXPO_PUBLIC_VPS_API_BASE_URL",
+  );
+  const originalVpsUrlInEnv = env.EXPO_PUBLIC_VPS_API_BASE_URL;
+  env.EXPO_PUBLIC_VPS_API_BASE_URL = localVpsUrl;
   writeEnv(env);
 
-  return { originalApiMode, originalVpsUrl };
+  // Ensure child processes inherit local API base URL even if shell env had another value.
+  const hadVpsUrlInProcessEnv = Object.prototype.hasOwnProperty.call(
+    process.env,
+    "EXPO_PUBLIC_VPS_API_BASE_URL",
+  );
+  const originalVpsUrlInProcessEnv = process.env.EXPO_PUBLIC_VPS_API_BASE_URL;
+  process.env.EXPO_PUBLIC_VPS_API_BASE_URL = localVpsUrl;
+
+  return {
+    hadApiMode,
+    originalApiMode,
+    hadVpsUrlInEnv,
+    originalVpsUrlInEnv,
+    hadVpsUrlInProcessEnv,
+    originalVpsUrlInProcessEnv,
+    localVpsUrl,
+  };
 }
 
 function restoreConfig(original) {
-  if (original.originalApiMode) {
-    const config = readConfig();
+  const config = readConfig();
+  if (original.hadApiMode) {
     config.apiMode = original.originalApiMode;
-    writeConfig(config);
+  } else {
+    delete config.apiMode;
   }
-  if (original.originalVpsUrl) {
-    const env = readEnv();
-    env.EXPO_PUBLIC_VPS_API_BASE_URL = original.originalVpsUrl;
-    writeEnv(env);
+  writeConfig(config);
+
+  const env = readEnv();
+  if (original.hadVpsUrlInEnv) {
+    env.EXPO_PUBLIC_VPS_API_BASE_URL = original.originalVpsUrlInEnv;
+  } else {
+    delete env.EXPO_PUBLIC_VPS_API_BASE_URL;
+  }
+  writeEnv(env);
+
+  if (original.hadVpsUrlInProcessEnv) {
+    process.env.EXPO_PUBLIC_VPS_API_BASE_URL =
+      original.originalVpsUrlInProcessEnv;
+  } else {
+    delete process.env.EXPO_PUBLIC_VPS_API_BASE_URL;
   }
 }
 
@@ -185,7 +222,7 @@ function startExpo(port, extraArgs) {
       cwd: ROOT_DIR,
       stdio: "inherit",
       env: process.env,
-    }
+    },
   );
 
   return child;
@@ -199,9 +236,15 @@ async function main() {
   const extraArgs = separator >= 0 ? args.slice(separator + 1) : args;
 
   console.log("");
-  console.log(`${colors.bright}╔══════════════════════════════════════╗${colors.reset}`);
-  console.log(`${colors.bright}║   vibe-cooking Development Server    ║${colors.reset}`);
-  console.log(`${colors.bright}╚══════════════════════════════════════╝${colors.reset}`);
+  console.log(
+    `${colors.bright}╔══════════════════════════════════════╗${colors.reset}`,
+  );
+  console.log(
+    `${colors.bright}║   vibe-cooking Development Server    ║${colors.reset}`,
+  );
+  console.log(
+    `${colors.bright}╚══════════════════════════════════════╝${colors.reset}`,
+  );
   console.log("");
 
   // Find available ports
@@ -209,13 +252,21 @@ async function main() {
 
   const vpsPort = await findAvailablePort(VPS_PORT_START, MAX_TRIES);
   if (!vpsPort) {
-    logError("setup", `No available port in range ${VPS_PORT_START}-${VPS_PORT_START + MAX_TRIES - 1}`);
+    logError(
+      "setup",
+      `No available port in range ${VPS_PORT_START}-${VPS_PORT_START + MAX_TRIES - 1}`,
+    );
     process.exit(1);
   }
 
-  const expoPort = await findAvailablePort(EXPO_PORT_START, MAX_TRIES);
+  const expoPort = await findAvailablePort(EXPO_PORT_START, MAX_TRIES, {
+    excludePorts: [vpsPort],
+  });
   if (!expoPort) {
-    logError("setup", `No available port in range ${EXPO_PORT_START}-${EXPO_PORT_START + MAX_TRIES - 1}`);
+    logError(
+      "setup",
+      `No available port in range ${EXPO_PORT_START}-${EXPO_PORT_START + MAX_TRIES - 1}`,
+    );
     process.exit(1);
   }
 
@@ -230,7 +281,16 @@ async function main() {
 
   // Update config for local development
   const originalConfig = updateConfigForLocalDev(vpsPort);
-  log("setup", "Updated config.json and .env for local development", colors.yellow);
+  log(
+    "setup",
+    "Updated config.json and .env for local development",
+    colors.yellow,
+  );
+  log(
+    "setup",
+    `Forced VPS base URL: ${originalConfig.localVpsUrl}`,
+    colors.yellow,
+  );
 
   // Start servers
   const vpsChild = startVpsApi(vpsPort, {
@@ -245,10 +305,13 @@ async function main() {
   const expoChild = startExpo(expoPort, extraArgs);
 
   // Cleanup on exit
+  let cleanedUp = false;
   const cleanup = () => {
+    if (cleanedUp) return;
+    cleanedUp = true;
     log("cleanup", "Shutting down...", colors.yellow);
     restoreConfig(originalConfig);
-    log("cleanup", "Restored original config", colors.yellow);
+    log("cleanup", "Restored original config and env", colors.yellow);
 
     vpsChild.kill();
     expoChild.kill();
@@ -277,10 +340,18 @@ async function main() {
 
   // Print summary
   console.log("");
-  console.log(`${colors.bright}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
-  console.log(`${colors.green}✓${colors.reset} VPS API:  http://localhost:${vpsPort}`);
-  console.log(`${colors.green}✓${colors.reset} Expo:     http://localhost:${expoPort}`);
-  console.log(`${colors.bright}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
+  console.log(
+    `${colors.bright}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`,
+  );
+  console.log(
+    `${colors.green}✓${colors.reset} VPS API:  http://localhost:${vpsPort}`,
+  );
+  console.log(
+    `${colors.green}✓${colors.reset} Expo:     http://localhost:${expoPort}`,
+  );
+  console.log(
+    `${colors.bright}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`,
+  );
   console.log("");
 }
 

@@ -28,6 +28,9 @@ export default {
         if (path === "/vps/asr/transcribe") {
           return withCors(await handleAsr(request, env));
         }
+        if (path === "/vps/audio/understand") {
+          return withCors(await handleAudioUnderstand(request, env));
+        }
         if (path === "/vps/ai/classify-intent") {
           return withCors(await handleClassifyIntent(request, env));
         }

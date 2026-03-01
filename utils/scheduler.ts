@@ -547,8 +547,8 @@ export async function scheduleMultipleRecipes(
       };
     } catch (e) {
       console.warn("VPS scheduler API failed, using local fallback:", e);
-      // claude_e2eの失敗時は追加のLLM呼び出しをせず、ローカルルールベースへフォールバック
-      if (algorithm === "claude_e2e") useLLMInLocalFallback = false;
+      // VPS経由の失敗時はローカルのルールベースへフォールバック
+      useLLMInLocalFallback = false;
     }
   }
 
