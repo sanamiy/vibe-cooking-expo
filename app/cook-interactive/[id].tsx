@@ -219,7 +219,7 @@ export default function CookInteractiveScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [voiceInputMode, setVoiceInputMode] = useState<VoiceInputMode>(
-    config?.voiceInputMode ?? "voxtral_speech_understanding",
+    config?.voiceInputMode ?? "asr_then_llm",
   );
 
   const {
