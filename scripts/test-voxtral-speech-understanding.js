@@ -67,6 +67,33 @@ function extractAssistantText(response) {
     .trim();
 }
 
+async function transcribeViaVpsAsr(vpsBase, wavPath) {
+  const formData = new FormData();
+  formData.append("model", "voxtral-mini-2602");
+  formData.append("language", "en");
+  formData.append("stream", "false");
+  formData.append(
+    "file",
+    new Blob([fs.readFileSync(wavPath)], { type: "audio/wav" }),
+    "audio.wav",
+  );
+
+  const res = await fetch(`${vpsBase}/vps/asr/transcribe`, {
+    method: "POST",
+    body: formData,
+  });
+  const raw = await res.text();
+  if (!res.ok) {
+    throw new Error(`VPS ASR API error ${res.status}: ${raw}`);
+  }
+  try {
+    const data = JSON.parse(raw);
+    return String(data.text || "").trim();
+  } catch {
+    return String(raw || "").trim();
+  }
+}
+
 async function main() {
   loadEnvFromDotenv();
 
@@ -109,14 +136,24 @@ async function main() {
         }),
       });
       const raw = await res.text();
-      if (!res.ok) {
-        throw new Error(`VPS API error ${res.status}: ${raw}`);
+      if (res.ok) {
+        const data = JSON.parse(raw);
+        console.log("mode=vps_proxy");
+        console.log(`synthetic_audio_text="${synthText}"`);
+        console.log(`voxtral_response="${String(data.text || "").trim()}"`);
+        return;
       }
-      const data = JSON.parse(raw);
-      console.log("mode=vps_proxy");
-      console.log(`synthetic_audio_text="${synthText}"`);
-      console.log(`voxtral_response="${String(data.text || "").trim()}"`);
-      return;
+
+      // Some deployments only expose ASR proxy and do not provide /vps/audio/understand.
+      if (res.status === 404) {
+        const text = await transcribeViaVpsAsr(vpsBase, wavPath);
+        console.log("mode=vps_proxy(asr-fallback)");
+        console.log(`synthetic_audio_text="${synthText}"`);
+        console.log(`voxtral_response="${text}"`);
+        return;
+      }
+
+      throw new Error(`VPS API error ${res.status}: ${raw}`);
     }
 
     const mistralKey =
