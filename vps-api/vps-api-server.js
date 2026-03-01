@@ -7,9 +7,9 @@ const { URL } = require("node:url");
 const DEFAULT_ANTHROPIC_MODEL =
   process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
 const EVALUATOR_ANTHROPIC_MODEL =
-  process.env.CLAUDE_EVALUATOR_MODEL || "claude-sonnet-4-5-20250929";
+  process.env.CLAUDE_EVALUATOR_MODEL || "claude-sonnet-4-6";
 const EVALUATOR_ANTHROPIC_FALLBACK_MODEL =
-  process.env.CLAUDE_EVALUATOR_MODEL_FALLBACK || "claude-sonnet-4-6";
+  process.env.CLAUDE_EVALUATOR_MODEL_FALLBACK || "claude-sonnet-4-5-20250929";
 
 // Scheduler module (compiled from TypeScript)
 let scheduler = null;
