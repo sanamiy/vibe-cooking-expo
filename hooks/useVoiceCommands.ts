@@ -539,8 +539,8 @@ export function useVoiceCommands({
             "samples",
           );
 
-          const recordedChunks =
-            audioChunksRef.current.length > 0 ? audioChunksRef.current : [pcm16];
+          // Prefer VAD finalized audio for better boundary quality.
+          const recordedChunks = audio.length > 0 ? [pcm16] : audioChunksRef.current;
           audioChunksRef.current = [];
           await processRecordedChunks(recordedChunks);
         },

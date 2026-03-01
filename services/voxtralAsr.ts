@@ -28,7 +28,7 @@ async function consumeSseTranscription(
           const event = JSON.parse(jsonStr);
           if (event.type === "transcription.text.delta" && event.text) {
             fullText += event.text;
-            onInterim(fullText);
+            onInterim(normalizeTranscriptText(fullText));
           }
         } catch {
           // ignore parse errors
@@ -37,7 +37,17 @@ async function consumeSseTranscription(
     }
   }
 
-  return fullText;
+  return normalizeTranscriptText(fullText);
+}
+
+function normalizeTranscriptText(text: string): string {
+  return String(text ?? "")
+    .replace(
+      /\[\s*\d+m\d+s\d+ms\s*-\s*\d+m\d+s\d+ms\s*\]\s*/g,
+      " ",
+    )
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function buildWavFromChunks(audioChunks: Int16Array[]): Blob {
@@ -89,7 +99,7 @@ export async function transcribeStream(
   onInterim: (text: string) => void,
   onFinal: (text: string) => void,
   onError: (error: string) => void,
-  opts?: { model?: string; language?: string },
+  opts?: { model?: string; language?: string; prompt?: string },
 ): Promise<void> {
   const wav = buildWavFromChunks(audioChunks);
 
@@ -97,6 +107,11 @@ export async function transcribeStream(
   formData.append("model", opts?.model ?? "voxtral-mini-2602");
   formData.append("file", wav, "audio.wav");
   formData.append("language", opts?.language ?? "ja");
+  formData.append(
+    "prompt",
+    opts?.prompt ??
+      "日本語で自然に文字起こししてください。料理中の短い発話（終わりました、次、前、タイマー）を正確に認識してください。",
+  );
   formData.append("stream", "true");
 
   try {
@@ -141,11 +156,16 @@ export async function transcribeFile(
   onInterim: (text: string) => void,
   onFinal: (text: string) => void,
   onError: (error: string) => void,
-  opts?: { model?: string; language?: string },
+  opts?: { model?: string; language?: string; prompt?: string },
 ): Promise<void> {
   const formData = new FormData();
   formData.append("model", opts?.model ?? "voxtral-mini-2602");
   formData.append("language", opts?.language ?? "ja");
+  formData.append(
+    "prompt",
+    opts?.prompt ??
+      "日本語で自然に文字起こししてください。料理中の短い発話（終わりました、次、前、タイマー）を正確に認識してください。",
+  );
   formData.append("stream", "true");
   formData.append("file", {
     uri: file.uri,
