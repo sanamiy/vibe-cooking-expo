@@ -11,10 +11,14 @@ interface UseVoiceCommandsProps {
   active?: boolean;
   inputDeviceId?: string;
   isSpeaking?: boolean;
+  voiceInputMode?: VoiceInputMode;
+  voxtralSpeechPrompt?: string;
 }
 
+export type VoiceInputMode = "asr_then_llm" | "voxtral_speech_understanding";
+
 const config = require("@/config.json") as {
-  voiceInputMode?: "asr_then_llm" | "voxtral_speech_understanding";
+  voiceInputMode?: VoiceInputMode;
   voxtralSpeechPrompt?: string;
 };
 
@@ -72,6 +76,8 @@ export function useVoiceCommands({
   active = true,
   inputDeviceId,
   isSpeaking = false,
+  voiceInputMode,
+  voxtralSpeechPrompt,
 }: UseVoiceCommandsProps) {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -172,15 +178,18 @@ export function useVoiceCommands({
 
           const recordedChunks =
             audioChunksRef.current.length > 0 ? audioChunksRef.current : [pcm16];
+          const activeVoiceInputMode = voiceInputMode ?? config?.voiceInputMode;
+          const activeVoxtralPrompt =
+            voxtralSpeechPrompt ?? config?.voxtralSpeechPrompt;
           const useSpeechUnderstandingMode =
-            config?.voiceInputMode === "voxtral_speech_understanding";
+            activeVoiceInputMode === "voxtral_speech_understanding";
 
           if (useSpeechUnderstandingMode) {
             try {
               const understoodText = await understandAudioWithVoxtral(
                 recordedChunks,
                 {
-                  prompt: config?.voxtralSpeechPrompt,
+                  prompt: activeVoxtralPrompt,
                 },
               );
               if (understoodText.trim()) {
@@ -236,7 +245,7 @@ export function useVoiceCommands({
       setError(e instanceof Error ? e.message : "音声認識の開始に失敗しました");
       setIsListening(false);
     }
-  }, [inputDeviceId]);
+  }, [inputDeviceId, voiceInputMode, voxtralSpeechPrompt]);
 
   const stopListening = useCallback(() => {
     vadRef.current?.pause();
