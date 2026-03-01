@@ -5,14 +5,7 @@ import { buildRecipeGantt, RecipeGanttData, GanttTask } from "@/utils/gantt";
 import { stripHtml } from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import {
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
@@ -99,9 +92,7 @@ export default function CookInteractiveScreen() {
         recipeName: t.recipe_name,
         text: t.step_description,
         schedulerTask: t,
-        color:
-          t.color ||
-          RECIPE_COLORS[ids.indexOf(t.recipe_id) % RECIPE_COLORS.length],
+        color: t.color || RECIPE_COLORS[ids.indexOf(t.recipe_id) % RECIPE_COLORS.length],
       }));
     }
     // Fallback: interleave original recipe steps
@@ -125,18 +116,13 @@ export default function CookInteractiveScreen() {
   }, [allScheduledTasks, ids, recipes]);
 
   // For voice dialogue, use simple steps array
-  const steps = useMemo(
-    () => combinedSteps.map((s) => ({ text: s.text })),
-    [combinedSteps],
-  );
+  const steps = useMemo(() => combinedSteps.map((s) => ({ text: s.text })), [combinedSteps]);
 
   // Build combined gantt chart
   const gantt = useMemo<RecipeGanttData>(() => {
     if (allScheduledTasks.length > 0) {
       // Note: scheduler duration and start_time are already in MINUTES
-      const totalTime = Math.max(
-        ...allScheduledTasks.map((t) => t.start_time + t.duration),
-      );
+      const totalTime = Math.max(...allScheduledTasks.map((t) => t.start_time + t.duration));
       return {
         version: 1 as const,
         recipe_id: ids.join(","),
@@ -152,9 +138,7 @@ export default function CookInteractiveScreen() {
           return {
             task_id: `${t.recipe_id}-${idx}`,
             step_index: idx + 1,
-            label:
-              t.step_description.slice(0, 25) +
-              (t.step_description.length > 25 ? "…" : ""),
+            label: t.step_description.slice(0, 25) + (t.step_description.length > 25 ? "…" : ""),
             source_text: t.step_description,
             duration_min: durationMin,
             start_min: startMin,
@@ -168,9 +152,9 @@ export default function CookInteractiveScreen() {
       };
     }
     // Fallback to first recipe's prebuilt gantt
-    const prebuilt = (
-      prebuiltGantt as { recipes?: RecipeGanttData[] }
-    ).recipes?.find((r) => r.recipe_id === ids[0]);
+    const prebuilt = (prebuiltGantt as { recipes?: RecipeGanttData[] }).recipes?.find(
+      (r) => r.recipe_id === ids[0],
+    );
     return prebuilt ?? buildRecipeGantt(ids[0], steps);
   }, [ids, steps, allScheduledTasks]);
 
@@ -303,16 +287,12 @@ export default function CookInteractiveScreen() {
 
   // Calculate progress percentage
   const progressPercent =
-    combinedSteps.length > 0
-      ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100)
-      : 0;
+    combinedSteps.length > 0 ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100) : 0;
 
   // Calculate per-recipe progress
   const recipeProgress = useMemo(() => {
-    const progress: Record<
-      string,
-      { done: number; total: number; name: string; color: string }
-    > = {};
+    const progress: Record<string, { done: number; total: number; name: string; color: string }> =
+      {};
     for (let i = 0; i < combinedSteps.length; i++) {
       const step = combinedSteps[i];
       if (!progress[step.recipeId]) {
@@ -356,17 +336,13 @@ export default function CookInteractiveScreen() {
           <Text style={styles.topProgressPercent}>{progressPercent}%</Text>
         </View>
         <View style={styles.topProgressBar}>
-          <View
-            style={[styles.topProgressFill, { width: `${progressPercent}%` }]}
-          />
+          <View style={[styles.topProgressFill, { width: `${progressPercent}%` }]} />
         </View>
         {recipeProgress.length > 1 && (
           <View style={styles.topRecipeProgress}>
             {recipeProgress.map((rp) => (
               <View key={rp.recipeId} style={styles.topRecipeItem}>
-                <View
-                  style={[styles.topRecipeDot, { backgroundColor: rp.color }]}
-                />
+                <View style={[styles.topRecipeDot, { backgroundColor: rp.color }]} />
                 <Text style={styles.topRecipeName} numberOfLines={1}>
                   {rp.name}
                 </Text>
@@ -379,12 +355,7 @@ export default function CookInteractiveScreen() {
 
       <ScrollView contentContainerStyle={styles.content}>
         {/* Current step card */}
-        <View
-          style={[
-            styles.card,
-            { borderLeftWidth: 4, borderLeftColor: currentStep?.color },
-          ]}
-        >
+        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: currentStep?.color }]}>
           <View style={styles.stepHeader}>
             <View style={styles.stepBadge}>
               <Text style={styles.stepBadgeText}>
@@ -396,9 +367,7 @@ export default function CookInteractiveScreen() {
                 style={[
                   styles.typeBadge,
                   {
-                    backgroundColor: getTaskTypeColor(
-                      currentStep.schedulerTask.task_type,
-                    ),
+                    backgroundColor: getTaskTypeColor(currentStep.schedulerTask.task_type),
                   },
                 ]}
               >
@@ -409,15 +378,11 @@ export default function CookInteractiveScreen() {
             )}
           </View>
           <Text style={styles.recipeLabel}>📖 {currentStep?.recipeName}</Text>
-          <Text style={styles.stepText}>
-            {stripHtml(currentStep?.text ?? "手順がありません")}
-          </Text>
+          <Text style={styles.stepText}>{stripHtml(currentStep?.text ?? "手順がありません")}</Text>
           {currentStep?.schedulerTask?.tips && (
             <View style={styles.tipsContainer}>
               <Text style={styles.tipsLabel}>💡 コツ</Text>
-              <Text style={styles.tipsText}>
-                {currentStep.schedulerTask.tips}
-              </Text>
+              <Text style={styles.tipsText}>{currentStep.schedulerTask.tips}</Text>
             </View>
           )}
         </View>
@@ -456,12 +421,7 @@ export default function CookInteractiveScreen() {
             return (
               <View key={task.task_id} style={styles.ganttRow}>
                 <View style={styles.ganttLabelRow}>
-                  <View
-                    style={[
-                      styles.ganttColorDot,
-                      { backgroundColor: stepColor },
-                    ]}
-                  />
+                  <View style={[styles.ganttColorDot, { backgroundColor: stepColor }]} />
                   <Text
                     style={[
                       styles.ganttLabel,

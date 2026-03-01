@@ -9,9 +9,7 @@ const config = require("@/config.json") as {
 function requireApiMode(): ApiMode {
   const mode = config?.apiMode;
   if (mode !== "vps_proxy" && mode !== "direct_client") {
-    throw new Error(
-      "Missing or invalid config.json apiMode (expected vps_proxy or direct_client)",
-    );
+    throw new Error("Missing or invalid config.json apiMode (expected vps_proxy or direct_client)");
   }
   return mode;
 }
@@ -22,24 +20,22 @@ export function getApiMode(): ApiMode {
 
 export function requireVpsBaseUrl(): string {
   const base = getVpsBaseUrlOptional();
-  if (!base) throw new Error("Missing VPS API base URL");
+  if (base === null) throw new Error("Missing VPS API base URL");
   return base;
 }
 
 export function getVpsBaseUrlOptional(): string | null {
-  const base =
+  const raw =
     (Constants.expoConfig?.extra as any)?.VPS_API_BASE_URL ??
-    process.env.EXPO_PUBLIC_VPS_API_BASE_URL ??
-    "";
-  if (!base) return null;
-  return base.replace(/\/$/, "");
+    process.env.EXPO_PUBLIC_VPS_API_BASE_URL;
+  if (raw === "") return "";
+  if (!raw) return null;
+  return raw.replace(/\/$/, "");
 }
 
 export function requireMistralApiKey(): string {
   if (requireApiMode() === "vps_proxy") {
-    throw new Error(
-      "Mistral API key should not be used on client in vps_proxy mode",
-    );
+    throw new Error("Mistral API key should not be used on client in vps_proxy mode");
   }
 
   const key =
@@ -54,9 +50,7 @@ export function requireMistralApiKey(): string {
 
 export function requireClaudeApiKey(): string {
   if (requireApiMode() === "vps_proxy") {
-    throw new Error(
-      "Claude API key should not be used on client in vps_proxy mode",
-    );
+    throw new Error("Claude API key should not be used on client in vps_proxy mode");
   }
 
   const key =
@@ -70,9 +64,7 @@ export function requireClaudeApiKey(): string {
 
 export function requireElevenLabsApiKey(): string {
   if (requireApiMode() === "vps_proxy") {
-    throw new Error(
-      "ElevenLabs API key should not be used on client in vps_proxy mode",
-    );
+    throw new Error("ElevenLabs API key should not be used on client in vps_proxy mode");
   }
 
   const key =
