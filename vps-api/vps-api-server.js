@@ -1002,7 +1002,7 @@ function normalizeEvaluationCriteria(rawCriteria) {
     must_respect_kitchen_limits: true,
     prefer_vegetables_before_meat: true,
     minimize_cutting_board_washes: true,
-    max_cutting_board_washes: 1,
+    max_cutting_board_washes: null,
     max_total_time: null,
     max_sync_variance: null,
     min_parallel_windows: null,
@@ -1256,19 +1256,43 @@ function buildCriteriaResultsFromDeterministicChecks({
   }
 
   if (criteria.minimize_cutting_board_washes) {
-    const washLimit =
-      criteria.max_cutting_board_washes != null
-        ? criteria.max_cutting_board_washes
-        : 1;
+    const hasRaw =
+      boardFlow.raw_meat_task_count > 0 || boardFlow.raw_fish_task_count > 0;
+    const hasVegetables = boardFlow.vegetable_task_count > 0;
+    const estimatedBestWashCount = hasRaw && hasVegetables ? 1 : 0;
+    const improvementPossible =
+      !boardFlow.vegetables_before_raw ||
+      boardFlow.raw_to_vegetable_transitions > 0 ||
+      boardFlow.wash_task_count > estimatedBestWashCount;
+    const pass = !improvementPossible;
+    results.push({
+      criterion: "まな板洗浄回数を最小化（改善余地がない）",
+      passed: pass,
+      reason: pass
+        ? `実測 ${boardFlow.wash_task_count} 回（改善余地なし）`
+        : `実測 ${boardFlow.wash_task_count} 回（理想目安 ${estimatedBestWashCount} 回、並び替え改善余地あり）`,
+      source: "deterministic",
+    });
+    if (!pass) {
+      blockers.push(
+        `まな板洗浄最小化未達: 実測 ${boardFlow.wash_task_count} 回、野菜先切り/遷移削減で改善余地あり`,
+      );
+    }
+  }
+
+  if (criteria.max_cutting_board_washes != null) {
+    const washLimit = criteria.max_cutting_board_washes;
     const pass = boardFlow.wash_task_count <= washLimit;
     results.push({
-      criterion: `まな板洗浄回数 <= ${washLimit}`,
+      criterion: `まな板洗浄回数 <= ${washLimit}（ハード制約）`,
       passed: pass,
       reason: `実測 ${boardFlow.wash_task_count} 回`,
       source: "deterministic",
     });
     if (!pass) {
-      blockers.push(`まな板洗浄回数超過: ${boardFlow.wash_task_count} 回`);
+      blockers.push(
+        `まな板洗浄回数ハード制約超過: ${boardFlow.wash_task_count} 回 > ${washLimit} 回`,
+      );
     }
   }
 
@@ -1855,7 +1879,7 @@ async function runSchedulerAgent({
 - 手動調整依頼がある場合は update_schedule を呼ぶ
 - 合否判定依頼がある場合は evaluate_schedule を呼ぶ
 - まな板作業は「野菜を先にすべて切る -> 肉/魚はあとで切る」を優先する
-- まな板洗浄回数は最小化する（目標1回以下）
+- まな板洗浄回数は最小化し、改善余地がない状態を目指す（1回以下は目安であり固定制約ではない）
 - evaluate_schedule で pass=true なら作業完了として最終回答する
 - 最後は日本語で簡潔に結果を要約し、schedule_id と次アクションを示す`;
 
@@ -2013,7 +2037,7 @@ blockers: ${blockers}
 これまでの履歴は保持したまま、このフィードバックを反映して次の作業を行ってください。
 必須改善:
 1) まな板作業は「全野菜を先に切る -> 肉/魚を後で切る」順序にする
-2) まな板洗浄回数を最小化する（目標1回以下）
+2) まな板洗浄回数を最小化し、改善余地がない状態にする（1回以下は目安）
 3) update_schedule または optimize_schedule を使って改善する
 4) 最後に evaluate_schedule を呼んで再判定する`,
     });
