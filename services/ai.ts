@@ -2,19 +2,22 @@ import {
   getApiMode,
   getElevenLabsModelId,
   getElevenLabsVoiceId,
+  getVpsBaseUrlOptional,
   requireClaudeApiKey,
   requireElevenLabsApiKey,
   requireMistralApiKey,
   requireVpsBaseUrl,
 } from "@/services/apiConfig";
+import { Platform } from "react-native";
 
-const IS_WEB =
-  typeof (globalThis as any).window !== "undefined" &&
-  typeof (globalThis as any).document !== "undefined";
+const IS_WEB = Platform.OS === "web";
 
 function shouldUseVpsProxy(): boolean {
   const mode = getApiMode();
-  return mode === "vps_proxy" || (mode === "direct_client" && IS_WEB);
+  if (mode === "vps_proxy") return true;
+  if (mode !== "direct_client") return false;
+  if (!IS_WEB) return false;
+  return !!getVpsBaseUrlOptional();
 }
 
 async function postJsonVps<T>(path: string, body: any): Promise<T> {

@@ -21,11 +21,17 @@ export function getApiMode(): ApiMode {
 }
 
 export function requireVpsBaseUrl(): string {
+  const base = getVpsBaseUrlOptional();
+  if (!base) throw new Error("Missing VPS API base URL");
+  return base;
+}
+
+export function getVpsBaseUrlOptional(): string | null {
   const base =
     (Constants.expoConfig?.extra as any)?.VPS_API_BASE_URL ??
     process.env.EXPO_PUBLIC_VPS_API_BASE_URL ??
     "";
-  if (!base) throw new Error("Missing VPS API base URL");
+  if (!base) return null;
   return base.replace(/\/$/, "");
 }
 
