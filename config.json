@@ -1,4 +1,4 @@
 {
   "tts": "online_elevenlabs",
-  "apiMode": "direct_client"
+  "apiMode": "vps_proxy"
 }
