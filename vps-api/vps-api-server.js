@@ -93,7 +93,14 @@ async function callMistral(messages, { temperature, responseFormat } = {}) {
   return JSON.parse(text);
 }
 
-async function callAnthropic({ system, messages, maxTokens }) {
+async function callAnthropic({
+  system,
+  messages,
+  maxTokens,
+  tools,
+  toolChoice,
+  temperature,
+}) {
   const key = requireEnv("CLAUDE_API_KEY");
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -105,7 +112,10 @@ async function callAnthropic({ system, messages, maxTokens }) {
     body: JSON.stringify({
       model: "claude-haiku-4-5-20251001",
       max_tokens: maxTokens,
+      ...(temperature != null ? { temperature } : {}),
       ...(system ? { system } : {}),
+      ...(tools ? { tools } : {}),
+      ...(toolChoice ? { tool_choice: toolChoice } : {}),
       messages,
     }),
   });
@@ -898,6 +908,362 @@ function applyTaskUpdates(existingTasks, updates) {
   return { tasks, warnings };
 }
 
+const SCHEDULER_AGENT_TOOLS = [
+  {
+    name: "optimize_schedule",
+    description:
+      "利用可能なアルゴリズムから適切なものを選び、スケジュールを最適化して保存する。",
+    input_schema: {
+      type: "object",
+      properties: {
+        recipes: {
+          type: "array",
+          description: "レシピ配列",
+        },
+        kitchen: {
+          type: "object",
+          description: "キッチン制約",
+        },
+        objective: {
+          type: "string",
+          description: "最適化の狙い（例: 速度重視、同時完成重視）",
+        },
+        algorithm_candidates: {
+          type: "array",
+          items: { type: "string" },
+          description: "選択候補アルゴリズム",
+        },
+        options: {
+          type: "object",
+          description: "スケジューラの追加オプション",
+        },
+        schedule_name: {
+          type: "string",
+          description: "保存名",
+        },
+      },
+      required: ["recipes", "kitchen"],
+    },
+  },
+  {
+    name: "get_schedule",
+    description: "保存済みスケジュールを取得する。",
+    input_schema: {
+      type: "object",
+      properties: {
+        schedule_id: { type: "string" },
+        include_tasks: { type: "boolean" },
+        task_limit: { type: "integer" },
+      },
+      required: ["schedule_id"],
+    },
+  },
+  {
+    name: "update_schedule",
+    description:
+      "保存済みスケジュールへ手動調整（更新・追加・削除）を適用する。",
+    input_schema: {
+      type: "object",
+      properties: {
+        schedule_id: { type: "string" },
+        updates: {
+          type: "object",
+          properties: {
+            task_updates: { type: "array" },
+            add_tasks: { type: "array" },
+            remove_task_ids: { type: "array", items: { type: "string" } },
+          },
+        },
+      },
+      required: ["schedule_id", "updates"],
+    },
+  },
+];
+
+async function agentToolOptimizeSchedule(args) {
+  const {
+    recipes,
+    kitchen,
+    objective,
+    algorithm_candidates,
+    options = {},
+    schedule_name,
+  } = args ?? {};
+
+  if (!Array.isArray(recipes) || recipes.length === 0 || !kitchen) {
+    throw new Error("optimize_schedule requires recipes and kitchen");
+  }
+
+  const selection = chooseAgentAlgorithm({
+    recipes,
+    kitchen,
+    objective,
+    algorithmCandidates: algorithm_candidates,
+    forceAlgorithm: options?.force_algorithm,
+  });
+
+  const scheduleOptions = {
+    ...options,
+    algorithm: selection.algorithm,
+  };
+  if (scheduleOptions.algorithm === "claude_e2e") {
+    scheduleOptions.use_llm_analysis = true;
+  }
+
+  const result = await runCreateSchedule({
+    recipes,
+    kitchen,
+    options: scheduleOptions,
+  });
+
+  const now = new Date().toISOString();
+  const scheduleId = randomUUID();
+  const store = readAgenticStore();
+  const record = {
+    schedule_id: scheduleId,
+    schedule_name: String(schedule_name ?? ""),
+    objective: String(objective ?? ""),
+    selected_algorithm: selection.algorithm,
+    selection_reason: selection.reason,
+    algorithm_candidates: selection.candidates,
+    request: {
+      recipes,
+      kitchen,
+      options: scheduleOptions,
+    },
+    result,
+    version: 1,
+    created_at: now,
+    updated_at: now,
+  };
+  store.schedules[scheduleId] = record;
+  writeAgenticStore(store);
+
+  return {
+    schedule_id: scheduleId,
+    selected_algorithm: selection.algorithm,
+    selection_reason: selection.reason,
+    schedule_name: record.schedule_name,
+    summary: {
+      total_time: result?.schedule?.total_time ?? 0,
+      task_count: result?.schedule?.tasks?.length ?? 0,
+      algorithm_used: result?.schedule?.algorithm_used ?? selection.algorithm,
+    },
+  };
+}
+
+async function agentToolGetSchedule(args) {
+  const scheduleId = String(args?.schedule_id ?? "");
+  if (!scheduleId) throw new Error("get_schedule requires schedule_id");
+
+  const includeTasks = args?.include_tasks !== false;
+  const taskLimit = toInt(args?.task_limit, 200, { min: 1, max: 5_000 });
+  const store = readAgenticStore();
+  const record = store.schedules[scheduleId];
+  if (!record) throw new Error(`schedule not found: ${scheduleId}`);
+
+  const tasks = Array.isArray(record?.result?.schedule?.tasks)
+    ? record.result.schedule.tasks
+    : [];
+  const limitedTasks = includeTasks ? tasks.slice(0, taskLimit) : undefined;
+
+  return {
+    schedule_id: scheduleId,
+    version: record.version,
+    schedule_name: record.schedule_name,
+    selected_algorithm: record.selected_algorithm,
+    updated_at: record.updated_at,
+    schedule: {
+      total_time: record?.result?.schedule?.total_time ?? 0,
+      algorithm_used: record?.result?.schedule?.algorithm_used ?? "unknown",
+      task_count: tasks.length,
+      tasks: limitedTasks,
+      tasks_truncated: includeTasks ? tasks.length > taskLimit : false,
+    },
+  };
+}
+
+async function agentToolUpdateSchedule(args) {
+  const scheduleId = String(args?.schedule_id ?? "");
+  const updates = args?.updates ?? {};
+  if (!scheduleId) throw new Error("update_schedule requires schedule_id");
+
+  const store = readAgenticStore();
+  const record = store.schedules[scheduleId];
+  if (!record) throw new Error(`schedule not found: ${scheduleId}`);
+
+  const currentTasks = record?.result?.schedule?.tasks;
+  if (!Array.isArray(currentTasks)) {
+    throw new Error("stored schedule has invalid task format");
+  }
+
+  const { tasks, warnings } = applyTaskUpdates(currentTasks, updates);
+  const stats = computeScheduleStats(tasks);
+  const baseAlgorithm = String(
+    record.result?.schedule?.algorithm_used ?? "manual",
+  );
+  const algorithmUsed = baseAlgorithm.includes("+manual_update")
+    ? baseAlgorithm
+    : `${baseAlgorithm}+manual_update`;
+
+  record.result.schedule.tasks = stats.tasks;
+  record.result.schedule.total_time = stats.totalTime;
+  record.result.schedule.algorithm_used = algorithmUsed;
+  record.result.metrics = {
+    ...(record.result.metrics ?? {}),
+    computation_time_ms: 0,
+    sync_variance: stats.syncVariance,
+    parallel_windows: stats.parallelWindows,
+    recipe_end_times: stats.recipeEndTimes,
+  };
+  record.version = toInt(record.version, 1, { min: 1, max: 1_000_000 }) + 1;
+  record.updated_at = new Date().toISOString();
+  store.schedules[scheduleId] = record;
+  writeAgenticStore(store);
+
+  return {
+    schedule_id: scheduleId,
+    version: record.version,
+    warnings,
+    summary: {
+      total_time: record?.result?.schedule?.total_time ?? 0,
+      task_count: record?.result?.schedule?.tasks?.length ?? 0,
+      algorithm_used: record?.result?.schedule?.algorithm_used ?? "manual",
+    },
+  };
+}
+
+const SCHEDULER_AGENT_HANDLERS = {
+  optimize_schedule: agentToolOptimizeSchedule,
+  get_schedule: agentToolGetSchedule,
+  update_schedule: agentToolUpdateSchedule,
+};
+
+async function runSchedulerAgent({
+  userRequest,
+  recipes,
+  kitchen,
+  scheduleId,
+  objective,
+  algorithmCandidates,
+  options,
+  maxSteps,
+}) {
+  const requestText = String(userRequest ?? "").trim();
+  if (!requestText) {
+    throw new Error("user_request is required");
+  }
+
+  const stepsLimit = toInt(maxSteps, 8, { min: 1, max: 12 });
+  const context = {
+    recipes: Array.isArray(recipes) ? recipes : undefined,
+    kitchen: kitchen ?? undefined,
+    schedule_id: scheduleId ? String(scheduleId) : undefined,
+    objective: objective ? String(objective) : undefined,
+    algorithm_candidates: Array.isArray(algorithmCandidates)
+      ? algorithmCandidates
+      : undefined,
+    options: options ?? undefined,
+  };
+
+  const system = `あなたはスケジューリング最適化エージェントです。
+必ず tool calling を使って作業を進めてください。
+利用可能ツール:
+- optimize_schedule: スケジュール最適化と保存
+- get_schedule: 保存済みスケジュール取得
+- update_schedule: 保存済みスケジュールの手動調整
+
+ルール:
+- 新規作成が必要なら optimize_schedule を呼ぶ
+- 既存 schedule_id がある場合、内容確認には get_schedule を呼ぶ
+- 手動調整依頼がある場合は update_schedule を呼ぶ
+- 最後は日本語で簡潔に結果を要約し、schedule_id と次アクションを示す`;
+
+  const messages = [
+    {
+      role: "user",
+      content: `ユーザー依頼:\n${requestText}\n\n初期コンテキスト:\n${JSON.stringify(context, null, 2)}`,
+    },
+  ];
+
+  const trace = [];
+  let finalText = "";
+
+  for (let step = 1; step <= stepsLimit; step++) {
+    const response = await callAnthropic({
+      system,
+      maxTokens: 1400,
+      tools: SCHEDULER_AGENT_TOOLS,
+      toolChoice: { type: "auto" },
+      messages,
+    });
+
+    const content = Array.isArray(response?.content) ? response.content : [];
+    const toolUses = content.filter((c) => c?.type === "tool_use");
+    const text = content
+      .filter((c) => c?.type === "text")
+      .map((c) => String(c.text ?? ""))
+      .join("\n")
+      .trim();
+
+    messages.push({ role: "assistant", content });
+
+    if (toolUses.length === 0) {
+      finalText = text;
+      break;
+    }
+
+    const resultBlocks = [];
+    for (const toolUse of toolUses) {
+      const toolName = String(toolUse.name ?? "");
+      const handler = SCHEDULER_AGENT_HANDLERS[toolName];
+      let payload;
+      if (!handler) {
+        payload = { ok: false, error: `unknown tool: ${toolName}` };
+      } else {
+        try {
+          const result = await handler(toolUse.input ?? {});
+          payload = { ok: true, result };
+        } catch (e) {
+          payload = {
+            ok: false,
+            error: e instanceof Error ? e.message : String(e),
+          };
+        }
+      }
+
+      trace.push({
+        step,
+        tool: toolName,
+        ok: !!payload.ok,
+        schedule_id:
+          payload?.result?.schedule_id ?? toolUse?.input?.schedule_id ?? null,
+        error: payload.ok ? null : payload.error,
+      });
+
+      resultBlocks.push({
+        type: "tool_result",
+        tool_use_id: toolUse.id,
+        content: JSON.stringify(payload),
+      });
+    }
+
+    messages.push({
+      role: "user",
+      content: resultBlocks,
+    });
+  }
+
+  const touchedScheduleIds = [
+    ...new Set(trace.map((t) => t.schedule_id).filter(Boolean)),
+  ];
+  return {
+    final_text: finalText || "処理を完了しました。",
+    trace,
+    schedule_ids: touchedScheduleIds,
+  };
+}
+
 const server = http.createServer(async (req, res) => {
   setCors(res);
   if (req.method === "OPTIONS") {
@@ -1154,188 +1520,42 @@ ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
 
     if (path === "/vps/scheduler/agent/tools") {
       json(res, 200, {
-        tools: [
-          {
-            name: "optimize_schedule",
-            description:
-              "最適化アルゴリズムを自動選択してスケジュールを作成・保存します。",
-            input: {
-              recipes: "RecipeInput[]",
-              kitchen: "KitchenConfig",
-              objective: "string (optional)",
-              algorithm_candidates: "AlgorithmType[] (optional)",
-              options: "ScheduleOptions (optional)",
-              schedule_name: "string (optional)",
-            },
-          },
-          {
-            name: "update_schedule",
-            description:
-              "保存済みスケジュールに対してタスク更新・追加・削除を適用します。",
-            input: {
-              schedule_id: "string",
-              updates: {
-                task_updates:
-                  "Array<{ task_id, start_time?, duration?, description?, uses_stove?, uses_cutting_board?, requires_attention?, task_type?, tips? }>",
-                add_tasks: "Array<ScheduledTask-like object>",
-                remove_task_ids: "string[]",
-              },
-            },
-          },
-          {
-            name: "get_schedule",
-            description: "保存済みスケジュールを取得します。",
-            input: {
-              schedule_id: "string",
-            },
-          },
-        ],
+        tools: SCHEDULER_AGENT_TOOLS,
         supported_algorithms: AGENTIC_ALGORITHMS,
       });
       return;
     }
 
-    if (path === "/vps/scheduler/agent/optimize") {
+    if (path === "/vps/scheduler/agent/run") {
       const {
+        user_request,
         recipes,
         kitchen,
+        schedule_id,
         objective,
         algorithm_candidates,
-        options = {},
-        schedule_name,
+        options,
+        max_steps,
       } = body;
 
-      if (!Array.isArray(recipes) || recipes.length === 0 || !kitchen) {
-        json(res, 400, { error: "recipes and kitchen are required" });
+      if (!String(user_request ?? "").trim()) {
+        json(res, 400, { error: "user_request is required" });
         return;
       }
 
-      const selection = chooseAgentAlgorithm({
+      const result = await runSchedulerAgent({
+        userRequest: user_request,
         recipes,
         kitchen,
+        scheduleId: schedule_id,
         objective,
         algorithmCandidates: algorithm_candidates,
-        forceAlgorithm: options?.force_algorithm,
+        options,
+        maxSteps: max_steps,
       });
-
-      const scheduleOptions = {
-        ...options,
-        algorithm: selection.algorithm,
-      };
-      if (scheduleOptions.algorithm === "claude_e2e") {
-        scheduleOptions.use_llm_analysis = true;
-      }
-
-      const result = await runCreateSchedule({
-        recipes,
-        kitchen,
-        options: scheduleOptions,
-      });
-
-      const now = new Date().toISOString();
-      const scheduleId = randomUUID();
-      const store = readAgenticStore();
-      const record = {
-        schedule_id: scheduleId,
-        schedule_name: String(schedule_name ?? ""),
-        objective: String(objective ?? ""),
-        selected_algorithm: selection.algorithm,
-        selection_reason: selection.reason,
-        algorithm_candidates: selection.candidates,
-        request: {
-          recipes,
-          kitchen,
-          options: scheduleOptions,
-        },
+      json(res, 200, {
+        mode: "tool_calling_agent",
         result,
-        version: 1,
-        created_at: now,
-        updated_at: now,
-      };
-      store.schedules[scheduleId] = record;
-      writeAgenticStore(store);
-
-      json(res, 200, {
-        tool: "optimize_schedule",
-        schedule_id: scheduleId,
-        selected_algorithm: selection.algorithm,
-        selection_reason: selection.reason,
-        schedule_name: record.schedule_name,
-        result,
-      });
-      return;
-    }
-
-    if (path === "/vps/scheduler/agent/get-schedule") {
-      const scheduleId = String(body?.schedule_id ?? "");
-      if (!scheduleId) {
-        json(res, 400, { error: "schedule_id is required" });
-        return;
-      }
-      const store = readAgenticStore();
-      const record = store.schedules[scheduleId];
-      if (!record) {
-        json(res, 404, { error: `schedule not found: ${scheduleId}` });
-        return;
-      }
-      json(res, 200, {
-        tool: "get_schedule",
-        schedule_id: scheduleId,
-        record,
-      });
-      return;
-    }
-
-    if (path === "/vps/scheduler/agent/update-schedule") {
-      const scheduleId = String(body?.schedule_id ?? "");
-      const updates = body?.updates ?? {};
-      if (!scheduleId) {
-        json(res, 400, { error: "schedule_id is required" });
-        return;
-      }
-
-      const store = readAgenticStore();
-      const record = store.schedules[scheduleId];
-      if (!record) {
-        json(res, 404, { error: `schedule not found: ${scheduleId}` });
-        return;
-      }
-
-      const currentTasks = record?.result?.schedule?.tasks;
-      if (!Array.isArray(currentTasks)) {
-        json(res, 500, { error: "stored schedule has invalid task format" });
-        return;
-      }
-
-      const { tasks, warnings } = applyTaskUpdates(currentTasks, updates);
-      const stats = computeScheduleStats(tasks);
-      const algorithmUsed = String(
-        record.result?.schedule?.algorithm_used ?? "manual",
-      ).includes("+manual_update")
-        ? String(record.result?.schedule?.algorithm_used ?? "manual")
-        : `${String(record.result?.schedule?.algorithm_used ?? "manual")}+manual_update`;
-
-      record.result.schedule.tasks = stats.tasks;
-      record.result.schedule.total_time = stats.totalTime;
-      record.result.schedule.algorithm_used = algorithmUsed;
-      record.result.metrics = {
-        ...(record.result.metrics ?? {}),
-        computation_time_ms: 0,
-        sync_variance: stats.syncVariance,
-        parallel_windows: stats.parallelWindows,
-        recipe_end_times: stats.recipeEndTimes,
-      };
-      record.version = toInt(record.version, 1, { min: 1, max: 1_000_000 }) + 1;
-      record.updated_at = new Date().toISOString();
-
-      store.schedules[scheduleId] = record;
-      writeAgenticStore(store);
-
-      json(res, 200, {
-        tool: "update_schedule",
-        schedule_id: scheduleId,
-        warnings,
-        record,
       });
       return;
     }
