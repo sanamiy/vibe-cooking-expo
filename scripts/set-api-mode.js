@@ -5,13 +5,11 @@ const path = require("path");
 
 const apiMode = process.argv[2];
 if (!apiMode) {
-  console.error(
-    "Usage: node scripts/set-api-mode.js <vps_proxy|direct_client>",
-  );
+  console.error("Usage: node scripts/set-api-mode.js <vps_proxy|direct_client|cloudflare>");
   process.exit(1);
 }
 
-const allowed = new Set(["vps_proxy", "direct_client"]);
+const allowed = new Set(["vps_proxy", "direct_client", "cloudflare"]);
 if (!allowed.has(apiMode)) {
   console.error(`Invalid apiMode: ${apiMode}`);
   process.exit(1);

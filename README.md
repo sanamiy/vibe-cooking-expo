@@ -23,23 +23,28 @@ automatic progression keep the experience hands-free.
 - Settings (servings, burner count, AsyncStorage persistence)
 - Safe Area support (iPhone notch / home indicator)
 - Auto port selection for concurrent Expo instances
-- VPS proxy mode and direct client mode
+- Three API modes: Cloudflare Workers proxy, VPS proxy, and direct client
+- Three voice input modes: ASR + LLM pipeline, Voxtral Speech Understanding,
+  Voxtral end-to-end dialogue
 - E2E tests with Playwright
 
 ## Architecture
 
 Frontend and backend (API proxy) are deployed together as a single Cloudflare
 Worker. The API proxy runs at /vps/\* paths on the same origin (the "/vps"
-prefix is a legacy naming convention). In production, EXPO_PUBLIC_VPS_API_BASE_URL
-is set to "" (empty string), so API calls use relative paths to the same Worker.
+prefix is a legacy naming convention). In production web,
+EXPO_PUBLIC_CLOUDFLARE_PROXY_BASE_URL is set to "" (empty string), so API calls
+use relative paths to the same Worker. For Expo on smartphones, set
+EXPO_PUBLIC_CLOUDFLARE_PROXY_BASE_URL to the Workers URL.
 
 The API proxy forwards requests to Mistral, Claude, and ElevenLabs APIs so that
 API keys stay server-side (stored as Cloudflare Workers secrets).
 
-8 API endpoints:
+9 API endpoints:
 
 - health
 - asr/transcribe
+- audio/understand
 - ai/classify-intent
 - ai/answer-question
 - ai/barge-in
@@ -49,6 +54,12 @@ API keys stay server-side (stored as Cloudflare Workers secrets).
 
 The VPS at temp.synome.jp still exists as legacy, but Cloudflare Workers is
 the primary deployment.
+
+`apiMode` selects the API communication strategy:
+
+- `cloudflare` - Cloudflare Workers proxy (default)
+- `vps_proxy` - VPS proxy (temp.synome.jp)
+- `direct_client` - direct API calls from client
 
 TTS engine is configured in config.json:
 
@@ -94,6 +105,7 @@ npm run web
 | android          | Launch on Android emulator           |
 | web              | Launch in browser                    |
 | deploy:vps       | Deploy API proxy to VPS (legacy)     |
+| api:cloudflare   | Set apiMode to cloudflare            |
 | api:vps          | Set apiMode to vps_proxy             |
 | api:direct       | Set apiMode to direct_client         |
 | format           | Run Prettier                         |
@@ -113,15 +125,16 @@ npm run web
 
 Defined in .env (see .env.example).
 
-| Variable                        | Required | Description           |
-| ------------------------------- | -------- | --------------------- |
-| EXPO_PUBLIC_VPS_API_BASE_URL    | Yes      | VPS proxy base URL    |
-| EXPO_PUBLIC_MUSIC_LINK          | No       | Background music link |
-| EXPO_PUBLIC_MISTRAL_API_KEY     | \*       | Mistral API key       |
-| EXPO_PUBLIC_CLAUDE_API_KEY      | \*       | Claude API key        |
-| EXPO_PUBLIC_ELEVENLABS_API_KEY  | \*       | ElevenLabs API key    |
-| EXPO_PUBLIC_ELEVENLABS_VOICE_ID | No       | ElevenLabs voice ID   |
-| EXPO_PUBLIC_ELEVENLABS_MODEL    | No       | ElevenLabs model ID   |
+| Variable                              | Required | Description                         |
+| ------------------------------------- | -------- | ----------------------------------- |
+| EXPO_PUBLIC_CLOUDFLARE_PROXY_BASE_URL | Yes      | Cloudflare Workers proxy URL        |
+| EXPO_PUBLIC_VPS_API_BASE_URL          | \*       | VPS proxy base URL (vps_proxy mode) |
+| EXPO_PUBLIC_MUSIC_LINK                | No       | Background music link               |
+| EXPO_PUBLIC_MISTRAL_API_KEY           | \*       | Mistral API key                     |
+| EXPO_PUBLIC_CLAUDE_API_KEY            | \*       | Claude API key                      |
+| EXPO_PUBLIC_ELEVENLABS_API_KEY        | \*       | ElevenLabs API key                  |
+| EXPO_PUBLIC_ELEVENLABS_VOICE_ID       | No       | ElevenLabs voice ID                 |
+| EXPO_PUBLIC_ELEVENLABS_MODEL          | No       | ElevenLabs model ID                 |
 
 (\*) Required only when apiMode is direct_client.
 
@@ -140,31 +153,32 @@ Defined in .dev.vars for local development (see .dev.vars.example). Set via
 
 ## Main Files
 
-| Path                            | Role                                                  |
-| ------------------------------- | ----------------------------------------------------- |
-| app/index.tsx                   | Home (recipe selection)                               |
-| app/recipe/[id].tsx             | Recipe detail                                         |
-| app/shopping/[id].tsx           | Shopping list                                         |
-| app/schedule/[id].tsx           | Multi-recipe scheduling                               |
-| app/cook-interactive/[id].tsx   | Cooking navigation                                    |
-| app/settings.tsx                | Settings                                              |
-| contexts/AppSettingsContext.tsx | Shared settings + persistence                         |
-| hooks/useVoiceDialogue.ts       | Voice dialogue state machine                          |
-| hooks/useVoiceCommands.ts       | Speech-to-text via Voxtral ASR                        |
-| services/ai.ts                  | AI orchestration (intent, Q&A, TTS)                   |
-| services/apiConfig.ts           | API mode and key management                           |
-| services/vpsClient.ts           | VPS proxy HTTP client                                 |
-| services/voxtralAsr.ts          | Voxtral ASR streaming client                          |
-| services/anthropicClient.ts     | Claude API client                                     |
-| utils/gantt.ts                  | Gantt chart generation                                |
-| utils/recipe.ts                 | Ingredient scaling utilities                          |
-| utils/scheduler.ts              | Multi-recipe greedy scheduler                         |
-| utils/scheduleStore.ts          | In-memory store for schedule data                     |
-| src/worker.ts                   | Cloudflare Workers entry point (API proxy)            |
-| src/routes/\*.ts                | API route handlers (8 endpoints)                      |
-| src/lib/\*.ts                   | API client libraries (Mistral, Anthropic, ElevenLabs) |
-| wrangler.toml                   | Cloudflare Workers configuration                      |
-| .dev.vars.example               | Workers local dev env template                        |
+| Path                                   | Role                                                  |
+| -------------------------------------- | ----------------------------------------------------- |
+| app/index.tsx                          | Home (recipe selection)                               |
+| app/recipe/[id].tsx                    | Recipe detail                                         |
+| app/shopping/[id].tsx                  | Shopping list                                         |
+| app/schedule/[id].tsx                  | Multi-recipe scheduling                               |
+| app/cook-interactive/[id].tsx          | Cooking navigation                                    |
+| app/settings.tsx                       | Settings                                              |
+| contexts/AppSettingsContext.tsx        | Shared settings + persistence                         |
+| hooks/useVoiceDialogue.ts              | Voice dialogue state machine                          |
+| hooks/useVoiceCommands.ts              | Speech-to-text via Voxtral ASR                        |
+| services/ai.ts                         | AI orchestration (intent, Q&A, TTS)                   |
+| services/apiConfig.ts                  | API mode and key management                           |
+| services/vpsClient.ts                  | Server proxy HTTP client (Cloudflare/VPS)             |
+| services/voxtralAsr.ts                 | Voxtral ASR streaming client                          |
+| services/voxtralSpeechUnderstanding.ts | Voxtral Speech Understanding client                   |
+| services/anthropicClient.ts            | Claude API client                                     |
+| utils/gantt.ts                         | Gantt chart generation                                |
+| utils/recipe.ts                        | Ingredient scaling utilities                          |
+| utils/scheduler.ts                     | Multi-recipe greedy scheduler                         |
+| utils/scheduleStore.ts                 | In-memory store for schedule data                     |
+| src/worker.ts                          | Cloudflare Workers entry point (API proxy)            |
+| src/routes/\*.ts                       | API route handlers (9 endpoints)                      |
+| src/lib/\*.ts                          | API client libraries (Mistral, Anthropic, ElevenLabs) |
+| wrangler.toml                          | Cloudflare Workers configuration                      |
+| .dev.vars.example                      | Workers local dev env template                        |
 
 ## Data Assets
 
@@ -224,23 +238,27 @@ Expo + React Native で構築した料理ナビゲーションアプリ。vibe-c
 - 設定 (人数、コンロ口数、AsyncStorage 永続化)
 - Safe Area 対応 (iPhone ノッチ / ホームインジケータ)
 - 自動ポート選択 (複数 Expo インスタンスの同時起動)
-- VPS プロキシモードとダイレクトクライアントモード
+- 3 つの API モード (Cloudflare Workers プロキシ, VPS プロキシ, ダイレクトクライアント)
+- 3 つの音声入力モード (ASR + LLM パイプライン, Voxtral Speech Understanding,
+  Voxtral E2E 対話)
 - Playwright による E2E テスト
 
 ## アーキテクチャ
 
 フロントエンドとバックエンド (API プロキシ) を単一の Cloudflare Worker として
 デプロイ。API プロキシは同一オリジンの /vps/\* パスで動作する ("/vps" プレフィックス
-はレガシーな命名規則)。本番では EXPO_PUBLIC_VPS_API_BASE_URL を "" (空文字列) に
-設定し、API 呼び出しは同一 Worker への相対パスで行う。
+はレガシーな命名規則)。本番 Web では EXPO_PUBLIC_CLOUDFLARE_PROXY_BASE_URL を ""
+(空文字列) に設定し、API 呼び出しは同一 Worker への相対パスで行う。Expo スマホでは
+EXPO_PUBLIC_CLOUDFLARE_PROXY_BASE_URL に Workers URL を設定する。
 
 API プロキシは Mistral, Claude, ElevenLabs API へのリクエストを中継し、API キーを
 サーバー側に保持する (Cloudflare Workers secrets として保管)。
 
-8 つの API エンドポイント:
+9 つの API エンドポイント:
 
 - health
 - asr/transcribe
+- audio/understand
 - ai/classify-intent
 - ai/answer-question
 - ai/barge-in
@@ -250,6 +268,12 @@ API プロキシは Mistral, Claude, ElevenLabs API へのリクエストを中�
 
 temp.synome.jp の VPS はレガシーとして残存するが、Cloudflare Workers が主要な
 デプロイ先。
+
+`apiMode` で API 通信方式を選択:
+
+- `cloudflare` - Cloudflare Workers プロキシ (デフォルト)
+- `vps_proxy` - VPS プロキシ (temp.synome.jp)
+- `direct_client` - クライアントから直接 API 呼び出し
 
 TTS エンジンは config.json で設定:
 
@@ -295,6 +319,7 @@ npm run web
 | android          | Android エミュレータで起動                    |
 | web              | ブラウザで起動                                |
 | deploy:vps       | API プロキシを VPS にデプロイ (レガシー)      |
+| api:cloudflare   | apiMode を cloudflare に設定                  |
 | api:vps          | apiMode を vps_proxy に設定                   |
 | api:direct       | apiMode を direct_client に設定               |
 | format           | Prettier 実行                                 |
@@ -314,15 +339,16 @@ npm run web
 
 .env で定義 (.env.example を参照)。
 
-| 変数                            | 必須 | 説明                 |
-| ------------------------------- | ---- | -------------------- |
-| EXPO_PUBLIC_VPS_API_BASE_URL    | Yes  | VPS プロキシの URL   |
-| EXPO_PUBLIC_MUSIC_LINK          | No   | BGM リンク           |
-| EXPO_PUBLIC_MISTRAL_API_KEY     | \*   | Mistral API キー     |
-| EXPO_PUBLIC_CLAUDE_API_KEY      | \*   | Claude API キー      |
-| EXPO_PUBLIC_ELEVENLABS_API_KEY  | \*   | ElevenLabs API キー  |
-| EXPO_PUBLIC_ELEVENLABS_VOICE_ID | No   | ElevenLabs 音声 ID   |
-| EXPO_PUBLIC_ELEVENLABS_MODEL    | No   | ElevenLabs モデル ID |
+| 変数                                  | 必須 | 説明                                  |
+| ------------------------------------- | ---- | ------------------------------------- |
+| EXPO_PUBLIC_CLOUDFLARE_PROXY_BASE_URL | Yes  | Cloudflare Workers プロキシ URL       |
+| EXPO_PUBLIC_VPS_API_BASE_URL          | \*   | VPS プロキシの URL (vps_proxy モード) |
+| EXPO_PUBLIC_MUSIC_LINK                | No   | BGM リンク                            |
+| EXPO_PUBLIC_MISTRAL_API_KEY           | \*   | Mistral API キー                      |
+| EXPO_PUBLIC_CLAUDE_API_KEY            | \*   | Claude API キー                       |
+| EXPO_PUBLIC_ELEVENLABS_API_KEY        | \*   | ElevenLabs API キー                   |
+| EXPO_PUBLIC_ELEVENLABS_VOICE_ID       | No   | ElevenLabs 音声 ID                    |
+| EXPO_PUBLIC_ELEVENLABS_MODEL          | No   | ElevenLabs モデル ID                  |
 
 (\*) apiMode が direct_client の場合のみ必要。
 
@@ -341,31 +367,32 @@ npm run web
 
 ## 主要ファイル
 
-| パス                            | 役割                                              |
-| ------------------------------- | ------------------------------------------------- |
-| app/index.tsx                   | ホーム (レシピ選択)                               |
-| app/recipe/[id].tsx             | レシピ詳細                                        |
-| app/shopping/[id].tsx           | 買い出しリスト                                    |
-| app/schedule/[id].tsx           | 複数レシピスケジューリング                        |
-| app/cook-interactive/[id].tsx   | 調理ナビ                                          |
-| app/settings.tsx                | 設定                                              |
-| contexts/AppSettingsContext.tsx | 共有設定 + 永続化                                 |
-| hooks/useVoiceDialogue.ts       | 音声対話ステートマシン                            |
-| hooks/useVoiceCommands.ts       | Voxtral ASR による音声認識                        |
-| services/ai.ts                  | AI オーケストレーション                           |
-| services/apiConfig.ts           | API モード / キー管理                             |
-| services/vpsClient.ts           | VPS プロキシ HTTP クライアント                    |
-| services/voxtralAsr.ts          | Voxtral ASR ストリーミング                        |
-| services/anthropicClient.ts     | Claude API クライアント                           |
-| utils/gantt.ts                  | ガントチャート生成                                |
-| utils/recipe.ts                 | 分量スケールユーティリティ                        |
-| utils/scheduler.ts              | 複数レシピ貪欲法スケジューラ                      |
-| utils/scheduleStore.ts          | スケジュールデータのメモリ内ストア                |
-| src/worker.ts                   | Cloudflare Workers エントリポイント (API proxy)   |
-| src/routes/\*.ts                | API ルートハンドラ (8 エンドポイント)             |
-| src/lib/\*.ts                   | API クライアント (Mistral, Anthropic, ElevenLabs) |
-| wrangler.toml                   | Cloudflare Workers 設定                           |
-| .dev.vars.example               | Workers ローカル開発用環境変数テンプレート        |
+| パス                                   | 役割                                                |
+| -------------------------------------- | --------------------------------------------------- |
+| app/index.tsx                          | ホーム (レシピ選択)                                 |
+| app/recipe/[id].tsx                    | レシピ詳細                                          |
+| app/shopping/[id].tsx                  | 買い出しリスト                                      |
+| app/schedule/[id].tsx                  | 複数レシピスケジューリング                          |
+| app/cook-interactive/[id].tsx          | 調理ナビ                                            |
+| app/settings.tsx                       | 設定                                                |
+| contexts/AppSettingsContext.tsx        | 共有設定 + 永続化                                   |
+| hooks/useVoiceDialogue.ts              | 音声対話ステートマシン                              |
+| hooks/useVoiceCommands.ts              | Voxtral ASR による音声認識                          |
+| services/ai.ts                         | AI オーケストレーション                             |
+| services/apiConfig.ts                  | API モード / キー管理                               |
+| services/vpsClient.ts                  | サーバープロキシ HTTP クライアント (Cloudflare/VPS) |
+| services/voxtralAsr.ts                 | Voxtral ASR ストリーミング                          |
+| services/voxtralSpeechUnderstanding.ts | Voxtral Speech Understanding クライアント           |
+| services/anthropicClient.ts            | Claude API クライアント                             |
+| utils/gantt.ts                         | ガントチャート生成                                  |
+| utils/recipe.ts                        | 分量スケールユーティリティ                          |
+| utils/scheduler.ts                     | 複数レシピ貪欲法スケジューラ                        |
+| utils/scheduleStore.ts                 | スケジュールデータのメモリ内ストア                  |
+| src/worker.ts                          | Cloudflare Workers エントリポイント (API proxy)     |
+| src/routes/\*.ts                       | API ルートハンドラ (9 エンドポイント)               |
+| src/lib/\*.ts                          | API クライアント (Mistral, Anthropic, ElevenLabs)   |
+| wrangler.toml                          | Cloudflare Workers 設定                             |
+| .dev.vars.example                      | Workers ローカル開発用環境変数テンプレート          |
 
 ## データ資産
 
