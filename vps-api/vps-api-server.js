@@ -232,6 +232,7 @@ function normalizeIntentText(text) {
 }
 
 function classifyIntentHeuristic({ userText, nextStep }) {
+  // TODO: Remove this heuristic fallback after intent classification is fully stable with LLM-only routing.
   const raw = String(userText ?? "").trim();
   const text = normalizeIntentText(raw);
   if (!text) return null;
