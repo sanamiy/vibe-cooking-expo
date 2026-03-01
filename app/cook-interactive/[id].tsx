@@ -24,21 +24,31 @@ const formatCountdownLabel = (countdown: number | null) => {
 
 const getTaskTypeLabel = (taskType: string) => {
   switch (taskType) {
-    case "prep": return "下準備";
-    case "cook_active": return "加熱中";
-    case "cook_passive": return "待機";
-    case "wash": return "洗い物";
-    default: return taskType;
+    case "prep":
+      return "下準備";
+    case "cook_active":
+      return "加熱中";
+    case "cook_passive":
+      return "待機";
+    case "wash":
+      return "洗い物";
+    default:
+      return taskType;
   }
 };
 
 const getTaskTypeColor = (taskType: string) => {
   switch (taskType) {
-    case "prep": return "#4ECDC4";
-    case "cook_active": return "#FF6B6B";
-    case "cook_passive": return "#FFE66D";
-    case "wash": return "#95E1D3";
-    default: return theme.colors.subText;
+    case "prep":
+      return "#4ECDC4";
+    case "cook_active":
+      return "#FF6B6B";
+    case "cook_passive":
+      return "#FFE66D";
+    case "wash":
+      return "#95E1D3";
+    default:
+      return theme.colors.subText;
   }
 };
 
@@ -50,9 +60,7 @@ interface CombinedStep {
   color: string;
 }
 
-const RECIPE_COLORS = [
-  "#FF6B6B", "#4ECDC4", "#FFE66D", "#95E1D3", "#F38181",
-];
+const RECIPE_COLORS = ["#FF6B6B", "#4ECDC4", "#FFE66D", "#95E1D3", "#F38181"];
 
 export default function CookInteractiveScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -61,7 +69,7 @@ export default function CookInteractiveScreen() {
   const ids = useMemo(() => String(id).split(","), [id]);
   const recipes = useMemo(
     () => ids.map((rid) => getRecipeById(rid)).filter(Boolean),
-    [ids, getRecipeById]
+    [ids, getRecipeById],
   );
 
   // Combine all scheduled tasks from all recipes, sorted by start_time
@@ -94,7 +102,7 @@ export default function CookInteractiveScreen() {
       if (!recipe) continue;
       const recipeSteps = recipe.instruction_steps?.length
         ? recipe.instruction_steps.map((s) => s.text)
-        : recipe.instructions ?? [];
+        : (recipe.instructions ?? []);
       for (const text of recipeSteps) {
         steps.push({
           recipeId: recipe.id,
@@ -108,10 +116,7 @@ export default function CookInteractiveScreen() {
   }, [allScheduledTasks, ids, recipes]);
 
   // For voice dialogue, use simple steps array
-  const steps = useMemo(
-    () => combinedSteps.map((s) => ({ text: s.text })),
-    [combinedSteps]
-  );
+  const steps = useMemo(() => combinedSteps.map((s) => ({ text: s.text })), [combinedSteps]);
 
   // Build combined gantt chart
   const gantt = useMemo<RecipeGanttData>(() => {
@@ -147,9 +152,9 @@ export default function CookInteractiveScreen() {
       };
     }
     // Fallback to first recipe's prebuilt gantt
-    const prebuilt = (
-      prebuiltGantt as { recipes?: RecipeGanttData[] }
-    ).recipes?.find((r) => r.recipe_id === ids[0]);
+    const prebuilt = (prebuiltGantt as { recipes?: RecipeGanttData[] }).recipes?.find(
+      (r) => r.recipe_id === ids[0],
+    );
     return prebuilt ?? buildRecipeGantt(ids[0], steps);
   }, [ids, steps, allScheduledTasks]);
 
@@ -164,7 +169,10 @@ export default function CookInteractiveScreen() {
       if (tips.length > 0) allTips.push(...tips);
     }
     return {
-      recipeName: recipes.map((r) => r?.name).filter(Boolean).join("、"),
+      recipeName: recipes
+        .map((r) => r?.name)
+        .filter(Boolean)
+        .join("、"),
       ingredients: allIngredients,
       allSteps: combinedSteps.map((s) => stripHtml(s.text)),
       ...(allTips.length > 0 ? { stepTips: allTips } : {}),
@@ -196,7 +204,10 @@ export default function CookInteractiveScreen() {
   } = useVoiceDialogue({
     steps,
     tasks: gantt.tasks,
-    recipeName: recipes.map((r) => r?.name).filter(Boolean).join("、"),
+    recipeName: recipes
+      .map((r) => r?.name)
+      .filter(Boolean)
+      .join("、"),
     currentIndex,
     outputDeviceId: selectedOutputId,
     startBgmUri: process.env.EXPO_PUBLIC_MUSIC_LINK,
@@ -233,16 +244,18 @@ export default function CookInteractiveScreen() {
 
   // Debug: keyboard navigation (dev only)
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const g = globalThis as Record<string, unknown>;
+    if (typeof g.addEventListener !== "function") return;
+    const handleKeyDown = (ev: unknown) => {
+      const e = ev as { key: string };
       if (e.key === "ArrowRight" || e.key === "n") {
         setCurrentIndex((prev) => Math.min(prev + 1, combinedSteps.length - 1));
       } else if (e.key === "ArrowLeft" || e.key === "p") {
         setCurrentIndex((prev) => Math.max(prev - 1, 0));
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    g.addEventListener("keydown", handleKeyDown);
+    return () => (g.removeEventListener as Function)("keydown", handleKeyDown);
   }, [combinedSteps.length]);
 
   // Timer countdown
@@ -271,13 +284,13 @@ export default function CookInteractiveScreen() {
   const countdownLabel = formatCountdownLabel(countdown);
 
   // Calculate progress percentage
-  const progressPercent = combinedSteps.length > 0
-    ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100)
-    : 0;
+  const progressPercent =
+    combinedSteps.length > 0 ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100) : 0;
 
   // Calculate per-recipe progress
   const recipeProgress = useMemo(() => {
-    const progress: Record<string, { done: number; total: number; name: string; color: string }> = {};
+    const progress: Record<string, { done: number; total: number; name: string; color: string }> =
+      {};
     for (let i = 0; i < combinedSteps.length; i++) {
       const step = combinedSteps[i];
       if (!progress[step.recipeId]) {
@@ -323,7 +336,9 @@ export default function CookInteractiveScreen() {
             {recipeProgress.map((rp) => (
               <View key={rp.recipeId} style={styles.topRecipeItem}>
                 <View style={[styles.topRecipeDot, { backgroundColor: rp.color }]} />
-                <Text style={styles.topRecipeName} numberOfLines={1}>{rp.name}</Text>
+                <Text style={styles.topRecipeName} numberOfLines={1}>
+                  {rp.name}
+                </Text>
                 <Text style={styles.topRecipePercent}>{rp.percent}%</Text>
               </View>
             ))}
@@ -332,7 +347,6 @@ export default function CookInteractiveScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-
         {/* Current step card */}
         <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: currentStep?.color }]}>
           <View style={styles.stepHeader}>
@@ -342,7 +356,12 @@ export default function CookInteractiveScreen() {
               </Text>
             </View>
             {currentStep?.schedulerTask?.task_type && (
-              <View style={[styles.typeBadge, { backgroundColor: getTaskTypeColor(currentStep.schedulerTask.task_type) }]}>
+              <View
+                style={[
+                  styles.typeBadge,
+                  { backgroundColor: getTaskTypeColor(currentStep.schedulerTask.task_type) },
+                ]}
+              >
                 <Text style={styles.typeBadgeText}>
                   {getTaskTypeLabel(currentStep.schedulerTask.task_type)}
                 </Text>
@@ -350,9 +369,7 @@ export default function CookInteractiveScreen() {
             )}
           </View>
           <Text style={styles.recipeLabel}>📖 {currentStep?.recipeName}</Text>
-          <Text style={styles.stepText}>
-            {stripHtml(currentStep?.text ?? "手順がありません")}
-          </Text>
+          <Text style={styles.stepText}>{stripHtml(currentStep?.text ?? "手順がありません")}</Text>
           {currentStep?.schedulerTask?.tips && (
             <View style={styles.tipsContainer}>
               <Text style={styles.tipsLabel}>💡 コツ</Text>
@@ -411,7 +428,15 @@ export default function CookInteractiveScreen() {
                   <View
                     style={[
                       styles.bar,
-                      { left: left as any, width: width as any, backgroundColor: isDone ? theme.colors.success : isActive ? stepColor : theme.colors.border },
+                      {
+                        left: left as any,
+                        width: width as any,
+                        backgroundColor: isDone
+                          ? theme.colors.success
+                          : isActive
+                            ? stepColor
+                            : theme.colors.border,
+                      },
                     ]}
                   />
                 </View>
