@@ -1,6 +1,14 @@
 const http = require("node:http");
 const { URL } = require("node:url");
 
+// Scheduler module (compiled from TypeScript)
+let scheduler = null;
+try {
+  scheduler = require("./dist/index.js");
+} catch (e) {
+  console.warn("Scheduler module not found. Run 'npm run build' first.");
+}
+
 function json(res, status, body) {
   const data = JSON.stringify(body);
   res.writeHead(status, {
@@ -470,6 +478,93 @@ ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
       }
       const parsed = JSON.parse(text.slice(start, end + 1));
       json(res, 200, { steps: parsed });
+      return;
+    }
+
+    if (path === "/vps/scheduler/create-schedule") {
+      if (!scheduler) {
+        json(res, 500, { error: "Scheduler module not loaded. Run 'npm run build' in vps-api." });
+        return;
+      }
+
+      const { recipes, kitchen, options } = body;
+
+      // Optionally analyze recipes with LLM first
+      let analyzedRecipes = [];
+      if (options?.use_llm_analysis !== false) {
+        for (const recipe of recipes) {
+          try {
+            const stepsText = recipe.steps
+              .map((s, i) => `${i + 1}. ${s.text.replace(/<[^>]*>/g, "")}`)
+              .join("\n");
+            const ingredientsText = recipe.ingredients.join(", ");
+
+            const prompt = `レシピの各工程を解析し、必要に応じて細かいサブステップに分割してください。
+
+レシピ名: ${recipe.name}
+材料: ${ingredientsText}
+工程:
+${stepsText}
+
+## 重要：工程の分割ルール
+
+1つの工程に複数の作業が含まれている場合、必ず分割してください：
+
+【分割が必要な例】
+- 「じゃがいもを切って茹でる（15分）」→ 分割：
+  1. じゃがいもを切る（2分、手動、まな板使用）
+  2. 鍋に入れて火にかける（1分、手動、コンロ使用）
+  3. 茹でる（10分、放置、コンロ使用）
+  4. 水を切ってザルにあげる（2分、手動）
+
+## リソース判断基準
+
+- uses_stove: コンロを使うか（炒める、煮る、焼く、沸かす、茹でる等）
+- uses_cutting_board: まな板を使うか（切る、刻む、みじん切り等）
+- requires_attention: 人の手が必要か
+  - true: 切る、炒める、混ぜる、材料を入れる、火にかける、取り出す、盛り付け等
+  - false: 煮込み中、蒸らし中、茹で中（放置して待つだけの時間）
+
+## 出力形式
+
+JSONの配列のみを出力してください。
+
+[
+  {
+    "step_index": 0,
+    "step_description": "工程の説明",
+    "duration": 分数,
+    "uses_stove": true/false,
+    "uses_cutting_board": true/false,
+    "requires_attention": true/false,
+    "tips": "この工程の注意点やコツ"
+  }
+]`;
+
+            const data = await callAnthropic({
+              maxTokens: 2048,
+              messages: [{ role: "user", content: prompt }],
+            });
+
+            const text = data.content?.[0]?.text ?? "";
+            const start = text.indexOf("[");
+            const end = text.lastIndexOf("]");
+            if (start !== -1 && end !== -1) {
+              const steps = JSON.parse(text.slice(start, end + 1));
+              analyzedRecipes.push({ recipeId: recipe.id, steps });
+            }
+          } catch (e) {
+            console.warn(`LLM analysis failed for ${recipe.name}:`, e.message);
+          }
+        }
+      }
+
+      const result = await scheduler.createSchedule(
+        { recipes, kitchen, options },
+        analyzedRecipes.length > 0 ? analyzedRecipes : undefined
+      );
+
+      json(res, 200, result);
       return;
     }
 

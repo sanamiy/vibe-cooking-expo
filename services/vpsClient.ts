@@ -1,4 +1,8 @@
-import { getApiMode, getVpsBaseUrlOptional, requireVpsBaseUrl } from "@/services/apiConfig";
+import {
+  getApiMode,
+  getVpsBaseUrlOptional,
+  requireVpsBaseUrl,
+} from "@/services/apiConfig";
 import { Platform } from "react-native";
 
 const IS_WEB = Platform.OS === "web";

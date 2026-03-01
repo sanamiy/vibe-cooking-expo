@@ -7,9 +7,12 @@ import React, {
   useState,
 } from "react";
 
+export type SchedulerAlgorithm = "auto" | "greedy" | "genetic" | "critical_path" | "backward" | "astar";
+
 interface AppSettings {
   servingsPerMeal: number;
   stoveBurners: number;
+  schedulerAlgorithm: SchedulerAlgorithm;
 }
 
 interface AppSettingsContextValue {
@@ -22,6 +25,7 @@ const SETTINGS_KEY = "app-settings";
 const defaultSettings: AppSettings = {
   servingsPerMeal: 4,
   stoveBurners: 2,
+  schedulerAlgorithm: "auto",
 };
 
 const AppSettingsContext = createContext<AppSettingsContextValue | undefined>(

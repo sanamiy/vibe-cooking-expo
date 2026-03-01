@@ -120,8 +120,8 @@ export function useVoiceDialogue({
 
   const writeBase64Mp3ToCache = useCallback(async (base64Audio: string) => {
     const cacheDir = FS.cacheDirectory ?? FS.documentDirectory;
-    if (!cacheDir) {
-      throw new Error("No writable directory available for audio cache");
+    if (!cacheDir || typeof FS.writeAsStringAsync !== "function") {
+      return null;
     }
     const uri = `${cacheDir}voice-${Date.now()}.mp3`;
     await FS.writeAsStringAsync(uri, base64Audio, {
@@ -166,6 +166,9 @@ export function useVoiceDialogue({
       }
 
       const uri = await writeBase64Mp3ToCache(base64Audio);
+      if (!uri) {
+        throw new Error("No writable directory available for audio cache");
+      }
       nativeAudioUriRef.current = uri;
 
       const { sound } = await Audio.Sound.createAsync({
@@ -271,7 +274,11 @@ export function useVoiceDialogue({
         await playAudio(audio);
       } catch (e) {
         // Don't crash the app if audio playback fails.
-        if (__DEV__) {
+        const msg = String(e);
+        const isNoWritableCache = msg.includes(
+          "No writable directory available for audio cache",
+        );
+        if (__DEV__ && !isNoWritableCache) {
           // eslint-disable-next-line no-console
           console.warn("[voice] speakText failed:", e);
         }

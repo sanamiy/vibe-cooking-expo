@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
-import { transcribeStream } from "@/services/voxtralAsr";
 import { understandAudioWithVoxtral } from "@/services/voxtralSpeechUnderstanding";
+import { Audio } from "expo-av";
+import { transcribeFile, transcribeStream } from "@/services/voxtralAsr";
 
 interface UseVoiceCommandsProps {
   onTranscript: (text: string) => void;
@@ -83,6 +84,7 @@ export function useVoiceCommands({
   const [error, setError] = useState<string | null>(null);
 
   const vadRef = useRef<any>(null);
+  const nativeRecordingRef = useRef<Audio.Recording | null>(null);
   const activeRef = useRef(active);
   activeRef.current = active;
 
@@ -105,9 +107,195 @@ export function useVoiceCommands({
   const audioChunksRef = useRef<Int16Array[]>([]);
   const isRecordingRef = useRef(false);
 
+  const nativeVadRef = useRef({
+    hasSpeech: false,
+    speechStartMs: 0,
+    lastVoiceMs: 0,
+    recordingStartMs: 0,
+  });
+
+  const getMimeTypeFromUri = (uri: string): string => {
+    const lower = uri.toLowerCase();
+    if (lower.endsWith(".m4a")) return "audio/m4a";
+    if (lower.endsWith(".mp4")) return "audio/mp4";
+    if (lower.endsWith(".3gp")) return "audio/3gpp";
+    if (lower.endsWith(".wav")) return "audio/wav";
+    if (lower.endsWith(".mp3")) return "audio/mpeg";
+    if (lower.endsWith(".ogg")) return "audio/ogg";
+    if (lower.endsWith(".flac")) return "audio/flac";
+    return "audio/m4a";
+  };
+
+  const stopNativeRecording = useCallback(async () => {
+    const rec = nativeRecordingRef.current;
+    nativeRecordingRef.current = null;
+    if (!rec) return;
+
+    try {
+      rec.setOnRecordingStatusUpdate(null);
+    } catch {
+      // ignore
+    }
+
+    try {
+      const status = await rec.getStatusAsync();
+      if (status.isRecording) {
+        await rec.stopAndUnloadAsync();
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const startNativeLoop = useCallback(async () => {
+    if (!activeRef.current) return;
+    if (Platform.OS === "web") return;
+
+    try {
+      setError(null);
+
+      const perm = await Audio.requestPermissionsAsync();
+      if (!perm.granted) {
+        setError("マイクへのアクセスが許可されていません");
+        setIsListening(false);
+        return;
+      }
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const thresholdDb = -28;
+      const minSpeechMs = 250;
+      const endSilenceMs = 600;
+      const maxUtteranceMs = 8000;
+      const statusIntervalMs = 100;
+
+      const rec = new Audio.Recording();
+      nativeRecordingRef.current = rec;
+
+      // Ensure we get metering updates.
+      await rec.prepareToRecordAsync({
+        ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
+        isMeteringEnabled: true,
+      } as any);
+
+      const state = nativeVadRef.current;
+      state.hasSpeech = false;
+      state.speechStartMs = 0;
+      state.lastVoiceMs = 0;
+      state.recordingStartMs = Date.now();
+
+      rec.setProgressUpdateInterval(statusIntervalMs);
+
+      rec.setOnRecordingStatusUpdate(async (st: any) => {
+        if (!activeRef.current) return;
+        if (!st?.isRecording) return;
+
+        const now = Date.now();
+        const metering = typeof st.metering === "number" ? st.metering : null;
+        const isVoice = metering !== null && metering > thresholdDb;
+
+        if (isVoice) {
+          if (!state.hasSpeech) {
+            if (state.speechStartMs === 0) state.speechStartMs = now;
+            if (now - state.speechStartMs >= minSpeechMs) {
+              state.hasSpeech = true;
+              state.lastVoiceMs = now;
+
+              if (isSpeakingRef.current) {
+                onSpeechStartRef.current?.();
+              }
+            }
+          } else {
+            state.lastVoiceMs = now;
+          }
+        }
+
+        const utteranceTooLong = now - state.recordingStartMs >= maxUtteranceMs;
+        const silenceLongEnough =
+          state.hasSpeech && now - state.lastVoiceMs >= endSilenceMs;
+
+        if (utteranceTooLong || silenceLongEnough) {
+          const currentRec = nativeRecordingRef.current;
+          if (!currentRec) return;
+
+          // Detach first to avoid re-entrancy.
+          nativeRecordingRef.current = null;
+          try {
+            currentRec.setOnRecordingStatusUpdate(null);
+          } catch {
+            // ignore
+          }
+
+          try {
+            await currentRec.stopAndUnloadAsync();
+          } catch (e) {
+            setError(
+              e instanceof Error ? e.message : "録音の停止に失敗しました",
+            );
+            setIsListening(false);
+            return;
+          }
+
+          const uri = currentRec.getURI();
+          if (!uri) {
+            // Restart loop even if no uri.
+            nativeVadRef.current.speechStartMs = 0;
+            nativeVadRef.current.hasSpeech = false;
+            nativeVadRef.current.lastVoiceMs = 0;
+            nativeVadRef.current.recordingStartMs = 0;
+            if (activeRef.current) {
+              startNativeLoop();
+            }
+            return;
+          }
+
+          let gotTranscript = false;
+          await transcribeFile(
+            {
+              uri,
+              mimeType: getMimeTypeFromUri(uri),
+              filename: uri.split("/").pop() ?? "audio.m4a",
+            },
+            (interim) => {
+              onInterimTranscriptRef.current?.(interim);
+            },
+            (final) => {
+              gotTranscript = true;
+              onTranscriptRef.current(final);
+            },
+            (err) => {
+              setError(err);
+            },
+          );
+
+          if (!gotTranscript) {
+            onSpeechEndRef.current?.();
+          }
+
+          // Continue always-listening.
+          if (activeRef.current) {
+            startNativeLoop();
+          }
+        }
+      });
+
+      await rec.startAsync();
+      setIsListening(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "音声認識の開始に失敗しました");
+      setIsListening(false);
+    }
+  }, []);
+
   const startListening = useCallback(async () => {
     if (!activeRef.current) return;
-    if (Platform.OS !== "web") return;
+    if (Platform.OS !== "web") {
+      await startNativeLoop();
+      return;
+    }
 
     try {
       setError(null);
@@ -248,12 +436,19 @@ export function useVoiceCommands({
   }, [inputDeviceId, voiceInputMode, voxtralSpeechPrompt]);
 
   const stopListening = useCallback(() => {
-    vadRef.current?.pause();
-    vadRef.current?.destroy();
-    vadRef.current = null;
-    isRecordingRef.current = false;
-    audioChunksRef.current = [];
-    setIsListening(false);
+    if (Platform.OS === "web") {
+      vadRef.current?.pause();
+      vadRef.current?.destroy();
+      vadRef.current = null;
+      isRecordingRef.current = false;
+      audioChunksRef.current = [];
+      setIsListening(false);
+      return;
+    }
+
+    stopNativeRecording().finally(() => {
+      setIsListening(false);
+    });
   }, []);
 
   useEffect(() => {
