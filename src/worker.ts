@@ -58,6 +58,10 @@ export default {
       );
     }
 
-    return env.ASSETS.fetch(request);
+    try {
+      return await env.ASSETS.fetch(request);
+    } catch {
+      return env.ASSETS.fetch(new Request(new URL("/index.html", request.url)));
+    }
   },
 };
