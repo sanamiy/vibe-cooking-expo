@@ -8,7 +8,6 @@ import {
   answerQuestion,
   generateStepGuidance,
   synthesizeSpeech,
-  handleBargeIn,
   type RecipeContext,
 } from "@/services/ai";
 import { stripHtml } from "@/utils/recipe";
@@ -442,42 +441,14 @@ export function useVoiceDialogue({
           return;
         }
 
-        // If we were interrupted, handle barge-in logic
+        // speaking/interrupted中の発話も通常intent処理に統一する
+        // （説明だけ進んで工程が進まない競合を防ぐ）
         if (prevState === "interrupted" || prevState === "speaking") {
-          const interruptedText = currentSpeechTextRef.current;
           currentSpeechTextRef.current = "";
           await stopSpeaking();
-          setDialogueState("processing");
-
-          setConversationHistory((prev) => [
-            ...prev,
-            { role: "user", content: transcript },
-          ]);
-
-          const idx = currentIndexRef.current;
-          const localSteps = stepsRef.current;
-          const currentStep = stripHtml(localSteps[idx]?.text ?? "");
-          const stepProgress = `工程${idx + 1}/${localSteps.length}`;
-
-          const result = await handleBargeIn(
-            transcript,
-            interruptedText,
-            currentStep,
-            stepProgress,
-            conversationHistory,
-            recipeContext,
-          );
-
-          setLastResponse(result.response);
-          setConversationHistory((prev) => [
-            ...prev,
-            { role: "assistant", content: result.response },
-          ]);
-          await speakText(result.response);
+        } else if (prevState !== "listening") {
           return;
         }
-
-        if (prevState !== "listening") return;
 
         setDialogueState("processing");
 
@@ -555,12 +526,14 @@ export function useVoiceDialogue({
 
           case "question": {
             const stepProgress = `工程${idx + 1}/${localSteps.length}`;
+            const currentStepTip = recipeContext?.stepTips?.[idx] ?? null;
             response = await answerQuestion(
               transcript,
               currentStep,
               stepProgress,
               conversationHistory,
               recipeContext,
+              currentStepTip,
             );
             break;
           }
