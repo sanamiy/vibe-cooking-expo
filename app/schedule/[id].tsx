@@ -600,15 +600,15 @@ const taskStyles = StyleSheet.create({
   tagText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#fff",
+    color: theme.colors.subText,
   },
   stoveTag: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.border,
   },
   boardTag: {
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.border,
   },
   passiveTag: {
-    backgroundColor: theme.colors.success,
+    backgroundColor: theme.colors.border,
   },
 });
