@@ -16,12 +16,23 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
+import type { VoiceInputMode } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
 import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
 import { useAudioDevices } from "@/hooks/useAudioDevices";
 import type { RecipeContext } from "@/services/ai";
 import { getScheduleTips, getScheduleTasks } from "@/utils/scheduleStore";
 import type { SchedulerTask } from "@/utils/scheduler";
+
+const config = require("@/config.json") as {
+  voiceInputMode?: VoiceInputMode;
+  voxtralSpeechPrompt?: string;
+  enableVoiceAlgorithmSelector?: boolean;
+};
+
+const ENABLE_VOICE_ALGORITHM_SELECTOR = Boolean(
+  config?.enableVoiceAlgorithmSelector,
+);
 
 const formatCountdownLabel = (countdown: number | null) => {
   if (countdown === null) return "";
@@ -198,6 +209,9 @@ export default function CookInteractiveScreen() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [voiceInputMode, setVoiceInputMode] = useState<VoiceInputMode>(
+    config?.voiceInputMode ?? "voxtral_speech_understanding",
+  );
 
   const {
     inputDevices,
@@ -251,6 +265,8 @@ export default function CookInteractiveScreen() {
     active: dialogueState !== "processing",
     inputDeviceId: selectedInputId,
     isSpeaking: dialogueState === "speaking",
+    voiceInputMode,
+    voxtralSpeechPrompt: config?.voxtralSpeechPrompt,
   });
 
   useEffect(() => {
@@ -439,6 +455,9 @@ export default function CookInteractiveScreen() {
           selectedOutputId={selectedOutputId}
           onSelectInput={selectInput}
           onSelectOutput={selectOutput}
+          showVoiceAlgorithmSelector={ENABLE_VOICE_ALGORITHM_SELECTOR}
+          selectedVoiceInputMode={voiceInputMode}
+          onSelectVoiceInputMode={setVoiceInputMode}
         />
 
         {/* Gantt chart */}

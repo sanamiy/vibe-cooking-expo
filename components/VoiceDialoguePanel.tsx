@@ -1,6 +1,7 @@
 import { theme } from "@/constants/theme";
 import { DialogueState } from "@/hooks/useVoiceDialogue";
 import { AudioDevice } from "@/hooks/useAudioDevices";
+import type { VoiceInputMode } from "@/hooks/useVoiceCommands";
 import {
   Platform,
   Pressable,
@@ -26,6 +27,9 @@ interface VoiceDialoguePanelProps {
   selectedOutputId: string;
   onSelectInput: (id: string) => void;
   onSelectOutput: (id: string) => void;
+  showVoiceAlgorithmSelector?: boolean;
+  selectedVoiceInputMode?: VoiceInputMode;
+  onSelectVoiceInputMode?: (mode: VoiceInputMode) => void;
 }
 
 const stateLabels: Record<DialogueState, { icon: string; text: string }> = {
@@ -103,6 +107,9 @@ export function VoiceDialoguePanel({
   selectedOutputId,
   onSelectInput,
   onSelectOutput,
+  showVoiceAlgorithmSelector = false,
+  selectedVoiceInputMode = "voxtral_speech_understanding",
+  onSelectVoiceInputMode,
 }: VoiceDialoguePanelProps) {
   const state = stateLabels[dialogueState];
 
@@ -125,6 +132,52 @@ export function VoiceDialoguePanel({
           onSelect={onSelectOutput}
         />
       </View>
+
+      {showVoiceAlgorithmSelector ? (
+        <View style={styles.modeSelectorCard}>
+          <Text style={styles.modeSelectorLabel}>音声認識アルゴリズム</Text>
+          <View style={styles.modeSelectorRow}>
+            <Pressable
+              style={[
+                styles.modeButton,
+                selectedVoiceInputMode === "voxtral_speech_understanding" &&
+                  styles.modeButtonSelected,
+              ]}
+              onPress={() =>
+                onSelectVoiceInputMode?.("voxtral_speech_understanding")
+              }
+            >
+              <Text
+                style={[
+                  styles.modeButtonText,
+                  selectedVoiceInputMode === "voxtral_speech_understanding" &&
+                    styles.modeButtonTextSelected,
+                ]}
+              >
+                音声LLM
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.modeButton,
+                selectedVoiceInputMode === "asr_then_llm" &&
+                  styles.modeButtonSelected,
+              ]}
+              onPress={() => onSelectVoiceInputMode?.("asr_then_llm")}
+            >
+              <Text
+                style={[
+                  styles.modeButtonText,
+                  selectedVoiceInputMode === "asr_then_llm" &&
+                    styles.modeButtonTextSelected,
+                ]}
+              >
+                ASR → LLM
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      ) : null}
 
       <View style={styles.stateRow}>
         <View
@@ -263,6 +316,42 @@ const styles = StyleSheet.create({
   stateRow: {
     flexDirection: "row",
     justifyContent: "center",
+  },
+  modeSelectorCard: {
+    backgroundColor: theme.colors.bg,
+    borderRadius: theme.radius.md,
+    padding: 10,
+    gap: 8,
+  },
+  modeSelectorLabel: {
+    fontSize: 12,
+    color: theme.colors.subText,
+    fontWeight: "700",
+  },
+  modeSelectorRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  modeButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    paddingVertical: 8,
+    alignItems: "center",
+    backgroundColor: theme.colors.card,
+  },
+  modeButtonSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.info,
+  },
+  modeButtonText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  modeButtonTextSelected: {
+    color: theme.colors.primary,
   },
   stateBadge: {
     flexDirection: "row",
