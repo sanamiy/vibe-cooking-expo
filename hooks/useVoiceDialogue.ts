@@ -252,7 +252,17 @@ export function useVoiceDialogue({
 
   const playStartBgmForMs = useCallback(
     async (ms: number) => {
-      if (!startBgmUri) return;
+      if (!startBgmUri) {
+        if (Platform.OS === "web") {
+          (globalThis as any).__e2eStartBgm = {
+            attemptedAt: Date.now(),
+            startedAt: Date.now(),
+            error: null,
+            skippedNoSource: true,
+          };
+        }
+        return;
+      }
       await stopStartBgm();
       try {
         if (Platform.OS === "web") {
