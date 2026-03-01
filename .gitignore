@@ -13,3 +13,4 @@ data/recipe-img
 data/*.mp3
 scripts/download_*.sh
 vps-api/agentic-schedules.json
+test-results/
