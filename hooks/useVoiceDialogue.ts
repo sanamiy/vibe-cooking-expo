@@ -78,6 +78,8 @@ export function useVoiceDialogue({
   const stepsRef = useRef<Array<{ text: string }>>(steps);
   const tasksRef = useRef<GanttTask[]>(tasks);
   const listeningTurnInFlightRef = useRef(false);
+  const listeningTurnStartedAtRef = useRef(0);
+  const LISTENING_TURN_TIMEOUT_MS = 12_000;
 
   // Track what AI was saying when interrupted
   const currentSpeechTextRef = useRef<string>("");
@@ -412,21 +414,38 @@ export function useVoiceDialogue({
   // Reset from interrupted state back to listening
   const resetFromInterrupted = useCallback(() => {
     setDialogueState((prev) => (prev === "interrupted" ? "listening" : prev));
+    // Ensure input loop resumes after barge-in/no-transcript edges.
+    listeningResumeRef.current?.();
   }, []);
+
+  useEffect(() => {
+    // Safety: if the turn lock remains for any reason, clear it outside processing.
+    if (dialogueState !== "processing") {
+      listeningTurnInFlightRef.current = false;
+      listeningTurnStartedAtRef.current = 0;
+    }
+  }, [dialogueState]);
 
   const processUserInput = useCallback(
     async (transcript: string) => {
       const prevStateSnapshot = dialogueState;
       const needsListeningLock = prevStateSnapshot === "listening";
       if (needsListeningLock && listeningTurnInFlightRef.current) {
-        if (__DEV__) {
-          // eslint-disable-next-line no-console
-          console.warn("[voice] dropped overlapping transcript:", transcript);
+        const elapsed = Date.now() - listeningTurnStartedAtRef.current;
+        if (elapsed > LISTENING_TURN_TIMEOUT_MS) {
+          listeningTurnInFlightRef.current = false;
+          listeningTurnStartedAtRef.current = 0;
+        } else {
+          if (__DEV__) {
+            // eslint-disable-next-line no-console
+            console.warn("[voice] dropped overlapping transcript:", transcript);
+          }
+          return;
         }
-        return;
       }
       if (needsListeningLock) {
         listeningTurnInFlightRef.current = true;
+        listeningTurnStartedAtRef.current = Date.now();
       }
 
       try {
@@ -599,6 +618,7 @@ export function useVoiceDialogue({
       } finally {
         if (needsListeningLock) {
           listeningTurnInFlightRef.current = false;
+          listeningTurnStartedAtRef.current = 0;
         }
       }
     },
