@@ -11,6 +11,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     slug: "vibe-cooking-expo",
     extra: {
       VPS_API_BASE_URL: process.env.EXPO_PUBLIC_VPS_API_BASE_URL,
+      CLOUDFLARE_PROXY_BASE_URL: process.env.EXPO_PUBLIC_CLOUDFLARE_PROXY_BASE_URL,
       ...(isDirect
         ? {
             MISTRAL_API_KEY: process.env.EXPO_PUBLIC_MISTRAL_API_KEY,
