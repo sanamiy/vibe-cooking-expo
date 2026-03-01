@@ -4,6 +4,13 @@ const path = require("node:path");
 const { randomUUID } = require("node:crypto");
 const { URL } = require("node:url");
 
+const DEFAULT_ANTHROPIC_MODEL =
+  process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
+const EVALUATOR_ANTHROPIC_MODEL =
+  process.env.CLAUDE_EVALUATOR_MODEL || "claude-sonnet-4-5-20250929";
+const EVALUATOR_ANTHROPIC_FALLBACK_MODEL =
+  process.env.CLAUDE_EVALUATOR_MODEL_FALLBACK || "claude-sonnet-4-6";
+
 // Scheduler module (compiled from TypeScript)
 let scheduler = null;
 try {
@@ -163,6 +170,7 @@ async function callAnthropic({
   tools,
   toolChoice,
   temperature,
+  model,
 }) {
   const key = requireEnv("CLAUDE_API_KEY");
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -173,7 +181,7 @@ async function callAnthropic({
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
+      model: String(model || DEFAULT_ANTHROPIC_MODEL),
       max_tokens: maxTokens,
       ...(temperature != null ? { temperature } : {}),
       ...(system ? { system } : {}),
@@ -1522,6 +1530,7 @@ async function runScheduleEvaluationOneCall(args) {
         system,
         maxTokens: 1200,
         temperature: 0,
+        model: EVALUATOR_ANTHROPIC_MODEL,
         messages: [{ role: "user", content: JSON.stringify(prompt, null, 2) }],
       });
       const text = (Array.isArray(data?.content) ? data.content : [])
@@ -1531,7 +1540,33 @@ async function runScheduleEvaluationOneCall(args) {
         .trim();
       llmPayload = extractJsonObject(text);
     } catch (e) {
-      llmError = e instanceof Error ? e.message : String(e);
+      const firstError = e instanceof Error ? e.message : String(e);
+      try {
+        const shouldRetryWithFallback =
+          EVALUATOR_ANTHROPIC_FALLBACK_MODEL &&
+          EVALUATOR_ANTHROPIC_FALLBACK_MODEL !== EVALUATOR_ANTHROPIC_MODEL &&
+          /model|not.?found|invalid/i.test(firstError);
+        if (!shouldRetryWithFallback) throw e;
+
+        const data = await callAnthropic({
+          system,
+          maxTokens: 1200,
+          temperature: 0,
+          model: EVALUATOR_ANTHROPIC_FALLBACK_MODEL,
+          messages: [
+            { role: "user", content: JSON.stringify(prompt, null, 2) },
+          ],
+        });
+        const text = (Array.isArray(data?.content) ? data.content : [])
+          .filter((c) => c?.type === "text")
+          .map((c) => String(c?.text ?? ""))
+          .join("\n")
+          .trim();
+        llmPayload = extractJsonObject(text);
+      } catch (retryErr) {
+        llmError =
+          retryErr instanceof Error ? retryErr.message : String(retryErr);
+      }
     }
   }
 
@@ -1593,6 +1628,8 @@ async function runScheduleEvaluationOneCall(args) {
     diagnostics: {
       llm_called: criteria.custom_rules.length > 0,
       llm_error: llmError,
+      llm_model_primary: EVALUATOR_ANTHROPIC_MODEL,
+      llm_model_fallback: EVALUATOR_ANTHROPIC_FALLBACK_MODEL,
       resource_violations_count: resourceViolations.length,
       step_order_violations_count: stepOrderViolations.length,
       cutting_board: boardFlow,
