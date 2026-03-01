@@ -18,7 +18,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import type { VoiceInputMode } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
-import { VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
+import {
+  VoiceDeviceSelectors,
+  VoiceDialoguePanel,
+} from "@/components/VoiceDialoguePanel";
 import { useAudioDevices } from "@/hooks/useAudioDevices";
 import type { RecipeContext } from "@/services/ai";
 import { getScheduleTips, getScheduleTasks } from "@/utils/scheduleStore";
@@ -280,7 +283,10 @@ export default function CookInteractiveScreen() {
         : "";
     const historyText = conversationHistory
       .slice(-6)
-      .map((h) => `${h.role === "user" ? "ユーザー" : "アシスタント"}: ${h.content}`)
+      .map(
+        (h) =>
+          `${h.role === "user" ? "ユーザー" : "アシスタント"}: ${h.content}`,
+      )
       .join("\n");
 
     const customPrompt = String(config?.voxtralDialoguePrompt ?? "").trim();
@@ -295,7 +301,7 @@ export default function CookInteractiveScreen() {
 ${historyText || "なし"}
 
 以下のJSONのみを返してください（コードフェンス禁止）:
-{"intent":"next_step|previous_step|question|timer_status|end_session|stay","assistant_reply":"ユーザーに話す短い日本語応答","user_text":"認識したユーザー発話の要約"}`
+{"intent":"next_step|previous_step|question|timer_status|end_session|stay","assistant_reply":"ユーザーに話す短い日本語応答","user_text":"認識したユーザー発話の要約"}`;
   }, [
     conversationHistory,
     currentIndex,
@@ -366,44 +372,6 @@ ${historyText || "なし"}
 
   const currentStep = combinedSteps[currentIndex];
   const countdownLabel = formatCountdownLabel(countdown);
-  const completedSteps = Math.max(0, Math.min(currentIndex, combinedSteps.length));
-  const remainingSteps = Math.max(0, combinedSteps.length - completedSteps - 1);
-
-  // Calculate progress percentage
-  const progressPercent =
-    combinedSteps.length > 0
-      ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100)
-      : 0;
-
-  // Calculate per-recipe progress
-  const recipeProgress = useMemo(() => {
-    const progress: Record<
-      string,
-      { done: number; total: number; name: string; color: string }
-    > = {};
-    for (let i = 0; i < combinedSteps.length; i++) {
-      const step = combinedSteps[i];
-      if (!progress[step.recipeId]) {
-        progress[step.recipeId] = {
-          done: 0,
-          total: 0,
-          name: step.recipeName,
-          color: step.color,
-        };
-      }
-      progress[step.recipeId].total += 1;
-      if (i < currentIndex) {
-        progress[step.recipeId].done += 1;
-      } else if (i === currentIndex) {
-        progress[step.recipeId].done += 0.5; // Current step is half done
-      }
-    }
-    return Object.entries(progress).map(([id, p]) => ({
-      recipeId: id,
-      ...p,
-      percent: Math.round((p.done / p.total) * 100),
-    }));
-  }, [combinedSteps, currentIndex]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -411,48 +379,19 @@ ${historyText || "なし"}
       <View style={styles.header}>
         <BackButton label="スケジュール" onPress={() => router.back()} />
         <Text style={styles.title}>調理ナビ</Text>
+        <Pressable
+          style={({ pressed }) => [
+            styles.settingsBtn,
+            pressed && { opacity: 0.8 },
+          ]}
+          onPress={() => router.push("/settings")}
+          hitSlop={12}
+        >
+          <Text style={styles.settingsText}>⚙️</Text>
+        </Pressable>
       </View>
 
       {/* Prominent progress bar at top */}
-      <View style={styles.topProgressContainer}>
-        <View style={styles.topProgressInfo}>
-          <Text style={styles.topProgressLabel}>
-            ステップ {currentIndex + 1} / {combinedSteps.length}
-          </Text>
-          <Text style={styles.topProgressPercent}>{progressPercent}%</Text>
-        </View>
-        <View style={styles.topProgressBar}>
-          <View
-            style={[styles.topProgressFill, { width: `${progressPercent}%` }]}
-          />
-        </View>
-        {recipeProgress.length > 1 && (
-          <View style={styles.topRecipeProgress}>
-            {recipeProgress.map((rp) => (
-              <View key={rp.recipeId} style={styles.topRecipeItem}>
-                <View
-                  style={[styles.topRecipeDot, { backgroundColor: rp.color }]}
-                />
-                <Text style={styles.topRecipeName} numberOfLines={1}>
-                  {rp.name}
-                </Text>
-                <Text style={styles.topRecipePercent}>{rp.percent}%</Text>
-              </View>
-            ))}
-          </View>
-        )}
-        <View style={styles.stepStateSummary}>
-          <View style={[styles.stepStateChip, styles.stepStateDone]}>
-            <Text style={styles.stepStateChipText}>完了 {completedSteps}</Text>
-          </View>
-          <View style={[styles.stepStateChip, styles.stepStateCurrent]}>
-            <Text style={styles.stepStateChipText}>現在 {currentIndex + 1}</Text>
-          </View>
-          <View style={[styles.stepStateChip, styles.stepStatePending]}>
-            <Text style={styles.stepStateChipText}>未着手 {remainingSteps}</Text>
-          </View>
-        </View>
-      </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         {/* Current step card */}
@@ -518,6 +457,7 @@ ${historyText || "なし"}
           selectedOutputId={selectedOutputId}
           onSelectInput={selectInput}
           onSelectOutput={selectOutput}
+          showDeviceSelectors={false}
           showVoiceAlgorithmSelector={ENABLE_VOICE_ALGORITHM_SELECTOR}
           selectedVoiceInputMode={voiceInputMode}
           onSelectVoiceInputMode={setVoiceInputMode}
@@ -525,13 +465,14 @@ ${historyText || "なし"}
 
         {/* Gantt chart */}
         <View style={styles.card}>
-          <Text style={styles.subTitle}>工程チャート（完了 / 実行中 / 未着手）</Text>
           {combinedSteps.map((step, idx) => {
             const task = gantt.tasks[idx];
             const total = Math.max(1, gantt.total_estimated_minutes);
             const fallbackLeft = `${(idx / Math.max(1, combinedSteps.length)) * 100}%`;
             const fallbackWidth = `${Math.max(8, 100 / Math.max(1, combinedSteps.length))}%`;
-            const left = task ? `${(task.start_min / total) * 100}%` : fallbackLeft;
+            const left = task
+              ? `${(task.start_min / total) * 100}%`
+              : fallbackLeft;
             const width = task
               ? `${Math.max(8, (task.duration_min / total) * 100)}%`
               : fallbackWidth;
@@ -597,6 +538,17 @@ ${historyText || "なし"}
             );
           })}
         </View>
+
+        <View style={styles.card}>
+          <VoiceDeviceSelectors
+            inputDevices={inputDevices}
+            outputDevices={outputDevices}
+            selectedInputId={selectedInputId}
+            selectedOutputId={selectedOutputId}
+            onSelectInput={selectInput}
+            onSelectOutput={selectOutput}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -615,6 +567,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  settingsBtn: {
+    position: "absolute",
+    right: 16,
+    top: 0,
+    bottom: 0,
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  settingsText: { fontSize: 24 },
   backBtn: {
     position: "absolute",
     left: 20,
