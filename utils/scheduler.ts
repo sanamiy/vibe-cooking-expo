@@ -537,6 +537,7 @@ export async function scheduleMultipleRecipes(
   algorithm: SchedulerAlgorithmType = "auto",
 ): Promise<MultiRecipeSchedule> {
   const useVps = shouldUseVpsProxy();
+  let vpsSchedulerUnavailable = false;
 
   // VPS API経由でスケジューリング（高度なアルゴリズムを使用）
   if (useVps && algorithm !== "greedy") {
@@ -588,12 +589,13 @@ export async function scheduleMultipleRecipes(
       };
     } catch (e) {
       console.warn("VPS scheduler API failed, using local fallback:", e);
+      vpsSchedulerUnavailable = true;
     }
   }
 
   // ローカルフォールバック: greedy のみ
   const allTasks: SchedulerTask[] = [];
-  const useLLM = useVps;
+  const useLLM = useVps && !vpsSchedulerUnavailable;
 
   for (let rIdx = 0; rIdx < recipes.length; rIdx++) {
     const recipe = recipes[rIdx];

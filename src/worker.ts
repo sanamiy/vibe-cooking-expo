@@ -8,6 +8,7 @@ import { handleBargeIn } from "./routes/bargeIn";
 import { handleStepGuidance } from "./routes/stepGuidance";
 import { handleTts } from "./routes/tts";
 import { handleAnalyzeRecipe } from "./routes/analyzeRecipe";
+import { handleAudioUnderstand } from "./routes/audioUnderstand";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -26,6 +27,9 @@ export default {
       if (request.method === "POST") {
         if (path === "/vps/asr/transcribe") {
           return withCors(await handleAsr(request, env));
+        }
+        if (path === "/vps/audio/understand") {
+          return withCors(await handleAudioUnderstand(request, env));
         }
         if (path === "/vps/ai/classify-intent") {
           return withCors(await handleClassifyIntent(request, env));

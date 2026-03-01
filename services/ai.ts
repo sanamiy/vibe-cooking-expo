@@ -77,6 +77,59 @@ interface ConversationEntry {
   content: string;
 }
 
+function normalizeIntentText(text: string): string {
+  return String(text ?? "")
+    .toLowerCase()
+    .replace(/[\s\u3000]/g, "")
+    .replace(/[。、，,.!！?？「」『』（）()［］[\]{}]/g, "")
+    .trim();
+}
+
+function classifyIntentHeuristic(
+  userText: string,
+  nextStep: string | null,
+): Intent | null {
+  const raw = String(userText ?? "").trim();
+  const text = normalizeIntentText(raw);
+  if (!text) return null;
+
+  const hasQuestionMark = /[?？]/.test(raw);
+  if (
+    hasQuestionMark ||
+    /コツ|どう|なぜ|なんで|どれくらい|何分|教えて|方法|ポイント|大丈夫/.test(
+      text,
+    )
+  ) {
+    return "question";
+  }
+
+  if (/タイマー|残り|あと\d+|何分/.test(text)) {
+    return "timer_status";
+  }
+
+  if (/前|戻|もど/.test(text)) {
+    return "previous_step";
+  }
+
+  if (
+    /終わりました|終わった|できました|完了|done|finished|作業完了|おわりました/.test(
+      text,
+    )
+  ) {
+    return nextStep ? "next_step" : "end_session";
+  }
+
+  if (/次|つぎ|進む|すすめ|next/.test(text)) {
+    return "next_step";
+  }
+
+  if (/終了|おしまい|終わりにする|やめる|stop/.test(text)) {
+    return "end_session";
+  }
+
+  return null;
+}
+
 // ---------- Mistral: Intent classification ----------
 
 export async function classifyIntent(
@@ -86,6 +139,9 @@ export async function classifyIntent(
   nextStep: string | null,
   recipeName?: string,
 ): Promise<Intent> {
+  const heuristic = classifyIntentHeuristic(userText, nextStep);
+  if (heuristic) return heuristic;
+
   if (shouldUseVpsProxy()) {
     try {
       const data = await postJsonVps<{ intent: Intent }>(

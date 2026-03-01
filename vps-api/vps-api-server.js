@@ -210,6 +210,56 @@ async function callElevenLabs({ text }) {
   return Buffer.from(binary, "binary").toString("base64");
 }
 
+function normalizeIntentText(text) {
+  return String(text ?? "")
+    .toLowerCase()
+    .replace(/[\s\u3000]/g, "")
+    .replace(/[。、，,.!！?？「」『』（）()［］[\]{}]/g, "")
+    .trim();
+}
+
+function classifyIntentHeuristic({ userText, nextStep }) {
+  const raw = String(userText ?? "").trim();
+  const text = normalizeIntentText(raw);
+  if (!text) return null;
+
+  const hasQuestionMark = /[?？]/.test(raw);
+  if (
+    hasQuestionMark ||
+    /コツ|どう|なぜ|なんで|どれくらい|何分|教えて|方法|ポイント|大丈夫/.test(
+      text,
+    )
+  ) {
+    return "question";
+  }
+
+  if (/タイマー|残り|あと\d+|何分/.test(text)) {
+    return "timer_status";
+  }
+
+  if (/前|戻|もど/.test(text)) {
+    return "previous_step";
+  }
+
+  if (
+    /終わりました|終わった|できました|完了|done|finished|作業完了|おわりました/.test(
+      text,
+    )
+  ) {
+    return nextStep ? "next_step" : "end_session";
+  }
+
+  if (/次|つぎ|進む|すすめ|next/.test(text)) {
+    return "next_step";
+  }
+
+  if (/終了|おしまい|終わりにする|やめる|stop/.test(text)) {
+    return "end_session";
+  }
+
+  return null;
+}
+
 const server = http.createServer(async (req, res) => {
   setCors(res);
   if (req.method === "OPTIONS") {
@@ -284,6 +334,12 @@ const server = http.createServer(async (req, res) => {
 
     if (path === "/vps/ai/classify-intent") {
       const { userText, currentStep, prevStep, nextStep, recipeName } = body;
+      const heuristicIntent = classifyIntentHeuristic({ userText, nextStep });
+      if (heuristicIntent) {
+        json(res, 200, { intent: heuristicIntent });
+        return;
+      }
+
       const system = `あなたは調理アシスタントの意図分類器です。
 ユーザーの発話を以下のラベルのいずれかに分類してください。
 ラベル: next_step, previous_step, question, timer_status, end_session
@@ -292,6 +348,12 @@ ${recipeName ? `料理名: ${recipeName}` : ""}
 現在の工程: ${currentStep}
 ${prevStep ? `前の工程: ${prevStep}` : "（最初の工程です）"}
 ${nextStep ? `次の工程: ${nextStep}` : "（最後の工程です）"}
+
+重要ルール:
+- 「終わりました」「終わった」「できました」「完了」などの完了報告は、質問ではありません。
+- 次の工程が存在する場合、完了報告は必ず next_step に分類してください。
+- 次の工程が存在しない（最後の工程）場合、完了報告は end_session に分類してください。
+- 疑問文・質問内容がある場合のみ question を返してください。
 
 JSON形式で返してください: {"intent": "ラベル"}`;
 
