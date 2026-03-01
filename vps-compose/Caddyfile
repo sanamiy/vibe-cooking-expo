@@ -1,11 +1,13 @@
 temp.synome.jp {
   encode gzip
 
-  handle_path /vps/* {
+  handle /vps/* {
     reverse_proxy vps-api:8080
   }
 
-  root * /srv
-  try_files {path} /index.html
-  file_server
+  handle {
+    root * /srv
+    try_files {path} /index.html
+    file_server
+  }
 }
