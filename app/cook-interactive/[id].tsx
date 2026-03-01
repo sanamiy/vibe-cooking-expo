@@ -205,6 +205,11 @@ export default function CookInteractiveScreen() {
     config?.voiceInputMode ?? "asr_then_llm",
   );
 
+  useEffect(() => {
+    const maxIndex = Math.max(0, combinedSteps.length - 1);
+    setCurrentIndex((prev) => Math.min(prev, maxIndex));
+  }, [combinedSteps.length]);
+
   const {
     inputDevices,
     outputDevices,
@@ -345,6 +350,8 @@ ${historyText || "なし"}
 
   const currentStep = combinedSteps[currentIndex];
   const countdownLabel = formatCountdownLabel(countdown);
+  const completedSteps = Math.max(0, Math.min(currentIndex, combinedSteps.length));
+  const remainingSteps = Math.max(0, combinedSteps.length - completedSteps - 1);
 
   // Calculate progress percentage
   const progressPercent =
@@ -412,6 +419,17 @@ ${historyText || "なし"}
             ))}
           </View>
         )}
+        <View style={styles.stepStateSummary}>
+          <View style={[styles.stepStateChip, styles.stepStateDone]}>
+            <Text style={styles.stepStateChipText}>完了 {completedSteps}</Text>
+          </View>
+          <View style={[styles.stepStateChip, styles.stepStateCurrent]}>
+            <Text style={styles.stepStateChipText}>現在 {currentIndex + 1}</Text>
+          </View>
+          <View style={[styles.stepStateChip, styles.stepStatePending]}>
+            <Text style={styles.stepStateChipText}>未着手 {remainingSteps}</Text>
+          </View>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -474,16 +492,28 @@ ${historyText || "なし"}
 
         {/* Gantt chart */}
         <View style={styles.card}>
-          <Text style={styles.subTitle}>工程チャート</Text>
-          {gantt.tasks.map((task, idx) => {
+          <Text style={styles.subTitle}>工程チャート（完了 / 実行中 / 未着手）</Text>
+          {combinedSteps.map((step, idx) => {
+            const task = gantt.tasks[idx];
             const total = Math.max(1, gantt.total_estimated_minutes);
-            const left = `${(task.start_min / total) * 100}%`;
-            const width = `${Math.max(8, (task.duration_min / total) * 100)}%`;
+            const fallbackLeft = `${(idx / Math.max(1, combinedSteps.length)) * 100}%`;
+            const fallbackWidth = `${Math.max(8, 100 / Math.max(1, combinedSteps.length))}%`;
+            const left = task ? `${(task.start_min / total) * 100}%` : fallbackLeft;
+            const width = task
+              ? `${Math.max(8, (task.duration_min / total) * 100)}%`
+              : fallbackWidth;
             const isActive = idx === currentIndex;
             const isDone = idx < currentIndex;
-            const stepColor = combinedSteps[idx]?.color ?? theme.colors.border;
+            const stepColor = step.color ?? theme.colors.border;
+            const statusText = isDone ? "完了" : isActive ? "実行中" : "未着手";
+            const label =
+              stripHtml(step.text).slice(0, 25) +
+              (stripHtml(step.text).length > 25 ? "…" : "");
             return (
-              <View key={task.task_id} style={styles.ganttRow}>
+              <View
+                key={`${step.recipeId}-${idx}`}
+                style={[styles.ganttRow, isActive && styles.ganttRowActive]}
+              >
                 <View style={styles.ganttLabelRow}>
                   <View style={[styles.ganttColorDot, { backgroundColor: stepColor }]} />
                   <Text
@@ -494,8 +524,20 @@ ${historyText || "なし"}
                     ]}
                     numberOfLines={1}
                   >
-                    {idx + 1}. {task.label}
+                    {idx + 1}. {label}
                   </Text>
+                  <View
+                    style={[
+                      styles.ganttStatusChip,
+                      isDone
+                        ? styles.ganttStatusDone
+                        : isActive
+                          ? styles.ganttStatusCurrent
+                          : styles.ganttStatusPending,
+                    ]}
+                  >
+                    <Text style={styles.ganttStatusText}>{statusText}</Text>
+                  </View>
                 </View>
                 <View style={styles.track}>
                   <View
@@ -615,6 +657,30 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     color: theme.colors.text,
+  },
+  stepStateSummary: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+  },
+  stepStateChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: theme.radius.pill,
+  },
+  stepStateDone: {
+    backgroundColor: "rgba(46, 204, 113, 0.18)",
+  },
+  stepStateCurrent: {
+    backgroundColor: "rgba(52, 152, 219, 0.18)",
+  },
+  stepStatePending: {
+    backgroundColor: "rgba(149, 165, 166, 0.2)",
+  },
+  stepStateChipText: {
+    color: theme.colors.text,
+    fontSize: 12,
+    fontWeight: "700",
   },
   content: { padding: 20, gap: 20 },
   meta: {
@@ -776,6 +842,11 @@ const styles = StyleSheet.create({
     fontFamily: "M PLUS Rounded 1c",
   },
   ganttRow: { gap: 6, marginBottom: 6 },
+  ganttRowActive: {
+    backgroundColor: "rgba(52, 152, 219, 0.06)",
+    borderRadius: 8,
+    padding: 6,
+  },
   ganttLabelRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -794,6 +865,25 @@ const styles = StyleSheet.create({
   },
   activeLabel: { color: theme.colors.primary, fontWeight: "800" },
   doneLabel: { color: theme.colors.success },
+  ganttStatusChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.radius.pill,
+  },
+  ganttStatusDone: {
+    backgroundColor: "rgba(46, 204, 113, 0.18)",
+  },
+  ganttStatusCurrent: {
+    backgroundColor: "rgba(52, 152, 219, 0.18)",
+  },
+  ganttStatusPending: {
+    backgroundColor: "rgba(149, 165, 166, 0.2)",
+  },
+  ganttStatusText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
   track: {
     height: 14,
     backgroundColor: theme.colors.bg,

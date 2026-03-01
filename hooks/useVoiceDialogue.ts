@@ -75,6 +75,9 @@ export function useVoiceDialogue({
   const listeningResumeRef = useRef<(() => void) | null>(null);
 
   const startBgmSoundRef = useRef<Audio.Sound | null>(null);
+  const currentIndexRef = useRef<number>(currentIndex);
+  const stepsRef = useRef<Array<{ text: string }>>(steps);
+  const tasksRef = useRef<GanttTask[]>(tasks);
 
   // Track what AI was saying when interrupted
   const currentSpeechTextRef = useRef<string>("");
@@ -106,6 +109,18 @@ export function useVoiceDialogue({
   const setListeningResume = useCallback((fn: () => void) => {
     listeningResumeRef.current = fn;
   }, []);
+
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
+
+  useEffect(() => {
+    stepsRef.current = steps;
+  }, [steps]);
+
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
 
   const speakWithExpoSpeech = useCallback((text: string) => {
     if (Platform.OS === "web") return Promise.resolve();
@@ -425,8 +440,10 @@ export function useVoiceDialogue({
             { role: "user", content: transcript },
           ]);
 
-          const currentStep = stripHtml(steps[currentIndex]?.text ?? "");
-          const stepProgress = `工程${currentIndex + 1}/${steps.length}`;
+          const idx = currentIndexRef.current;
+          const localSteps = stepsRef.current;
+          const currentStep = stripHtml(localSteps[idx]?.text ?? "");
+          const stepProgress = `工程${idx + 1}/${localSteps.length}`;
 
           const result = await handleBargeIn(
             transcript,
@@ -455,12 +472,15 @@ export function useVoiceDialogue({
           { role: "user", content: transcript },
         ]);
 
-        const currentStep = stripHtml(steps[currentIndex]?.text ?? "");
+        const idx = currentIndexRef.current;
+        const localSteps = stepsRef.current;
+        const localTasks = tasksRef.current;
+        const currentStep = stripHtml(localSteps[idx]?.text ?? "");
         const prevStep =
-          currentIndex > 0 ? stripHtml(steps[currentIndex - 1].text) : null;
+          idx > 0 ? stripHtml(localSteps[idx - 1].text) : null;
         const nextStep =
-          currentIndex < steps.length - 1
-            ? stripHtml(steps[currentIndex + 1].text)
+          idx < localSteps.length - 1
+            ? stripHtml(localSteps[idx + 1].text)
             : null;
 
         const intent = await classifyIntent(
@@ -475,7 +495,7 @@ export function useVoiceDialogue({
 
         switch (intent) {
           case "next_step": {
-            if (currentIndex >= steps.length - 1) {
+            if (idx >= localSteps.length - 1) {
               response = "すべての工程が完了しました。お疲れさまでした！";
               setLastResponse(response);
               setConversationHistory((prev) => [
@@ -486,12 +506,13 @@ export function useVoiceDialogue({
               onSessionEnd();
               return;
             }
-            const nextIdx = currentIndex + 1;
+            const nextIdx = idx + 1;
+            currentIndexRef.current = nextIdx;
             onChangeIndex(nextIdx);
             const guidance = await generateStepGuidance(
-              stripHtml(steps[nextIdx].text),
+              stripHtml(localSteps[nextIdx].text),
               nextIdx,
-              steps.length,
+              localSteps.length,
               recipeName,
               recipeContext,
             );
@@ -500,15 +521,16 @@ export function useVoiceDialogue({
           }
 
           case "previous_step": {
-            if (currentIndex <= 0) {
+            if (idx <= 0) {
               response = "最初の工程です。" + currentStep;
             } else {
-              const prevIdx = currentIndex - 1;
+              const prevIdx = idx - 1;
+              currentIndexRef.current = prevIdx;
               onChangeIndex(prevIdx);
               const guidance = await generateStepGuidance(
-                stripHtml(steps[prevIdx].text),
+                stripHtml(localSteps[prevIdx].text),
                 prevIdx,
-                steps.length,
+                localSteps.length,
                 recipeName,
                 recipeContext,
               );
@@ -518,7 +540,7 @@ export function useVoiceDialogue({
           }
 
           case "question": {
-            const stepProgress = `工程${currentIndex + 1}/${steps.length}`;
+            const stepProgress = `工程${idx + 1}/${localSteps.length}`;
             response = await answerQuestion(
               transcript,
               currentStep,
@@ -530,7 +552,7 @@ export function useVoiceDialogue({
           }
 
           case "timer_status": {
-            const task = tasks[currentIndex];
+            const task = localTasks[idx];
             if (task?.requires_timer && task.timer_minutes) {
               response = `この工程のタイマーは${task.timer_minutes}分です。`;
             } else {
@@ -625,10 +647,16 @@ export function useVoiceDialogue({
       await stopSpeaking();
       setDialogueState("processing");
 
-      if (intent === "next_step" && currentIndex < steps.length - 1) {
-        onChangeIndex(currentIndex + 1);
-      } else if (intent === "previous_step" && currentIndex > 0) {
-        onChangeIndex(currentIndex - 1);
+      const idx = currentIndexRef.current;
+      const localSteps = stepsRef.current;
+      if (intent === "next_step" && idx < localSteps.length - 1) {
+        const nextIdx = idx + 1;
+        currentIndexRef.current = nextIdx;
+        onChangeIndex(nextIdx);
+      } else if (intent === "previous_step" && idx > 0) {
+        const prevIdx = idx - 1;
+        currentIndexRef.current = prevIdx;
+        onChangeIndex(prevIdx);
       }
 
       setConversationHistory((prev) => {
@@ -645,13 +673,11 @@ export function useVoiceDialogue({
       }
     },
     [
-      currentIndex,
       hasSubstantialOverlap,
       lastResponse,
       onChangeIndex,
       onSessionEnd,
       speakText,
-      steps.length,
       stopSpeaking,
     ],
   );
