@@ -4,6 +4,11 @@ import { theme } from "@/constants/theme";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useRecipes } from "@/hooks/useRecipes";
 import {
+  getLocalizedDescription,
+  getLocalizedIngredients,
+  getLocalizedInstructions,
+  getLocalizedInstructionSteps,
+  getLocalizedName,
   multiplierForRecipe,
   scaleIngredient,
   stripHtml,
@@ -11,20 +16,12 @@ import {
 import { RECIPE_COLORS } from "@/utils/scheduler";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Pressable,
-} from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { ScrollView, StyleSheet, Text, View, Image, Pressable } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
 export default function RecipeDetailScreen() {
+  const { t, i18n } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getRecipeById } = useRecipes();
   const { settings } = useAppSettings();
@@ -41,7 +38,7 @@ export default function RecipeDetailScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.notFound}>
-          <Text>レシピが見つかりませんでした。</Text>
+          <Text>{t("common.recipeNotFound")}</Text>
         </View>
       </SafeAreaView>
     );
@@ -50,7 +47,7 @@ export default function RecipeDetailScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <BackButton label="トップ" onPress={() => router.back()} />
+        <BackButton label={t("common.top")} onPress={() => router.back()} />
         <Text style={styles.title}>Vibe Cooking 🍳</Text>
         <Pressable
           style={({ pressed }) => [
@@ -64,96 +61,62 @@ export default function RecipeDetailScreen() {
         </Pressable>
       </View>
 
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: 120 + insets.bottom },
-        ]}
-      >
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 + insets.bottom }]}>
         {recipes.map((recipe, rIdx) => {
           if (!recipe) return null;
-          const multiplier = multiplierForRecipe(
-            recipe,
-            settings.servingsPerMeal,
-          );
-          const ingredients = (recipe.ingredients ?? []).map((ing) =>
+          const multiplier = multiplierForRecipe(recipe, settings.servingsPerMeal);
+          const ingredients = getLocalizedIngredients(recipe, i18n.language).map((ing) =>
             scaleIngredient(ing, multiplier),
           );
+          const instructionSteps = getLocalizedInstructionSteps(recipe, i18n.language);
           const color = RECIPE_COLORS[rIdx % RECIPE_COLORS.length];
 
           return (
             <View key={recipe.id}>
               {isMulti && (
                 <View style={[styles.recipeLabel, { backgroundColor: color }]}>
-                  <Text style={styles.recipeLabelText}>{rIdx + 1}品目</Text>
+                  <Text style={styles.recipeLabelText}>{t("common.item", { n: rIdx + 1 })}</Text>
                 </View>
               )}
 
-              <Text style={styles.recipeName}>{recipe.name}</Text>
-              <Image
-                source={{ uri: recipe.image_url }}
-                style={styles.hero}
-                resizeMode="cover"
-              />
-              <Text style={styles.description}>{recipe.description}</Text>
+              <Text style={styles.recipeName}>{getLocalizedName(recipe, i18n.language)}</Text>
+              <Image source={{ uri: recipe.image_url }} style={styles.hero} resizeMode="cover" />
+              <Text style={styles.description}>
+                {getLocalizedDescription(recipe, i18n.language)}
+              </Text>
 
               <View style={styles.sectionHeader}>
                 <Text style={styles.section}>
-                  材料（{settings.servingsPerMeal}人前）
+                  {t("recipe.ingredients", { servings: settings.servingsPerMeal })}
                 </Text>
-                <View
-                  style={[
-                    styles.divider,
-                    isMulti && { backgroundColor: color },
-                  ]}
-                />
+                <View style={[styles.divider, isMulti && { backgroundColor: color }]} />
               </View>
               <View style={styles.card}>
                 {ingredients.map((item, idx) => (
                   <View key={`${idx}-${item}`} style={styles.ingredientRow}>
-                    <View
-                      style={[
-                        styles.bullet,
-                        isMulti && { backgroundColor: color },
-                      ]}
-                    />
+                    <View style={[styles.bullet, isMulti && { backgroundColor: color }]} />
                     <Text style={styles.line}>{item}</Text>
                   </View>
                 ))}
               </View>
 
               <View style={styles.sectionHeader}>
-                <Text style={styles.section}>作り方</Text>
-                <View
-                  style={[
-                    styles.divider,
-                    isMulti && { backgroundColor: color },
-                  ]}
-                />
+                <Text style={styles.section}>{t("recipe.instructions")}</Text>
+                <View style={[styles.divider, isMulti && { backgroundColor: color }]} />
               </View>
               <View style={styles.card}>
-                {(recipe.instruction_steps ?? []).length > 0
-                  ? recipe.instruction_steps?.map((step, idx) => (
+                {instructionSteps.length > 0
+                  ? instructionSteps.map((step, idx) => (
                       <View key={idx} style={styles.stepWrap}>
                         <View
-                          style={[
-                            styles.stepNumberBadge,
-                            isMulti && { backgroundColor: color },
-                          ]}
+                          style={[styles.stepNumberBadge, isMulti && { backgroundColor: color }]}
                         >
-                          <Text
-                            style={[
-                              styles.stepNumber,
-                              isMulti && { color: "#fff" },
-                            ]}
-                          >
+                          <Text style={[styles.stepNumber, isMulti && { color: "#fff" }]}>
                             {idx + 1}
                           </Text>
                         </View>
                         <View style={styles.stepContent}>
-                          <Text style={styles.step}>
-                            {stripHtml(step.text)}
-                          </Text>
+                          <Text style={styles.step}>{stripHtml(step.text)}</Text>
                           {step.image_url ? (
                             <Image
                               source={{ uri: step.image_url }}
@@ -164,20 +127,12 @@ export default function RecipeDetailScreen() {
                         </View>
                       </View>
                     ))
-                  : recipe.instructions?.map((step, idx) => (
+                  : getLocalizedInstructions(recipe, i18n.language).map((step, idx) => (
                       <View key={idx} style={styles.stepWrap}>
                         <View
-                          style={[
-                            styles.stepNumberBadge,
-                            isMulti && { backgroundColor: color },
-                          ]}
+                          style={[styles.stepNumberBadge, isMulti && { backgroundColor: color }]}
                         >
-                          <Text
-                            style={[
-                              styles.stepNumber,
-                              isMulti && { color: "#fff" },
-                            ]}
-                          >
+                          <Text style={[styles.stepNumber, isMulti && { color: "#fff" }]}>
                             {idx + 1}
                           </Text>
                         </View>
@@ -194,7 +149,7 @@ export default function RecipeDetailScreen() {
 
       <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
         <AppButton
-          label="買い出しリストへ進む"
+          label={t("recipe.goToShopping")}
           onPress={() => router.push(`/shopping/${ids.join(",")}`)}
         />
       </View>

@@ -3,20 +3,24 @@ import { BackButton } from "@/components/BackButton";
 import { theme } from "@/constants/theme";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useRecipes } from "@/hooks/useRecipes";
-import { multiplierForRecipe, scaleIngredient } from "@/utils/recipe";
+import {
+  getLocalizedIngredients,
+  getLocalizedName,
+  multiplierForRecipe,
+  scaleIngredient,
+} from "@/utils/recipe";
 import { RECIPE_COLORS } from "@/utils/scheduler";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ShoppingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getRecipeById } = useRecipes();
   const { settings } = useAppSettings();
+  const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const ids = useMemo(() => String(id).split(","), [id]);
@@ -32,8 +36,8 @@ export default function ShoppingScreen() {
       if (!recipe) return { name: "", items: [], color: "" };
       const multiplier = multiplierForRecipe(recipe, settings.servingsPerMeal);
       return {
-        name: recipe.name,
-        items: (recipe.ingredients ?? []).map((ing) =>
+        name: getLocalizedName(recipe, i18n.language),
+        items: getLocalizedIngredients(recipe, i18n.language).map((ing) =>
           scaleIngredient(ing, multiplier),
         ),
       };
@@ -47,13 +51,10 @@ export default function ShoppingScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <BackButton label="レシピ" onPress={() => router.back()} />
-        <Text style={styles.title}>買い出しリスト</Text>
+        <BackButton label={t("common.recipe")} onPress={() => router.back()} />
+        <Text style={styles.title}>{t("shopping.title")}</Text>
         <Pressable
-          style={({ pressed }) => [
-            styles.settingsBtn,
-            pressed && { opacity: 0.8 },
-          ]}
+          style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.8 }]}
           onPress={() => router.push("/settings")}
           hitSlop={12}
         >
@@ -61,31 +62,19 @@ export default function ShoppingScreen() {
         </Pressable>
       </View>
 
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: 120 + insets.bottom },
-        ]}
-      >
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 + insets.bottom }]}>
         {recipeItems.map((group, rIdx) => {
           const color = RECIPE_COLORS[rIdx % RECIPE_COLORS.length];
           return (
             <View key={rIdx}>
               <View style={styles.sectionHeader}>
                 {isMulti && (
-                  <View
-                    style={[styles.recipeLabel, { backgroundColor: color }]}
-                  >
-                    <Text style={styles.recipeLabelText}>{rIdx + 1}品目</Text>
+                  <View style={[styles.recipeLabel, { backgroundColor: color }]}>
+                    <Text style={styles.recipeLabelText}>{t("common.item", { n: rIdx + 1 })}</Text>
                   </View>
                 )}
                 <Text style={styles.recipe}>{group.name}</Text>
-                <View
-                  style={[
-                    styles.divider,
-                    isMulti && { backgroundColor: color },
-                  ]}
-                />
+                <View style={[styles.divider, isMulti && { backgroundColor: color }]} />
               </View>
 
               <View style={styles.card}>
@@ -96,26 +85,12 @@ export default function ShoppingScreen() {
                     <Pressable
                       key={key}
                       style={[styles.item, isLast && styles.itemLast]}
-                      onPress={() =>
-                        setChecked((p) => ({ ...p, [key]: !p[key] }))
-                      }
+                      onPress={() => setChecked((p) => ({ ...p, [key]: !p[key] }))}
                     >
-                      <View
-                        style={[
-                          styles.checkbox,
-                          checked[key] && styles.checkboxChecked,
-                        ]}
-                      >
-                        {checked[key] && (
-                          <Text style={styles.checkIcon}>✓</Text>
-                        )}
+                      <View style={[styles.checkbox, checked[key] && styles.checkboxChecked]}>
+                        {checked[key] && <Text style={styles.checkIcon}>✓</Text>}
                       </View>
-                      <Text
-                        style={[
-                          styles.itemText,
-                          checked[key] && styles.itemTextDone,
-                        ]}
-                      >
+                      <Text style={[styles.itemText, checked[key] && styles.itemTextDone]}>
                         {item}
                       </Text>
                     </Pressable>
@@ -129,7 +104,7 @@ export default function ShoppingScreen() {
 
       <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
         <AppButton
-          label="スケジュールを作成"
+          label={t("shopping.createSchedule")}
           onPress={() => router.push(`/schedule/${ids.join(",")}`)}
         />
       </View>

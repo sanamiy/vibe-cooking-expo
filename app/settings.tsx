@@ -1,12 +1,11 @@
 import { AppButton } from "@/components/AppButton";
 import { BackButton } from "@/components/BackButton";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { theme } from "@/constants/theme";
-import {
-  useAppSettings,
-  type SchedulerAlgorithm,
-} from "@/contexts/AppSettingsContext";
+import { useAppSettings, type SchedulerAlgorithm } from "@/contexts/AppSettingsContext";
 import { router } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 // Feature flag: アルゴリズム選択UIを表示するか
@@ -14,41 +13,39 @@ const SHOW_ALGORITHM_SELECTOR = __DEV__;
 
 const ALGORITHM_OPTIONS: {
   value: SchedulerAlgorithm;
-  label: string;
-  desc: string;
+  labelKey: string;
+  descKey: string;
 }[] = [
-  { value: "auto", label: "自動", desc: "レシピ数に応じて最適化" },
-  { value: "claude_e2e", label: "Claude E2E", desc: "Claude 1回で全体生成" },
-  { value: "greedy", label: "貪欲法", desc: "シンプルで高速" },
-  { value: "genetic", label: "遺伝的", desc: "同時完成を最適化" },
-  { value: "critical_path", label: "クリティカルパス", desc: "最長レシピ優先" },
-  { value: "backward", label: "逆算", desc: "同時完成を目指す" },
-  { value: "astar", label: "A*探索", desc: "最適解を探索" },
+  { value: "auto", labelKey: "settings.algo_auto", descKey: "settings.algo_auto_desc" },
+  {
+    value: "claude_e2e",
+    labelKey: "settings.algo_claude_e2e",
+    descKey: "settings.algo_claude_e2e_desc",
+  },
+  { value: "greedy", labelKey: "settings.algo_greedy", descKey: "settings.algo_greedy_desc" },
+  { value: "genetic", labelKey: "settings.algo_genetic", descKey: "settings.algo_genetic_desc" },
+  {
+    value: "critical_path",
+    labelKey: "settings.algo_critical_path",
+    descKey: "settings.algo_critical_path_desc",
+  },
+  { value: "backward", labelKey: "settings.algo_backward", descKey: "settings.algo_backward_desc" },
+  { value: "astar", labelKey: "settings.algo_astar", descKey: "settings.algo_astar_desc" },
 ];
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
+  const { t } = useTranslation();
   const { settings, updateSettings } = useAppSettings();
   const insets = useSafeAreaInsets();
-  const [servingsPerMeal, setServingsPerMeal] = useState(
-    settings.servingsPerMeal,
-  );
+  const [servingsPerMeal, setServingsPerMeal] = useState(settings.servingsPerMeal);
   const [stoveBurners, setStoveBurners] = useState(settings.stoveBurners);
-  const [schedulerAlgorithm, setSchedulerAlgorithm] = useState(
-    settings.schedulerAlgorithm,
-  );
+  const [schedulerAlgorithm, setSchedulerAlgorithm] = useState(settings.schedulerAlgorithm);
 
-  const incrementBurners = () =>
-    setStoveBurners((prev) => Math.min(5, prev + 1));
-  const decrementBurners = () =>
-    setStoveBurners((prev) => Math.max(1, prev - 1));
-  const incrementServings = () =>
-    setServingsPerMeal((prev) => Math.min(10, prev + 1));
-  const decrementServings = () =>
-    setServingsPerMeal((prev) => Math.max(1, prev - 1));
+  const incrementBurners = () => setStoveBurners((prev) => Math.min(5, prev + 1));
+  const decrementBurners = () => setStoveBurners((prev) => Math.max(1, prev - 1));
+  const incrementServings = () => setServingsPerMeal((prev) => Math.min(10, prev + 1));
+  const decrementServings = () => setServingsPerMeal((prev) => Math.max(1, prev - 1));
 
   const onSave = () => {
     updateSettings({
@@ -62,20 +59,25 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <BackButton label="ホーム" onPress={() => router.back()} />
-        <Text style={styles.title}>キッチン設定</Text>
+        <BackButton label={t("common.home")} onPress={() => router.back()} />
+        <Text style={styles.title}>{t("settings.title")}</Text>
       </View>
 
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: 40 + insets.bottom },
-        ]}
-      >
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 40 + insets.bottom }]}>
+        <Text style={styles.description}>{t("settings.description")}</Text>
+
+        <View style={styles.settingCard}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.icon}>🌐</Text>
+            <Text style={styles.cardTitle}>{t("settings.language")}</Text>
+          </View>
+          <LanguageToggle />
+        </View>
+
         <View style={styles.settingCard}>
           <View style={styles.cardHeader}>
             <Text style={styles.icon}>🔥</Text>
-            <Text style={styles.cardTitle}>コンロの数</Text>
+            <Text style={styles.cardTitle}>{t("settings.stoveBurners")}</Text>
           </View>
           <View style={styles.counterControl}>
             <Pressable
@@ -88,17 +90,14 @@ export default function SettingsScreen() {
               disabled={stoveBurners <= 1}
             >
               <Text
-                style={[
-                  styles.counterBtnText,
-                  stoveBurners <= 1 && styles.counterBtnTextDisabled,
-                ]}
+                style={[styles.counterBtnText, stoveBurners <= 1 && styles.counterBtnTextDisabled]}
               >
                 −
               </Text>
             </Pressable>
             <View style={styles.counterValueWrap}>
               <Text style={styles.counterValue}>{stoveBurners}</Text>
-              <Text style={styles.unit}>口</Text>
+              <Text style={styles.unit}>{t("settings.stoveBurnersUnit")}</Text>
             </View>
             <Pressable
               style={({ pressed }) => [
@@ -110,22 +109,19 @@ export default function SettingsScreen() {
               disabled={stoveBurners >= 5}
             >
               <Text
-                style={[
-                  styles.counterBtnText,
-                  stoveBurners >= 5 && styles.counterBtnTextDisabled,
-                ]}
+                style={[styles.counterBtnText, stoveBurners >= 5 && styles.counterBtnTextDisabled]}
               >
                 ＋
               </Text>
             </Pressable>
           </View>
-          <Text style={styles.cardCaption}>同時に使えるコンロ・IHの数</Text>
+          <Text style={styles.cardCaption}>{t("settings.stoveBurnersCaption")}</Text>
         </View>
 
         <View style={styles.settingCard}>
           <View style={styles.cardHeader}>
             <Text style={styles.icon}>🍽️</Text>
-            <Text style={styles.cardTitle}>1食あたりの人数</Text>
+            <Text style={styles.cardTitle}>{t("settings.servingsPerMeal")}</Text>
           </View>
           <View style={styles.counterControl}>
             <Pressable
@@ -148,7 +144,7 @@ export default function SettingsScreen() {
             </Pressable>
             <View style={styles.counterValueWrap}>
               <Text style={styles.counterValue}>{servingsPerMeal}</Text>
-              <Text style={styles.unit}>人前</Text>
+              <Text style={styles.unit}>{t("settings.servingsUnit")}</Text>
             </View>
             <Pressable
               style={({ pressed }) => [
@@ -169,9 +165,7 @@ export default function SettingsScreen() {
               </Text>
             </Pressable>
           </View>
-          <Text style={styles.cardCaption}>
-            レシピの分量を計算するために使用します
-          </Text>
+          <Text style={styles.cardCaption}>{t("settings.servingsCaption")}</Text>
         </View>
 
         {/* アルゴリズム選択 (開発モードのみ) */}
@@ -179,7 +173,7 @@ export default function SettingsScreen() {
           <View style={styles.settingCard}>
             <View style={styles.cardHeader}>
               <Text style={styles.icon}>🧪</Text>
-              <Text style={styles.cardTitle}>スケジューリング</Text>
+              <Text style={styles.cardTitle}>{t("settings.scheduling")}</Text>
             </View>
             <View style={styles.algorithmGrid}>
               {ALGORITHM_OPTIONS.map((opt) => (
@@ -187,33 +181,29 @@ export default function SettingsScreen() {
                   key={opt.value}
                   style={[
                     styles.algorithmOption,
-                    schedulerAlgorithm === opt.value &&
-                      styles.algorithmOptionSelected,
+                    schedulerAlgorithm === opt.value && styles.algorithmOptionSelected,
                   ]}
                   onPress={() => setSchedulerAlgorithm(opt.value)}
                 >
                   <Text
                     style={[
                       styles.algorithmLabel,
-                      schedulerAlgorithm === opt.value &&
-                        styles.algorithmLabelSelected,
+                      schedulerAlgorithm === opt.value && styles.algorithmLabelSelected,
                     ]}
                   >
-                    {opt.label}
+                    {t(opt.labelKey)}
                   </Text>
-                  <Text style={styles.algorithmDesc}>{opt.desc}</Text>
+                  <Text style={styles.algorithmDesc}>{t(opt.descKey)}</Text>
                 </Pressable>
               ))}
             </View>
-            <Text style={styles.cardCaption}>
-              調理スケジュールの最適化アルゴリズム
-            </Text>
+            <Text style={styles.cardCaption}>{t("settings.schedulingCaption")}</Text>
           </View>
         )}
 
         <View style={styles.actions}>
           <View style={styles.saveBtnWrap}>
-            <AppButton label="保存する" onPress={onSave} />
+            <AppButton label={t("settings.save")} onPress={onSave} />
           </View>
         </View>
       </ScrollView>

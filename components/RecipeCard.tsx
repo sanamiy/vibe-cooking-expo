@@ -1,7 +1,13 @@
 import { theme } from "@/constants/theme";
 import { Recipe } from "@/types/recipe";
-import { formatTime } from "@/utils/recipe";
+import {
+  formatTime,
+  getLocalizedDescription,
+  getLocalizedName,
+  getLocalizedServingsLabel,
+} from "@/utils/recipe";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   recipe: Recipe;
@@ -9,38 +15,37 @@ interface Props {
   onToggle: (id: string) => void;
 }
 
-export const RecipeCard = ({ recipe, isSelected, onToggle }: Props) => (
-  <Pressable
-    onPress={() => onToggle(recipe.id)}
-    style={[styles.card, isSelected && styles.selected]}
-  >
-    <View style={styles.imageContainer}>
-      <Image
-        source={{ uri: recipe.image_url }}
-        style={styles.img}
-        resizeMode="cover"
-      />
-    </View>
-    <View style={styles.body}>
-      <Text style={styles.title}>{recipe.name}</Text>
-      <Text style={styles.desc} numberOfLines={2}>
-        {recipe.description}
-      </Text>
-      <View style={styles.metaRow}>
-        <View style={styles.metaItem}>
-          <Text style={styles.metaIcon}>⏱</Text>
-          <Text style={styles.meta}>{formatTime(recipe.total_time)}</Text>
-        </View>
-        {recipe.recipe_servings_label ? (
-          <View style={styles.metaItem}>
-            <Text style={styles.metaIcon}>👨‍👩‍👧‍👦</Text>
-            <Text style={styles.meta}>{recipe.recipe_servings_label}</Text>
-          </View>
-        ) : null}
+export function RecipeCard({ recipe, isSelected, onToggle }: Props) {
+  const { i18n } = useTranslation();
+  return (
+    <Pressable
+      onPress={() => onToggle(recipe.id)}
+      style={[styles.card, isSelected && styles.selected]}
+    >
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: recipe.image_url }} style={styles.img} resizeMode="cover" />
       </View>
-    </View>
-  </Pressable>
-);
+      <View style={styles.body}>
+        <Text style={styles.title}>{getLocalizedName(recipe, i18n.language)}</Text>
+        <Text style={styles.desc} numberOfLines={2}>
+          {getLocalizedDescription(recipe, i18n.language)}
+        </Text>
+        <View style={styles.metaRow}>
+          <View style={styles.metaItem}>
+            <Text style={styles.metaIcon}>⏱</Text>
+            <Text style={styles.meta}>{formatTime(recipe.total_time, i18n.language)}</Text>
+          </View>
+          {recipe.recipe_servings ? (
+            <View style={styles.metaItem}>
+              <Text style={styles.metaIcon}>👨‍👩‍👧‍👦</Text>
+              <Text style={styles.meta}>{getLocalizedServingsLabel(recipe, i18n.language)}</Text>
+            </View>
+          ) : null}
+        </View>
+      </View>
+    </Pressable>
+  );
+}
 
 const styles = StyleSheet.create({
   card: {

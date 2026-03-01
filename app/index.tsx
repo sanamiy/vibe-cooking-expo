@@ -5,35 +5,24 @@ import { useRecipes } from "@/hooks/useRecipes";
 import { MAX_SELECTION } from "@/utils/recipe";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const { recipes } = useRecipes();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const insets = useSafeAreaInsets();
 
   const selectedCount = selectedIds.length;
-  const selectedLabel = useMemo(
-    () => `${selectedCount} / ${MAX_SELECTION}`,
-    [selectedCount],
-  );
+  const selectedLabel = useMemo(() => `${selectedCount} / ${MAX_SELECTION}`, [selectedCount]);
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
       if (prev.includes(id)) return prev.filter((v) => v !== id);
       if (prev.length >= MAX_SELECTION) {
-        Alert.alert(`最大${MAX_SELECTION}個まで選択できます`);
+        Alert.alert(t("home.maxSelection", { max: MAX_SELECTION }));
         return prev;
       }
       return [...prev, id];
@@ -48,14 +37,9 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Text style={styles.title}>Vibe Cooking 🍳</Text>
-        <Text style={styles.subtitle}>
-          気になる料理を選んで、今日のメニューを決めよう
-        </Text>
+        <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
         <Pressable
-          style={({ pressed }) => [
-            styles.settingsBtn,
-            pressed && { opacity: 0.8 },
-          ]}
+          style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.8 }]}
           onPress={() => router.push("/settings")}
           hitSlop={12}
         >
@@ -71,14 +55,14 @@ export default function HomeScreen() {
       >
         <View style={styles.sectionHeader}>
           <View style={styles.row}>
-            <Text style={styles.sectionTitle}>献立を決める</Text>
+            <Text style={styles.sectionTitle}>{t("home.menuTitle")}</Text>
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{selectedLabel}</Text>
             </View>
           </View>
           <View style={styles.divider} />
         </View>
-        <Text style={styles.help}>1〜5個の料理を選択してください</Text>
+        <Text style={styles.help}>{t("home.help")}</Text>
 
         <View style={styles.cardContainer}>
           {recipes.map((recipe) => (
@@ -96,9 +80,9 @@ export default function HomeScreen() {
         <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
           <View style={styles.bottomRow}>
             <Text style={styles.bottomInfo}>
-              {selectedCount}個の料理を選択中
+              {t("home.selectedCount", { count: selectedCount })}
             </Text>
-            <AppButton label="決定する" onPress={onConfirm} />
+            <AppButton label={t("home.confirm")} onPress={onConfirm} />
           </View>
         </View>
       ) : null}

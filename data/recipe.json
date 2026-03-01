@@ -37,18 +37,42 @@
         {
           "text": "（１）じゃがいも、にんじん、玉ねぎ、キャベツは１ｃｍ角に切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/701794_direction_0_0.jpeg",
-          "image_path": "recipe-img/701794_step_01.jpeg"
+          "image_path": "recipe-img/701794_step_01.jpeg",
+          "text_en": "(1) Cut the potato, carrot, onion, and cabbage into 1cm cubes."
         },
         {
           "text": "（２）鍋ににんにく、オリーブオイルを入れて熱し、香りが出たら（１）を加えて炒める。<br />野菜がしんなりしたら、ホールトマトをつぶしながら加え、Ａを加えて煮立てる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/701794_direction_1_0.jpeg",
-          "image_path": "recipe-img/701794_step_02.jpeg"
+          "image_path": "recipe-img/701794_step_02.jpeg",
+          "text_en": "(2) Heat garlic and olive oil in a pot until fragrant, then add the vegetables from step (1) and stir-fry. When the vegetables are tender, crush and add the whole tomatoes, then add A and bring to a boil."
         },
         {
           "text": "（３）中火で１０分ほど煮て、塩・こしょうで味を調える。器に盛り、パセリを散らす。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/701794_direction_2_0.jpeg",
-          "image_path": "recipe-img/701794_step_03.jpeg"
+          "image_path": "recipe-img/701794_step_03.jpeg",
+          "text_en": "(3) Simmer over medium heat for about 10 minutes and season with salt and pepper. Serve in bowls and garnish with parsley."
         }
+      ],
+      "name_en": "Vegetable Minestrone",
+      "description_en": "Simmered slowly with consomme, this hearty soup is packed with vegetables and full of natural sweetness.",
+      "ingredients_en": [
+        "potato 1",
+        "carrot 2/3",
+        "onion 1/2",
+        "cabbage 2 leaves",
+        "minced garlic 1 tbsp",
+        "canned whole tomatoes 200g",
+        "A water 4-1/2 cups",
+        "A consomme cubes 3",
+        "salt a pinch",
+        "pepper a pinch",
+        "olive oil 1 tbsp",
+        "chopped parsley to taste"
+      ],
+      "instructions_en": [
+        "(1) Cut the potato, carrot, onion, and cabbage into 1cm cubes.",
+        "(2) Heat garlic and olive oil in a pot until fragrant, then add the vegetables from step (1) and stir-fry. When the vegetables are tender, crush and add the whole tomatoes, then add A and bring to a boil.",
+        "(3) Simmer over medium heat for about 10 minutes and season with salt and pepper. Serve in bowls and garnish with parsley."
       ]
     },
     {
@@ -83,18 +107,40 @@
         {
           "text": "（１）鶏肉は２ｃｍ角に切り、玉ねぎは薄切りにする。みつばは２ｃｍ長さに切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/703024_direction_0_0.jpeg",
-          "image_path": "recipe-img/703024_step_01.jpeg"
+          "image_path": "recipe-img/703024_step_01.jpeg",
+          "text_en": "(1) Cut the chicken into 2cm cubes, thinly slice the onion, and cut the mitsuba into 2cm lengths."
         },
         {
           "text": "（２）小さめのフライパンにＡを入れて煮立てる。（１）の鶏肉・玉ねぎを加えて中火で３分煮て、溶き卵を回し入れ、半熟状に煮る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/703024_direction_1_0.jpeg",
-          "image_path": "recipe-img/703024_step_02.jpeg"
+          "image_path": "recipe-img/703024_step_02.jpeg",
+          "text_en": "(2) Add A to a small frying pan and bring to a boil. Add the chicken and onion from step (1) and simmer over medium heat for 3 minutes. Pour in the beaten eggs in a circular motion and cook until soft-set."
         },
         {
           "text": "（３）半量ずつご飯にかけ、（１）のみつばを散らす。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/703024_direction_2_0.jpeg",
-          "image_path": "recipe-img/703024_step_03.jpeg"
+          "image_path": "recipe-img/703024_step_03.jpeg",
+          "text_en": "(3) Divide into two portions and pour over rice. Garnish with the mitsuba from step (1)."
         }
+      ],
+      "name_en": "Classic Oyakodon (Chicken & Egg Rice Bowl)",
+      "description_en": "Fluffy, soft-set eggs paired with savory dashi make this dish irresistible over rice. Easy to make yet deeply satisfying, with tender chicken and onion adding a delightful contrast.",
+      "ingredients_en": [
+        "chicken thigh 100g",
+        "onion 1/2 (100g)",
+        "mitsuba (Japanese parsley) to taste",
+        "eggs 2",
+        "A water 3/4 cup",
+        "A soy sauce 1 tbsp",
+        "A mirin 1 tbsp",
+        "A sugar 1/2 tbsp",
+        "A dashi powder 1 tsp",
+        "cooked rice 400g"
+      ],
+      "instructions_en": [
+        "(1) Cut the chicken into 2cm cubes, thinly slice the onion, and cut the mitsuba into 2cm lengths.",
+        "(2) Add A to a small frying pan and bring to a boil. Add the chicken and onion from step (1) and simmer over medium heat for 3 minutes. Pour in the beaten eggs in a circular motion and cook until soft-set.",
+        "(3) Divide into two portions and pour over rice. Garnish with the mitsuba from step (1)."
       ]
     },
     {
@@ -125,18 +171,36 @@
         {
           "text": "（１）大根は２ｃｍ厚さの半月切りにする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/703164_direction_0_0.jpeg",
-          "image_path": "recipe-img/703164_step_01.jpeg"
+          "image_path": "recipe-img/703164_step_01.jpeg",
+          "text_en": "(1) Cut the daikon into 2cm-thick half-moon slices."
         },
         {
           "text": "（２）鍋に（１）の大根、かぶるくらいの水（分量外）を入れて煮立て、２０分ほど竹串がスッと通るまでゆでる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/703164_direction_1_0.jpeg",
-          "image_path": "recipe-img/703164_step_02.jpeg"
+          "image_path": "recipe-img/703164_step_02.jpeg",
+          "text_en": "(2) Place the daikon from step (1) in a pot with enough water to cover (not included in measurements) and bring to a boil. Boil for about 20 minutes until a bamboo skewer passes through easily."
         },
         {
           "text": "（３）別の鍋に（２）の大根、Ａを入れて火にかけ、煮立ったら弱火にし、落としぶたをして５分煮る。しょうゆを加えて３０分煮て、火を止め、味がしみるまで３０分ほどおく（時間外）。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/703164_direction_2_0.jpeg",
-          "image_path": "recipe-img/703164_step_03.jpeg"
+          "image_path": "recipe-img/703164_step_03.jpeg",
+          "text_en": "(3) Transfer the daikon from step (2) to a separate pot, add A, and bring to heat. Once boiling, reduce to low heat, place a drop lid on top, and simmer for 5 minutes. Add soy sauce and simmer for 30 minutes. Remove from heat and let rest for about 30 minutes to allow flavors to absorb (resting time not included)."
         }
+      ],
+      "name_en": "Simmered Daikon in Soy Glaze",
+      "description_en": "Daikon radish simmered until deeply infused with a sweet and savory soy glaze, turning a beautiful amber color.",
+      "ingredients_en": [
+        "daikon radish 400g",
+        "A water 3 cups",
+        "A mirin 2 tbsp",
+        "A sugar 1 tbsp",
+        "A dashi powder 1 tsp",
+        "soy sauce 1-1/2 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the daikon into 2cm-thick half-moon slices.",
+        "(2) Place the daikon from step (1) in a pot with enough water to cover (not included in measurements) and bring to a boil. Boil for about 20 minutes until a bamboo skewer passes through easily.",
+        "(3) Transfer the daikon from step (2) to a separate pot, add A, and bring to heat. Once boiling, reduce to low heat, place a drop lid on top, and simmer for 5 minutes. Add soy sauce and simmer for 30 minutes. Remove from heat and let rest for about 30 minutes to allow flavors to absorb (resting time not included)."
       ]
     },
     {
@@ -183,38 +247,76 @@
         {
           "text": "（１）豚肉は２～３等分に切り、塩、こしょうをする。キャベツは粗く刻み、青ねぎは小口切りにする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/704422_direction_0_0.jpeg",
-          "image_path": "recipe-img/704422_step_01.jpeg"
+          "image_path": "recipe-img/704422_step_01.jpeg",
+          "text_en": "(1) Cut the pork into 2-3 equal pieces and season with salt and pepper. Roughly chop the cabbage and thinly slice the green onion."
         },
         {
           "text": "（２）ボウルにＡを入れてよく混ぜ、割りほぐした卵、おろし長いもの順に加えて混ぜる。さらに、ふるっておいた薄力粉を加えて泡立て器でなめらかになるまで混ぜ合わせる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/704422_direction_1_0.jpeg",
-          "image_path": "recipe-img/704422_step_02.jpeg"
+          "image_path": "recipe-img/704422_step_02.jpeg",
+          "text_en": "(2) Combine A in a bowl and mix well. Add the beaten eggs, then grated nagaimo, and mix. Sift in the flour and whisk until smooth."
         },
         {
           "text": "（３）（２）に（１）のキャベツ・青ねぎを加えて混ぜ合わせる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/704422_direction_2_0.jpeg",
-          "image_path": "recipe-img/704422_step_03.jpeg"
+          "image_path": "recipe-img/704422_step_03.jpeg",
+          "text_en": "(3) Add the cabbage and green onion from step (1) to step (2) and mix together."
         },
         {
           "text": "（４）フライパンに「健康サララ」大さじ１を熱し（３）の１／４量弱を直径１４～１５ｃｍ大に丸く広げ、紅しょうが、揚げ玉の１／４量を上にふりかける。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/704422_direction_3_0.jpeg",
-          "image_path": "recipe-img/704422_step_04.jpeg"
+          "image_path": "recipe-img/704422_step_04.jpeg",
+          "text_en": "(4) Heat 1 tbsp oil in a frying pan, spread slightly less than 1/4 of the batter from step (3) into a 14-15cm circle, and sprinkle 1/4 of the pickled ginger and tenkasu on top."
         },
         {
           "text": "（５）（４）の上に（１）の豚肉の１／４量を全体にのせ、（３）を少量のせて広げ、中火で焼く。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/704422_direction_4_0.jpeg",
-          "image_path": "recipe-img/704422_step_05.jpeg"
+          "image_path": "recipe-img/704422_step_05.jpeg",
+          "text_en": "(5) Place 1/4 of the pork from step (1) evenly on top of step (4), add a small amount of batter from step (3) and spread, then cook over medium heat."
         },
         {
           "text": "（６）焼き目がついたら、裏返し、弱火でフタをして、火が通るまで焼く。残り３枚も同様に焼く。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2026/02/704422_direction_5_0.jpeg",
-          "image_path": "recipe-img/704422_step_06.jpeg"
+          "image_path": "recipe-img/704422_step_06.jpeg",
+          "text_en": "(6) When browned on the bottom, flip over, cover with a lid, and cook over low heat until cooked through. Repeat for the remaining 3 pancakes."
         },
         {
           "text": "（７）皿に盛り、お好み焼きソースと「サラリア」を塗り、削り節と青のりを上に散らす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(7) Serve on plates, spread okonomiyaki sauce and mayonnaise on top, and sprinkle with bonito flakes and aonori."
         }
+      ],
+      "name_en": "Okonomiyaki (Japanese Savory Pancake)",
+      "description_en": "A classic Japanese savory pancake loaded with cabbage and pork belly - even better when shared with family and friends.",
+      "ingredients_en": [
+        "thinly sliced pork belly 6 slices",
+        "salt a pinch",
+        "coarsely ground black pepper a pinch",
+        "cabbage 6 leaves",
+        "green onion 1",
+        "pickled red ginger, chopped 15g",
+        "tenkasu (tempura bits) 20g",
+        "A water 150ml",
+        "A dashi powder 1-1/2 tsp",
+        "eggs, L size 2",
+        "grated nagaimo (yam) 120g",
+        "all-purpose flour 140g",
+        "vegetable oil 4 tbsp",
+        "okonomiyaki sauce 6 tbsp",
+        "mayonnaise 6 tbsp",
+        "bonito flakes 2 packets",
+        "aonori (dried seaweed flakes) 2 tsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the pork into 2-3 equal pieces and season with salt and pepper. Roughly chop the cabbage and thinly slice the green onion.",
+        "(2) Combine A in a bowl and mix well. Add the beaten eggs, then grated nagaimo, and mix. Sift in the flour and whisk until smooth.",
+        "(3) Add the cabbage and green onion from step (1) to step (2) and mix together.",
+        "(4) Heat 1 tbsp oil in a frying pan, spread slightly less than 1/4 of the batter from step (3) into a 14-15cm circle, and sprinkle 1/4 of the pickled ginger and tenkasu on top.",
+        "(5) Place 1/4 of the pork from step (1) evenly on top of step (4), add a small amount of batter from step (3) and spread, then cook over medium heat.",
+        "(6) When browned on the bottom, flip over, cover with a lid, and cook over low heat until cooked through. Repeat for the remaining 3 pancakes.",
+        "(7) Serve on plates, spread okonomiyaki sauce and mayonnaise on top, and sprinkle with bonito flakes and aonori.",
+        "* A regional dish from Osaka Prefecture."
       ]
     },
     {
@@ -262,48 +364,89 @@
         {
           "text": "（１）あんこうは沸騰した湯で１０秒ほど湯引きし、氷水につけてザルに上げ、水気をきる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/704642_direction_0_0.jpeg",
-          "image_path": "recipe-img/704642_step_01.jpeg"
+          "image_path": "recipe-img/704642_step_01.jpeg",
+          "text_en": "(1) Briefly blanch the monkfish in boiling water for about 10 seconds, transfer to ice water, then drain in a colander."
         },
         {
           "text": "（２）あんきもは蒸し器で１０分～２５分蒸し、５ｍｍ幅に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Steam the monkfish liver for 10-25 minutes and cut into 5mm slices."
         },
         {
           "text": "（３）にんじんは飾り用に７～８枚、５ｍｍ幅の薄切りにし、花型で抜いて下ゆでし、残りは半月切りにする。春菊は根元を切り、長さを３等分に切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/704642_direction_2_0.jpeg",
-          "image_path": "recipe-img/704642_step_03.jpeg"
+          "image_path": "recipe-img/704642_step_03.jpeg",
+          "text_en": "(3) Cut 7-8 thin slices of carrot (5mm thick) for garnish and cut into flower shapes, then parboil. Cut the remaining carrot into half-moon slices. Trim the roots of the chrysanthemum greens and cut into thirds."
         },
         {
           "text": "（４）しいたけは石づきを取り、表面に飾り包丁を入れる。えのきだけは根元を切り、大きめにほぐす。ねぎは５ｍｍ幅の斜め切りにし、白菜は５ｃｍ角に切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/704642_direction_3_0.jpeg",
-          "image_path": "recipe-img/704642_step_04.jpeg"
+          "image_path": "recipe-img/704642_step_04.jpeg",
+          "text_en": "(4) Remove the stems from the shiitake mushrooms and score decorative cuts on the caps. Trim the base of the enoki mushrooms and separate into large clusters. Cut the green onion into 5mm diagonal slices and cut the napa cabbage into 5cm squares."
         },
         {
           "text": "（５）焼き豆腐は８等分に切り、しらたきは水で洗い、サッとゆでて５ｃｍ長さに切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/704642_direction_4_0.jpeg",
-          "image_path": "recipe-img/704642_step_05.jpeg"
+          "image_path": "recipe-img/704642_step_05.jpeg",
+          "text_en": "(5) Cut the grilled tofu into 8 pieces. Rinse the shirataki noodles, briefly boil, and cut into 5cm lengths."
         },
         {
           "text": "（６）土鍋を熱し、（２）のあんきも１／３量を入れ、弱火で丁寧にそぼろ状にからいりする。少し焦げ目がつき、脂が出てきたら、みそを少しずつ加えてさらによくいる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/704642_direction_5_0.jpeg",
-          "image_path": "recipe-img/704642_step_06.jpeg"
+          "image_path": "recipe-img/704642_step_06.jpeg",
+          "text_en": "(6) Heat an earthenware pot, add 1/3 of the monkfish liver from step (2), and dry-fry over low heat until crumbly. When slightly browned and the fat renders, gradually add miso and continue to cook."
         },
         {
           "text": "（７）分量の水を少しずつかき混ぜながら加え、Ａを加えて味を調える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(7) Gradually stir in the water, then add A and adjust the seasoning."
         },
         {
           "text": "（８）（１）のあんこう、（３）の半月切りにしたにんじん、（４）、（５）を加え、強火にかけ、煮立ったら残りのあんきもを加え、アクを取りながらさらに煮る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/704642_direction_7_0.jpeg",
-          "image_path": "recipe-img/704642_step_08.jpeg"
+          "image_path": "recipe-img/704642_step_08.jpeg",
+          "text_en": "(8) Add the monkfish from step (1), the half-moon cut carrots from step (3), and the ingredients from steps (4) and (5). Bring to a boil over high heat, add the remaining monkfish liver, and continue simmering while skimming off any scum."
         },
         {
           "text": "（９）具材に火が通ったら、（３）の春菊・飾り用のにんじんを加える。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/704642_direction_8_0.jpeg",
-          "image_path": "recipe-img/704642_step_09.jpeg"
+          "image_path": "recipe-img/704642_step_09.jpeg",
+          "text_en": "(9) Once the ingredients are cooked through, add the chrysanthemum greens and decorative carrots from step (3)."
         }
+      ],
+      "name_en": "Monkfish Hot Pot",
+      "description_en": "A luxurious hot pot featuring rich monkfish liver and vegetables with a perfect umami balance.",
+      "ingredients_en": [
+        "monkfish, cut into 5-6cm pieces 800g",
+        "monkfish liver 100g",
+        "shiitake mushrooms 4",
+        "enoki mushrooms 100g",
+        "carrot 1",
+        "chrysanthemum greens 1 bunch",
+        "long green onion 1",
+        "napa cabbage, large leaves 2",
+        "grilled tofu 1 block",
+        "shirataki noodles 1 package",
+        "miso 4-1/2 tbsp",
+        "water 8 cups",
+        "A soy sauce 1/2 cup",
+        "A mirin 4 tbsp",
+        "A dashi powder 2 tbsp",
+        "A sake 2 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Briefly blanch the monkfish in boiling water for about 10 seconds, transfer to ice water, then drain in a colander.",
+        "(2) Steam the monkfish liver for 10-25 minutes and cut into 5mm slices.",
+        "(3) Cut 7-8 thin slices of carrot (5mm thick) for garnish and cut into flower shapes, then parboil. Cut the remaining carrot into half-moon slices. Trim the roots of the chrysanthemum greens and cut into thirds.",
+        "(4) Remove the stems from the shiitake mushrooms and score decorative cuts on the caps. Trim the base of the enoki mushrooms and separate into large clusters. Cut the green onion into 5mm diagonal slices and cut the napa cabbage into 5cm squares.",
+        "(5) Cut the grilled tofu into 8 pieces. Rinse the shirataki noodles, briefly boil, and cut into 5cm lengths.",
+        "(6) Heat an earthenware pot, add 1/3 of the monkfish liver from step (2), and dry-fry over low heat until crumbly. When slightly browned and the fat renders, gradually add miso and continue to cook.",
+        "(7) Gradually stir in the water, then add A and adjust the seasoning.",
+        "(8) Add the monkfish from step (1), the half-moon cut carrots from step (3), and the ingredients from steps (4) and (5). Bring to a boil over high heat, add the remaining monkfish liver, and continue simmering while skimming off any scum.",
+        "(9) Once the ingredients are cooked through, add the chrysanthemum greens and decorative carrots from step (3).",
+        "* A regional dish from Ibaraki Prefecture."
       ]
     },
     {
@@ -341,18 +484,43 @@
         {
           "text": "（１）白菜は１枚ずつはがし、白菜と豚肉を交互に４回重ねる。５ｃｍ幅に切り、鍋のフチに沿って敷き詰める。これを３～４回繰り返す。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2024/11/705346_direction_0_0.jpeg",
-          "image_path": "recipe-img/705346_step_01.jpeg"
+          "image_path": "recipe-img/705346_step_01.jpeg",
+          "text_en": "(1) Peel off the napa cabbage leaves one by one and layer alternately with pork belly 4 times. Cut into 5cm widths and arrange along the edge of the pot. Repeat 3-4 times."
         },
         {
           "text": "（２）「ほんだし」をまんべんなくふり入れ、Ａを加えて火にかける。沸騰したらフタをして煮る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2024/11/705346_direction_1_0.jpeg",
-          "image_path": "recipe-img/705346_step_02.jpeg"
+          "image_path": "recipe-img/705346_step_02.jpeg",
+          "text_en": "(2) Sprinkle the dashi powder evenly, add A, and place over heat. Once boiling, cover with a lid and simmer."
         },
         {
           "text": "（３）火が通ったら白髪ねぎ、小ねぎ、しょうがを混ぜ合わせたものを上に盛る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) When cooked through, top with a mixture of shredded green onion, small green onion, and ginger."
         }
+      ],
+      "name_en": "Layered Pork Belly & Napa Cabbage Hot Pot",
+      "description_en": "A stunning layered hot pot made by simply stacking pork belly and napa cabbage. Seasoned with dashi, this crowd-pleaser is loved by both kids and adults.",
+      "ingredients_en": [
+        "thinly sliced pork belly 300g",
+        "napa cabbage 1/2 head (1000g)",
+        "dashi powder 2 tbsp",
+        "A water 6 cups",
+        "A soy sauce 2 tbsp",
+        "A salt 1/2 tsp",
+        "shredded white part of green onion 1 stalk",
+        "thinly sliced small green onion 3 stalks",
+        "julienned ginger 1/4 knob"
+      ],
+      "instructions_en": [
+        "(1) Peel off the napa cabbage leaves one by one and layer alternately with pork belly 4 times. Cut into 5cm widths and arrange along the edge of the pot. Repeat 3-4 times.",
+        "(2) Sprinkle the dashi powder evenly, add A, and place over heat. Once boiling, cover with a lid and simmer.",
+        "(3) When cooked through, top with a mixture of shredded green onion, small green onion, and ginger.",
+        "* You can add extra dashi powder while eating for more flavor.",
+        "* The pot may boil over if too small. Adjust the amount of broth to fit your pot.",
+        "* For finishing, mochi, udon, or rice porridge are recommended.",
+        "* Nutritional information is calculated assuming 60% of the broth is consumed."
       ]
     },
     {
@@ -390,23 +558,49 @@
         {
           "text": "（１）玉ねぎは８等分のくし形切りにし、にんじんは１．５ｃｍ幅のいちょう切りにする。じゃがいもは４等分に切る。さやいんげんは３ｃｍ長さに切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705645_direction_0_0.jpeg",
-          "image_path": "recipe-img/705645_step_01.jpeg"
+          "image_path": "recipe-img/705645_step_01.jpeg",
+          "text_en": "(1) Cut the onion into 8 wedges. Cut the carrot into 1.5cm-wide quarter-moon slices. Cut the potatoes into quarters. Cut the green beans into 3cm lengths."
         },
         {
           "text": "（２）フライパンに油を中火で熱し、牛肉を入れて炒める。肉の色が変わったら、（１）の玉ねぎ・にんじん・じゃがいもの順に加え炒め合わせる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705645_direction_1_0.jpeg",
-          "image_path": "recipe-img/705645_step_02.jpeg"
+          "image_path": "recipe-img/705645_step_02.jpeg",
+          "text_en": "(2) Heat oil in a frying pan over medium heat and stir-fry the beef. When the color changes, add the onion, carrot, and potatoes from step (1) in that order and stir-fry together."
         },
         {
           "text": "（３）Ａを加え、煮立ったらアクを取り、フタをして弱火で１０分煮、Ｂを加えてさらに５分煮る。しょうゆを加え、フタをせず５分煮る。フライパンの底から返すように煮汁を煮からめる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705645_direction_2_0.jpeg",
-          "image_path": "recipe-img/705645_step_03.jpeg"
+          "image_path": "recipe-img/705645_step_03.jpeg",
+          "text_en": "(3) Add A and when it comes to a boil, skim off the scum. Cover and simmer on low heat for 10 minutes. Add B and simmer for another 5 minutes. Add soy sauce and simmer uncovered for 5 minutes. Flip the ingredients from the bottom to coat with the simmering liquid."
         },
         {
           "text": "（４）器に盛り、（１）のさやいんげんを散らす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Serve in bowls and garnish with the green beans from step (1)."
         }
+      ],
+      "name_en": "Nikujaga (Meat & Potato Stew)",
+      "description_en": "A classic Japanese stew of meat and potatoes simmered in dashi broth, finished with a beautiful glossy glaze.",
+      "ingredients_en": [
+        "thinly sliced beef 150g",
+        "onion 1 (200g)",
+        "carrot 1 (150g)",
+        "potatoes 3 (450g)",
+        "A water 2 cups",
+        "A sake 2 tbsp",
+        "A dashi powder 1 tsp",
+        "B sugar 1 tbsp",
+        "B mirin 1 tbsp",
+        "soy sauce 2 tbsp",
+        "green beans (boiled) to taste",
+        "vegetable oil 1 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the onion into 8 wedges. Cut the carrot into 1.5cm-wide quarter-moon slices. Cut the potatoes into quarters. Cut the green beans into 3cm lengths.",
+        "(2) Heat oil in a frying pan over medium heat and stir-fry the beef. When the color changes, add the onion, carrot, and potatoes from step (1) in that order and stir-fry together.",
+        "(3) Add A and when it comes to a boil, skim off the scum. Cover and simmer on low heat for 10 minutes. Add B and simmer for another 5 minutes. Add soy sauce and simmer uncovered for 5 minutes. Flip the ingredients from the bottom to coat with the simmering liquid.",
+        "(4) Serve in bowls and garnish with the green beans from step (1)."
       ]
     },
     {
@@ -450,38 +644,73 @@
         {
           "text": "（１）フライパンに油を中火で熱し、玉ねぎをしんなりするまで炒め、粗熱を取る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/705646_direction_0_0.jpeg",
-          "image_path": "recipe-img/705646_step_01.jpeg"
+          "image_path": "recipe-img/705646_step_01.jpeg",
+          "text_en": "(1) Heat oil in a frying pan over medium heat and saute the onion until soft, then let cool."
         },
         {
           "text": "（２）キャベツは芯のまわりに深い切り込みを入れ、芯を取り除く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Make a deep cut around the core of the cabbage and remove it."
         },
         {
           "text": "（３）鍋に湯を沸かし、（２）のキャベツを入れ、外側４枚を菜ばしではがす。やわらかくなるまで５分ほどゆで、ザルに上げて水気をきる。残りも同様にする。キャベツを１枚ずつ広げ、芯の厚い部分をそぎ取る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/705646_direction_2_0.jpeg",
-          "image_path": "recipe-img/705646_step_03.jpeg"
+          "image_path": "recipe-img/705646_step_03.jpeg",
+          "text_en": "(3) Bring water to a boil in a pot, add the cabbage from step (2), and peel off the outer 4 leaves using chopsticks. Boil for about 5 minutes until tender, then drain in a colander. Repeat for remaining leaves. Spread each leaf flat and shave off the thick part of the stem."
         },
         {
           "text": "（４）ボウルにひき肉を入れ、粘りが出るまでよく練り混ぜ、（１）の玉ねぎ、Ａを加えてさらによく混ぜ、タネを８等分にする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/705646_direction_3_0.jpeg",
-          "image_path": "recipe-img/705646_step_04.jpeg"
+          "image_path": "recipe-img/705646_step_04.jpeg",
+          "text_en": "(4) Place the ground meat in a bowl and knead until sticky. Add the onion from step (1) and A, mix well, and divide the filling into 8 portions."
         },
         {
           "text": "（５）（３）のキャベツに（４）のタネをのせ、葉の手前をタネにかぶせる。左右の葉を内側に折り込み、きっちりと巻いて包む（葉が小さい時は数枚重ねながら巻く）。同様にあと７個作る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/705646_direction_4_0.jpeg",
-          "image_path": "recipe-img/705646_step_05.jpeg"
+          "image_path": "recipe-img/705646_step_05.jpeg",
+          "text_en": "(5) Place the filling from step (4) onto the cabbage leaves from step (3). Fold the near edge of the leaf over the filling, fold in the left and right sides, and roll tightly to wrap (use multiple leaves if they are small). Make 7 more rolls the same way."
         },
         {
           "text": "（６）巻き終わりを下にして鍋に並べ入れ、Ｂを加えて中火で煮立てて、アクを取る。弱火にしてフタをし、３０分ほど煮る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/705646_direction_5_0.jpeg",
-          "image_path": "recipe-img/705646_step_06.jpeg"
+          "image_path": "recipe-img/705646_step_06.jpeg",
+          "text_en": "(6) Place seam-side down in a pot, add B, and bring to a boil over medium heat. Skim off any scum, reduce to low heat, cover, and simmer for about 30 minutes."
         },
         {
           "text": "（７）器に汁ごと盛り、好みでパセリをふる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(7) Serve in bowls with the broth, and optionally sprinkle with parsley."
         }
+      ],
+      "name_en": "Stuffed Cabbage Rolls",
+      "description_en": "Slowly simmered cabbage rolls that become melt-in-your-mouth tender, with a delicious broth you can enjoy as soup.",
+      "ingredients_en": [
+        "ground beef and pork blend 200g",
+        "minced onion 1/2 (100g)",
+        "cabbage 1 head",
+        "A fresh breadcrumbs 3 tbsp",
+        "A beaten egg 1/2",
+        "A salt 1/2 tsp",
+        "A pepper a pinch",
+        "B water 3 cups",
+        "B consomme cube 1",
+        "B salt 1/2 tsp",
+        "B pepper a pinch",
+        "B bay leaf 1",
+        "vegetable oil 1 tsp",
+        "chopped parsley, optional a pinch"
+      ],
+      "instructions_en": [
+        "(1) Heat oil in a frying pan over medium heat and saute the onion until soft, then let cool.",
+        "(2) Make a deep cut around the core of the cabbage and remove it.",
+        "(3) Bring water to a boil in a pot, add the cabbage from step (2), and peel off the outer 4 leaves using chopsticks. Boil for about 5 minutes until tender, then drain in a colander. Repeat for remaining leaves. Spread each leaf flat and shave off the thick part of the stem.",
+        "(4) Place the ground meat in a bowl and knead until sticky. Add the onion from step (1) and A, mix well, and divide the filling into 8 portions.",
+        "(5) Place the filling from step (4) onto the cabbage leaves from step (3). Fold the near edge of the leaf over the filling, fold in the left and right sides, and roll tightly to wrap (use multiple leaves if they are small). Make 7 more rolls the same way.",
+        "(6) Place seam-side down in a pot, add B, and bring to a boil over medium heat. Skim off any scum, reduce to low heat, cover, and simmer for about 30 minutes.",
+        "(7) Serve in bowls with the broth, and optionally sprinkle with parsley.",
+        "* Use any leftover cabbage shredded for coleslaw, miso soup, or soup."
       ]
     },
     {
@@ -518,23 +747,48 @@
         {
           "text": "（１）豚肉は３ｃｍ幅に切る。じゃがいもは５～６ｍｍ幅のいちょう切りにし、大根、にんじんは３～４ｍｍ幅のいちょう切りにする。ごぼうはささがきにし、５分ほど水にさらして水気をきる。糸こんにゃくは食べやすい長さに切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705648_direction_0_0.jpeg",
-          "image_path": "recipe-img/705648_step_01.jpeg"
+          "image_path": "recipe-img/705648_step_01.jpeg",
+          "text_en": "(1) Cut the pork into 3cm widths. Cut the potato into 5-6mm quarter-moon slices. Cut the daikon and carrot into 3-4mm quarter-moon slices. Shave the burdock root into thin strips and soak in water for about 5 minutes, then drain. Cut the shirataki noodles into easy-to-eat lengths."
         },
         {
           "text": "（２）鍋に油を中火で熱し、（１）の豚肉を炒め、（１）の野菜を加え、さらに炒める。全体に油がまわったら、（１）の糸こんにゃくを加えてサッと炒め合わせる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705648_direction_1_0.jpeg",
-          "image_path": "recipe-img/705648_step_02.jpeg"
+          "image_path": "recipe-img/705648_step_02.jpeg",
+          "text_en": "(2) Heat oil in a pot over medium heat. Stir-fry the pork from step (1), add the vegetables from step (1), and continue stir-frying. When everything is coated with oil, add the shirataki noodles from step (1) and briefly stir-fry together."
         },
         {
           "text": "（３）Ａを加え、煮立ったらアクを取り、フタをして１０分煮る。玉じゃくしにみそを入れ、煮汁で溶きのばして加える。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705648_direction_2_0.jpeg",
-          "image_path": "recipe-img/705648_step_03.jpeg"
+          "image_path": "recipe-img/705648_step_03.jpeg",
+          "text_en": "(3) Add A and when it comes to a boil, skim off the scum. Cover and simmer for 10 minutes. Place the miso in a ladle, dissolve it with some of the cooking liquid, and stir into the pot."
         },
         {
           "text": "（４）椀に盛り、小ねぎを散らす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Serve in bowls and garnish with green onion."
         }
+      ],
+      "name_en": "Tonjiru (Pork Miso Soup)",
+      "description_en": "A family favorite - a warm and comforting bowl of pork miso soup loaded with vegetables.",
+      "ingredients_en": [
+        "thinly sliced pork belly 80g",
+        "potato, large 1 (200g)",
+        "daikon radish 5cm (150g)",
+        "carrot 1/2 (80g)",
+        "burdock root 1/3 (60g)",
+        "shirataki noodles 1/3 bag (70g)",
+        "A water 3 cups",
+        "A dashi powder 2/3 tsp",
+        "miso 2-1/2 tbsp",
+        "vegetable oil 1/2 tbsp",
+        "thinly sliced small green onion or chives to taste"
+      ],
+      "instructions_en": [
+        "(1) Cut the pork into 3cm widths. Cut the potato into 5-6mm quarter-moon slices. Cut the daikon and carrot into 3-4mm quarter-moon slices. Shave the burdock root into thin strips and soak in water for about 5 minutes, then drain. Cut the shirataki noodles into easy-to-eat lengths.",
+        "(2) Heat oil in a pot over medium heat. Stir-fry the pork from step (1), add the vegetables from step (1), and continue stir-frying. When everything is coated with oil, add the shirataki noodles from step (1) and briefly stir-fry together.",
+        "(3) Add A and when it comes to a boil, skim off the scum. Cover and simmer for 10 minutes. Place the miso in a ladle, dissolve it with some of the cooking liquid, and stir into the pot.",
+        "(4) Serve in bowls and garnish with green onion."
       ]
     },
     {
@@ -578,38 +832,73 @@
         {
           "text": "（１）豚肉は２ｃｍ幅に切る。玉ねぎはタテ１ｃｍ幅に切り、<br />しいたけは石づきを取って４等分に切る。白菜は葉と芯の部分を切り分け、<br />４～５ｃｍ長さ、２ｃｍ幅に切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705936_direction_0_0.jpeg",
-          "image_path": "recipe-img/705936_step_01.jpeg"
+          "image_path": "recipe-img/705936_step_01.jpeg",
+          "text_en": "(1) Cut the pork into 2cm widths. Cut the onion into 1cm vertical strips. Remove the stems from the shiitake mushrooms and cut into quarters. Separate the napa cabbage leaves from the core, and cut both into 4-5cm lengths, 2cm widths."
         },
         {
           "text": "（２）にんじんは短冊切りにし、絹さやはスジを取る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705936_direction_1_0.jpeg",
-          "image_path": "recipe-img/705936_step_02.jpeg"
+          "image_path": "recipe-img/705936_step_02.jpeg",
+          "text_en": "(2) Cut the carrot into thin rectangular strips and remove the strings from the snow peas."
         },
         {
           "text": "（３）ボウルにＡを合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Combine A in a bowl."
         },
         {
           "text": "（４）フライパンを中火で熱し、中華めんを入れてほぐし、全体に広げる。<br />フライ返しで押さえながら焼き色がつくまで両面３分ずつ焼く。<br />半分に分け、それぞれ器に盛る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705936_direction_3_0.jpeg",
-          "image_path": "recipe-img/705936_step_04.jpeg"
+          "image_path": "recipe-img/705936_step_04.jpeg",
+          "text_en": "(4) Heat a frying pan over medium heat, add the noodles, loosen and spread evenly. Press with a spatula and cook until browned, about 3 minutes on each side. Divide in half and place on serving plates."
         },
         {
           "text": "（５）フライパンに油を熱し、（１）の豚肉を入れて炒める。<br />肉の色が変わったら、（１）の玉ねぎ・しいたけを加えて炒め合わせる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705936_direction_4_0.jpeg",
-          "image_path": "recipe-img/705936_step_05.jpeg"
+          "image_path": "recipe-img/705936_step_05.jpeg",
+          "text_en": "(5) Heat oil in the frying pan and stir-fry the pork from step (1). When the color changes, add the onion and shiitake from step (1) and stir-fry together."
         },
         {
           "text": "（６）玉ねぎがしんなりとしたら（１）の白菜の芯、（２）のにんじん・絹さやを加え、<br />全体に油がまわるまで炒め、（３）を加える。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705936_direction_5_0.jpeg",
-          "image_path": "recipe-img/705936_step_06.jpeg"
+          "image_path": "recipe-img/705936_step_06.jpeg",
+          "text_en": "(6) When the onion is soft, add the napa cabbage cores from step (1), the carrot and snow peas from step (2), and stir-fry until everything is coated with oil. Add the mixture from step (3)."
         },
         {
           "text": "（７）煮立ったら、（１）の白菜の葉を加えてひと煮し、塩・こしょうで味を調え、<br />とろみがつくまで煮、ごま油を加えて合わせ、（４）のめんに等分にかける。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/705936_direction_6_0.jpeg",
-          "image_path": "recipe-img/705936_step_07.jpeg"
+          "image_path": "recipe-img/705936_step_07.jpeg",
+          "text_en": "(7) When it comes to a boil, add the napa cabbage leaves from step (1) and simmer briefly. Season with salt and pepper, cook until thickened, add sesame oil, and pour evenly over the noodles from step (4)."
         }
+      ],
+      "name_en": "Crispy Noodles with Thick Sauce",
+      "description_en": "Crispy pan-fried noodles topped with a rich and silky thick sauce - a perfect balance of textures.",
+      "ingredients_en": [
+        "steamed Chinese noodles 2 portions",
+        "thinly sliced pork belly 100g",
+        "onion 1/4",
+        "shiitake mushrooms 3",
+        "napa cabbage 150g",
+        "carrot 4cm",
+        "snow peas 8",
+        "A water 2 cups",
+        "A sake 2 tbsp",
+        "A potato starch 2 tbsp",
+        "A chicken stock powder 1 tbsp",
+        "salt 1/2 tsp",
+        "pepper a pinch",
+        "vegetable oil 1 tbsp",
+        "sesame oil 1 tsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the pork into 2cm widths. Cut the onion into 1cm vertical strips. Remove the stems from the shiitake mushrooms and cut into quarters. Separate the napa cabbage leaves from the core, and cut both into 4-5cm lengths, 2cm widths.",
+        "(2) Cut the carrot into thin rectangular strips and remove the strings from the snow peas.",
+        "(3) Combine A in a bowl.",
+        "(4) Heat a frying pan over medium heat, add the noodles, loosen and spread evenly. Press with a spatula and cook until browned, about 3 minutes on each side. Divide in half and place on serving plates.",
+        "(5) Heat oil in the frying pan and stir-fry the pork from step (1). When the color changes, add the onion and shiitake from step (1) and stir-fry together.",
+        "(6) When the onion is soft, add the napa cabbage cores from step (1), the carrot and snow peas from step (2), and stir-fry until everything is coated with oil. Add the mixture from step (3).",
+        "(7) When it comes to a boil, add the napa cabbage leaves from step (1) and simmer briefly. Season with salt and pepper, cook until thickened, add sesame oil, and pour evenly over the noodles from step (4)."
       ]
     },
     {
@@ -646,43 +935,72 @@
         {
           "text": "（１）ボウルにＡをふるい入れ、泡立て器で混ぜる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Sift A into a bowl and mix with a whisk."
         },
         {
           "text": "（２）別のボウルに卵を割りほぐし、牛乳を加えて混ぜる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) In a separate bowl, beat the egg and add milk, mixing well."
         },
         {
           "text": "（３）（１）のボウルに（２）を加え、泡立て器で粉っぽさがなくなるまで混ぜ、生地を作る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Add step (2) to the bowl from step (1) and whisk until no lumps of flour remain to make the batter."
         },
         {
           "text": "（４）フライパンに油をしみ込ませたキッチンペーパーで油を薄く塗り、フライパンを熱する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Lightly grease the frying pan by wiping with an oil-soaked paper towel, then heat the pan."
         },
         {
           "text": "（５）ぬれたふきんの上にフライパンを置いて熱を取り、再び弱火にかけ、（３）の生地をおたま１杯、上から中心に落とす（こうすると丸い形になる）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Place the frying pan on a damp cloth to cool slightly, return to low heat, and pour one ladle of batter from step (3) from above into the center (this creates a round shape)."
         },
         {
           "text": "（６）約３分焼き、表面にプツプツと穴がでてきたら裏返し、約２分弱火のまま焼き、取り出す。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(6) Cook for about 3 minutes. When bubbles appear on the surface, flip and cook for about 2 minutes on low heat, then remove."
         },
         {
           "text": "（７）２枚目からは油をひかずにフライパンをぬれふきんの上に置いて熱を取り、弱火にかけて同様に焼く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(7) From the second pancake onward, skip adding oil - place the pan on the damp cloth to cool, return to low heat, and cook in the same way."
         },
         {
           "text": "（８）器に盛り、好みでバター、メープルシロップをかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(8) Serve on plates and top with butter and maple syrup to taste."
         }
+      ],
+      "name_en": "Japanese Hotcakes",
+      "description_en": "Fluffy, thick Japanese-style hotcakes that look picture-perfect and taste amazing.",
+      "ingredients_en": [
+        "A all-purpose flour 150g",
+        "A baking powder 2 tsp",
+        "A sugar 40g",
+        "egg 1",
+        "milk 130ml",
+        "vegetable oil a small amount"
+      ],
+      "instructions_en": [
+        "(1) Sift A into a bowl and mix with a whisk.",
+        "(2) In a separate bowl, beat the egg and add milk, mixing well.",
+        "(3) Add step (2) to the bowl from step (1) and whisk until no lumps of flour remain to make the batter.",
+        "(4) Lightly grease the frying pan by wiping with an oil-soaked paper towel, then heat the pan.",
+        "(5) Place the frying pan on a damp cloth to cool slightly, return to low heat, and pour one ladle of batter from step (3) from above into the center (this creates a round shape).",
+        "(6) Cook for about 3 minutes. When bubbles appear on the surface, flip and cook for about 2 minutes on low heat, then remove.",
+        "(7) From the second pancake onward, skip adding oil - place the pan on the damp cloth to cool, return to low heat, and cook in the same way.",
+        "(8) Serve on plates and top with butter and maple syrup to taste.",
+        "* The baking powder batter should be cooked immediately after mixing, otherwise it will not rise properly."
       ]
     },
     {
@@ -719,23 +1037,48 @@
         {
           "text": "（１）スパゲッティは塩を入れた熱湯で表示時間通りにゆで、ザルに上げて水気をきる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cook the spaghetti in salted boiling water according to package directions, then drain in a colander."
         },
         {
           "text": "（２）玉ねぎはタテ薄切りにし、ソーセージは５ｍｍ幅の斜め薄切りにする。ピーマンはヘタと種を取り、５ｍｍ幅に切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/10/706281_direction_1_0.jpeg",
-          "image_path": "recipe-img/706281_step_02.jpeg"
+          "image_path": "recipe-img/706281_step_02.jpeg",
+          "text_en": "(2) Thinly slice the onion lengthwise. Cut the sausages into 5mm diagonal slices. Remove the stem and seeds from the bell pepper and cut into 5mm strips."
         },
         {
           "text": "（３）フライパンに油を熱し、（２）の玉ねぎ・ピーマンを弱火で炒める。しんなりしてきたら（２）のソーセージを加え、弱火で焼く。ソーセージに焼き色がついたら「コンソメ」、ケチャップを加えてひと炒めする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/10/706281_direction_2_0.jpeg",
-          "image_path": "recipe-img/706281_step_03.jpeg"
+          "image_path": "recipe-img/706281_step_03.jpeg",
+          "text_en": "(3) Heat oil in a frying pan and saute the onion and bell pepper from step (2) over low heat. When softened, add the sausages from step (2) and cook over low heat. When the sausages are browned, add the consomme and ketchup and stir-fry briefly."
         },
         {
           "text": "（４）（１）のスパゲッティを加えて炒め、Ａで味を調える。好みで粉チーズをふる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/10/706281_direction_3_0.jpeg",
-          "image_path": "recipe-img/706281_step_04.jpeg"
+          "image_path": "recipe-img/706281_step_04.jpeg",
+          "text_en": "(4) Add the spaghetti from step (1) and stir-fry, then season with A. Sprinkle with parmesan cheese if desired."
         }
+      ],
+      "name_en": "Napolitan Spaghetti",
+      "description_en": "Consomme takes the flavor up a notch for restaurant-quality Napolitan spaghetti at home.",
+      "ingredients_en": [
+        "spaghetti 100g",
+        "onion 1/4 (60g)",
+        "wiener sausages 3 (60g)",
+        "green bell pepper 1",
+        "consomme powder 1/2 tsp",
+        "tomato ketchup 3 tbsp",
+        "A water 1 tbsp",
+        "A salt a pinch",
+        "A pepper a pinch",
+        "vegetable oil 1 tbsp",
+        "grated parmesan cheese, optional to taste"
+      ],
+      "instructions_en": [
+        "(1) Cook the spaghetti in salted boiling water according to package directions, then drain in a colander.",
+        "(2) Thinly slice the onion lengthwise. Cut the sausages into 5mm diagonal slices. Remove the stem and seeds from the bell pepper and cut into 5mm strips.",
+        "(3) Heat oil in a frying pan and saute the onion and bell pepper from step (2) over low heat. When softened, add the sausages from step (2) and cook over low heat. When the sausages are browned, add the consomme and ketchup and stir-fry briefly.",
+        "(4) Add the spaghetti from step (1) and stir-fry, then season with A. Sprinkle with parmesan cheese if desired."
       ]
     },
     {
@@ -778,28 +1121,60 @@
         {
           "text": "（１）じゃがいもは４等分に切る。玉ねぎはくし形に切り、にんじんは乱切りにする。ブロッコリーは小房に分け、下ゆでする。鶏肉はひと口大に切り、塩で下味をつけ、フライパンで軽く焼き色をつけ、取り出す。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/706369_direction_0_0.jpeg",
-          "image_path": "recipe-img/706369_step_01.jpeg"
+          "image_path": "recipe-img/706369_step_01.jpeg",
+          "text_en": "(1) Cut the potatoes into quarters. Cut the onion into wedges and cut the carrot into irregular chunks. Separate the broccoli into small florets and parboil. Cut the chicken into bite-size pieces, season with salt, lightly brown in a frying pan, and set aside."
         },
         {
           "text": "（２）鍋にバター大さじ１、油を中火で熱し、（１）の玉ねぎを入れてサッと炒める。（１）のじゃがいもを加えて炒め合わせ、（１）のにんじんを加え、全体に油がまわるまで炒める。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/706369_direction_1_0.jpeg",
-          "image_path": "recipe-img/706369_step_02.jpeg"
+          "image_path": "recipe-img/706369_step_02.jpeg",
+          "text_en": "(2) Heat 1 tbsp butter and oil in a pot over medium heat. Briefly saute the onion from step (1), add the potatoes from step (1) and stir-fry, then add the carrot from step (1) and cook until everything is coated with oil."
         },
         {
           "text": "（３）いったん火を止めて薄力粉をふり入れ、全体を混ぜたら中火にかけて炒める。Ａを加えて煮立たせる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/706369_direction_2_0.jpeg",
-          "image_path": "recipe-img/706369_step_03.jpeg"
+          "image_path": "recipe-img/706369_step_03.jpeg",
+          "text_en": "(3) Remove from heat, sprinkle in the flour, and mix everything together. Return to medium heat and cook. Add A and bring to a boil."
         },
         {
           "text": "（４）ポコポコ煮立つくらいの火加減にし、１５～２０分ほどじゃがいもに火が通るまで、底が焦げないように途中かき混ぜながら煮る（とろみがつかない場合は、様子を見ながら加熱時間を追加してください）。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/706369_direction_3_0.jpeg",
-          "image_path": "recipe-img/706369_step_04.jpeg"
+          "image_path": "recipe-img/706369_step_04.jpeg",
+          "text_en": "(4) Adjust the heat to a gentle simmer and cook for 15-20 minutes until the potatoes are tender, stirring occasionally to prevent the bottom from burning (if it does not thicken, continue cooking while monitoring)."
         },
         {
           "text": "（５）（１）の鶏肉を戻し入れ、Ｂを加えて５分煮て、（１）のブロッコリー、白ワイン、バター大さじ１を加えて味を調える。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/706369_direction_4_0.jpeg",
-          "image_path": "recipe-img/706369_step_05.jpeg"
+          "image_path": "recipe-img/706369_step_05.jpeg",
+          "text_en": "(5) Return the chicken from step (1), add B, and simmer for 5 minutes. Add the broccoli from step (1), white wine, and 1 tbsp butter to finish."
         }
+      ],
+      "name_en": "Chicken Cream Stew",
+      "description_en": "A rich, from-scratch cream stew made without store-bought roux. Warms both body and soul.",
+      "ingredients_en": [
+        "chicken thigh 1",
+        "salt 1/2 tsp",
+        "potatoes 2",
+        "onion 1",
+        "carrot 1",
+        "broccoli 1/2 head (150g)",
+        "all-purpose flour 3 tbsp",
+        "A milk 2-1/2 cups",
+        "A water 2 cups",
+        "A consomme cube 1",
+        "A bay leaf 1",
+        "B salt 1 tsp",
+        "B pepper a pinch",
+        "white wine 1 tbsp",
+        "butter 2 tbsp",
+        "vegetable oil 1 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the potatoes into quarters. Cut the onion into wedges and cut the carrot into irregular chunks. Separate the broccoli into small florets and parboil. Cut the chicken into bite-size pieces, season with salt, lightly brown in a frying pan, and set aside.",
+        "(2) Heat 1 tbsp butter and oil in a pot over medium heat. Briefly saute the onion from step (1), add the potatoes from step (1) and stir-fry, then add the carrot from step (1) and cook until everything is coated with oil.",
+        "(3) Remove from heat, sprinkle in the flour, and mix everything together. Return to medium heat and cook. Add A and bring to a boil.",
+        "(4) Adjust the heat to a gentle simmer and cook for 15-20 minutes until the potatoes are tender, stirring occasionally to prevent the bottom from burning (if it does not thicken, continue cooking while monitoring).",
+        "(5) Return the chicken from step (1), add B, and simmer for 5 minutes. Add the broccoli from step (1), white wine, and 1 tbsp butter to finish."
       ]
     },
     {
@@ -833,18 +1208,39 @@
         {
           "text": "（１）キャベツは葉をひと口大にちぎり、芯は薄切りにする。じゃがいもはひと口大に切る。にんじんは乱切り、玉ねぎは薄切りにする。ソーセージは長さを４等分に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Tear the cabbage leaves into bite-size pieces and thinly slice the cores. Cut the potatoes into bite-size pieces. Cut the carrot into irregular chunks and thinly slice the onion. Cut the sausages into quarters lengthwise."
         },
         {
           "text": "（２）鍋にＡ、（１）のじゃがいも・にんじん・玉ねぎを入れて火にかけ、フタをして７～８分ほど煮る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Add A, along with the potatoes, carrot, and onion from step (1), to a pot and heat. Cover and simmer for about 7-8 minutes."
         },
         {
           "text": "（３）（１）のキャベツ・ソーセージを加え、７～８分煮る。塩・こしょうで味を調える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Add the cabbage and sausages from step (1) and simmer for 7-8 minutes. Season with salt and pepper."
         }
+      ],
+      "name_en": "Vegetable Consomme Soup",
+      "description_en": "A warm and gentle consomme soup that makes it easy to enjoy plenty of vegetables.",
+      "ingredients_en": [
+        "cabbage 4 leaves (200g)",
+        "potatoes 2",
+        "carrot 1/2",
+        "onion 1/2 (100g)",
+        "wiener sausages 2",
+        "A water 4 cups",
+        "A consomme cubes 2",
+        "salt a pinch",
+        "pepper a pinch"
+      ],
+      "instructions_en": [
+        "(1) Tear the cabbage leaves into bite-size pieces and thinly slice the cores. Cut the potatoes into bite-size pieces. Cut the carrot into irregular chunks and thinly slice the onion. Cut the sausages into quarters lengthwise.",
+        "(2) Add A, along with the potatoes, carrot, and onion from step (1), to a pot and heat. Cover and simmer for about 7-8 minutes.",
+        "(3) Add the cabbage and sausages from step (1) and simmer for 7-8 minutes. Season with salt and pepper."
       ]
     },
     {
@@ -884,18 +1280,45 @@
         {
           "text": "（１）ボウルにＡを混ぜ、合わせ調味料を作る。キャベツはひと口大に切り、玉ねぎはくし形に切る。にんじんは短冊切りにし、にらは３ｃｍの長さに切る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/706807_direction_0_0.jpeg",
-          "image_path": "recipe-img/706807_step_01.jpeg"
+          "image_path": "recipe-img/706807_step_01.jpeg",
+          "text_en": "(1) Combine A in a bowl to make the sauce. Cut the cabbage into bite-size pieces and cut the onion into wedges. Cut the carrot into thin rectangular strips and cut the garlic chives into 3cm lengths."
         },
         {
           "text": "（２）フライパンに油を熱し、にんにく、豚肉を炒め、（１）のにんじん・玉ねぎ・キャベツ、もやし、（１）のにらの順に加えて炒める。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/706807_direction_1_0.jpeg",
-          "image_path": "recipe-img/706807_step_02.jpeg"
+          "image_path": "recipe-img/706807_step_02.jpeg",
+          "text_en": "(2) Heat oil in a frying pan, stir-fry the garlic and pork, then add the carrot, onion, cabbage from step (1), bean sprouts, and garlic chives from step (1) in that order, stir-frying as you go."
         },
         {
           "text": "（３）（１）の合わせ調味料をよく混ぜて加え、とろみをつける。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/706807_direction_2_0.jpeg",
-          "image_path": "recipe-img/706807_step_03.jpeg"
+          "image_path": "recipe-img/706807_step_03.jpeg",
+          "text_en": "(3) Give the sauce from step (1) a good stir and add it to the pan, cooking until thickened."
         }
+      ],
+      "name_en": "Chinese-Style Meat & Vegetable Stir-Fry",
+      "description_en": "Restaurant-style Chinese meat and vegetable stir-fry you can make at home with pork and cabbage, loaded with veggies.",
+      "ingredients_en": [
+        "thinly sliced pork 100g",
+        "cabbage 4 leaves",
+        "onion 1/2",
+        "carrot 1/4",
+        "bean sprouts 1/3 bag",
+        "garlic chives 1/2 bunch",
+        "minced garlic 1/2 tbsp",
+        "A oyster sauce 1 tbsp",
+        "A chicken stock powder 2 tsp",
+        "A soy sauce 1 tsp",
+        "A pepper a pinch",
+        "A water 2 tsp",
+        "A potato starch 2 tsp",
+        "canola oil 1 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Combine A in a bowl to make the sauce. Cut the cabbage into bite-size pieces and cut the onion into wedges. Cut the carrot into thin rectangular strips and cut the garlic chives into 3cm lengths.",
+        "(2) Heat oil in a frying pan, stir-fry the garlic and pork, then add the carrot, onion, cabbage from step (1), bean sprouts, and garlic chives from step (1) in that order, stir-frying as you go.",
+        "(3) Give the sauce from step (1) a good stir and add it to the pan, cooking until thickened.",
+        "* Optionally add sesame oil (1 tsp) for extra flavor."
       ]
     },
     {
@@ -936,23 +1359,52 @@
         {
           "text": "（１）鶏肉はひと口大に切り、水菜は４ｃｍ長さに切る。ねぎは１ｃｍ幅の斜め切りにし、しめじ、えのきだけは根元を切って小房に分ける。豆腐はひと口大の角切りにする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/706981_direction_0_0.jpeg",
-          "image_path": "recipe-img/706981_step_01.jpeg"
+          "image_path": "recipe-img/706981_step_01.jpeg",
+          "text_en": "(1) Cut the chicken into bite-sized pieces. Cut the mizuna into 4cm lengths. Slice the green onion diagonally into 1cm widths. Trim the base of the shimeji and enoki mushrooms and separate into small clusters. Cut the tofu into bite-sized cubes."
         },
         {
           "text": "（２）鍋にＡ、（１）の鶏肉を入れて強火にかけ、沸騰したらアクを取り、中火にする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/706981_direction_1_0.jpeg",
-          "image_path": "recipe-img/706981_step_02.jpeg"
+          "image_path": "recipe-img/706981_step_02.jpeg",
+          "text_en": "(2) Place A and the chicken from step (1) in a pot over high heat. When it comes to a boil, skim off the scum and reduce to medium heat."
         },
         {
           "text": "（３）鶏肉に火が通ったら、（１）の水菜・ねぎ・きのこ類・豆腐を加え、Ｂを加えて味を調える。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/706981_direction_2_0.jpeg",
-          "image_path": "recipe-img/706981_step_03.jpeg"
+          "image_path": "recipe-img/706981_step_03.jpeg",
+          "text_en": "(3) Once the chicken is cooked through, add the mizuna, green onion, mushrooms, and tofu from step (1). Add B and adjust the seasoning."
         },
         {
           "text": "（４）好みでＣをつけて食べる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Serve with C as a dipping sauce to taste."
         }
+      ],
+      "name_en": "Mizutaki (Chicken Hot Pot)",
+      "description_en": "A rich chicken broth hot pot made with authentic dashi - a family-friendly dish everyone can enjoy together.",
+      "ingredients_en": [
+        "chicken thigh 2 pieces (600g)",
+        "mizuna greens 1/2 bunch (100g)",
+        "long green onion 1",
+        "shimeji mushrooms 1 pack",
+        "enoki mushrooms 1 bag",
+        "silken tofu 1 block",
+        "A water 5 cups",
+        "A chicken stock granules 1 tbsp",
+        "B sake 1/2 cup",
+        "B mirin 2 tbsp",
+        "B chicken stock granules 1 tbsp",
+        "B pepper a pinch",
+        "C ponzu soy sauce, to taste to taste",
+        "C grated daikon, to taste to taste",
+        "C sliced green onion, to taste to taste"
+      ],
+      "instructions_en": [
+        "(1) Cut the chicken into bite-sized pieces. Cut the mizuna into 4cm lengths. Slice the green onion diagonally into 1cm widths. Trim the base of the shimeji and enoki mushrooms and separate into small clusters. Cut the tofu into bite-sized cubes.",
+        "(2) Place A and the chicken from step (1) in a pot over high heat. When it comes to a boil, skim off the scum and reduce to medium heat.",
+        "(3) Once the chicken is cooked through, add the mizuna, green onion, mushrooms, and tofu from step (1). Add B and adjust the seasoning.",
+        "(4) Serve with C as a dipping sauce to taste."
       ]
     },
     {
@@ -989,28 +1441,54 @@
         {
           "text": "（１）にらは３ｃｍ長さに切り、にんじんはせん切りにする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/707201_direction_0_0.jpeg",
-          "image_path": "recipe-img/707201_step_01.jpeg"
+          "image_path": "recipe-img/707201_step_01.jpeg",
+          "text_en": "(1) Cut the garlic chives into 3cm lengths. Julienne the carrot."
         },
         {
           "text": "（２）ボウルにＡを順に入れてよく混ぜ、豚肉、（１）のにら・にんじんを加えてサックリと混ぜ合わせ、生地を作る。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/707201_direction_1_0.jpeg",
-          "image_path": "recipe-img/707201_step_02.jpeg"
+          "image_path": "recipe-img/707201_step_02.jpeg",
+          "text_en": "(2) Add A to a bowl in order and mix well. Add the pork and the chives and carrot from step (1), then fold together lightly to make the batter."
         },
         {
           "text": "（３）別のボウルにＢを混ぜ合わせ、たれを作る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) In a separate bowl, mix B together to make the dipping sauce."
         },
         {
           "text": "（４）フライパンにごま油を熱し、（２）の生地を流し入れ、厚さが均等になるように平らにならし、両面カリッと焼く。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/707201_direction_3_0.jpeg",
-          "image_path": "recipe-img/707201_step_04.jpeg"
+          "image_path": "recipe-img/707201_step_04.jpeg",
+          "text_en": "(4) Heat sesame oil in a frying pan, pour in the batter from step (2), spread it flat to an even thickness, and cook both sides until crispy."
         },
         {
           "text": "（５）食べやすい大きさに切って器に盛り、（３）のたれを添える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Cut into easy-to-eat pieces, plate, and serve with the sauce from step (3)."
         }
+      ],
+      "name_en": "Easy Jeon (Korean Savory Pancake)",
+      "description_en": "Crispy on the outside, chewy on the inside - addictive Korean savory pancakes with a spicy gochujang dipping sauce. Great as a snack, appetizer, or quick lunch.",
+      "ingredients_en": [
+        "thinly sliced pork 80g",
+        "garlic chives 1/2 bunch",
+        "carrot 1/6",
+        "A water 70ml",
+        "A all-purpose flour 50g",
+        "A chicken stock granules 1 heaping tsp",
+        "B ponzu soy sauce 2 tbsp",
+        "B gochujang 2 tsp (10g)",
+        "B sesame oil 1 tsp",
+        "sesame oil 3 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the garlic chives into 3cm lengths. Julienne the carrot.",
+        "(2) Add A to a bowl in order and mix well. Add the pork and the chives and carrot from step (1), then fold together lightly to make the batter.",
+        "(3) In a separate bowl, mix B together to make the dipping sauce.",
+        "(4) Heat sesame oil in a frying pan, pour in the batter from step (2), spread it flat to an even thickness, and cook both sides until crispy.",
+        "(5) Cut into easy-to-eat pieces, plate, and serve with the sauce from step (3)."
       ]
     },
     {
@@ -1052,23 +1530,53 @@
         {
           "text": "（１）豚肉は５ｃｍ幅に切り、キャベツはひと口大のザク切りにする。ピーマンは種を取って乱切りにし、ねぎは１ｃｍ幅の斜め切りにする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/707350_direction_0_0.jpeg",
-          "image_path": "recipe-img/707350_step_01.jpeg"
+          "image_path": "recipe-img/707350_step_01.jpeg",
+          "text_en": "(1) Cut the pork into 5cm widths. Roughly chop the cabbage into bite-sized pieces. Remove the seeds from the bell pepper and cut into irregular chunks. Slice the green onion diagonally into 1cm widths."
         },
         {
           "text": "（２）フライパンに油大さじ１を熱し、（１）のキャベツ・ピーマンを強火で炒め、いったん取り出す。フライパンで（１）の豚肉・ねぎを中火で炒め、肉に焼き色がついたらいったん取り出す。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/707350_direction_1_0.jpeg",
-          "image_path": "recipe-img/707350_step_02.jpeg"
+          "image_path": "recipe-img/707350_step_02.jpeg",
+          "text_en": "(2) Heat 1 tbsp of oil in a frying pan and stir-fry the cabbage and bell pepper from step (1) over high heat, then remove. In the same pan, stir-fry the pork and green onion from step (1) over medium heat until the meat is browned, then remove."
         },
         {
           "text": "（３）フライパンに残りの油を熱し、中火でＡを炒め、香りがたったら、Ｂを加えてひと煮立ちさせる。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/707350_direction_2_0.jpeg",
-          "image_path": "recipe-img/707350_step_03.jpeg"
+          "image_path": "recipe-img/707350_step_03.jpeg",
+          "text_en": "(3) Heat the remaining oil in the pan, stir-fry A over medium heat until fragrant, then add B and bring to a boil."
         },
         {
           "text": "（４）（２）の豚肉・ねぎを戻し入れて合わせ、（２）のキャベツ・ピーマンを戻し入れ、炒め合わせる。Ｃの水溶き片栗粉を回し入れ、とろみをつける。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/707350_direction_3_0.jpeg",
-          "image_path": "recipe-img/707350_step_04.jpeg"
+          "image_path": "recipe-img/707350_step_04.jpeg",
+          "text_en": "(4) Return the pork and green onion from step (2) and toss together. Return the cabbage and bell pepper from step (2) and stir-fry. Stir in the potato starch slurry (C) to thicken."
         }
+      ],
+      "name_en": "Twice-Cooked Pork (Hoikoro)",
+      "description_en": "Twice-cooked pork with crispy cabbage in a spicy doubanjiang sauce - irresistibly good with rice.",
+      "ingredients_en": [
+        "thinly sliced pork belly 240g",
+        "cabbage 2 leaves (100g)",
+        "green bell pepper 1",
+        "green onion 1/3",
+        "A grated garlic 1 tbsp",
+        "A grated ginger 1 tbsp",
+        "A soy sauce 1 tbsp",
+        "A doubanjiang chili bean paste 2 tsp (10g)",
+        "A tianmianjiang sweet bean paste 2 tsp (10g)",
+        "B water 4 1/2 tbsp",
+        "B sugar 1 1/3 tbsp",
+        "B chicken stock granules 1/2 tsp",
+        "C potato starch 1 tbsp",
+        "C water 1 tbsp",
+        "vegetable oil 2 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the pork into 5cm widths. Roughly chop the cabbage into bite-sized pieces. Remove the seeds from the bell pepper and cut into irregular chunks. Slice the green onion diagonally into 1cm widths.",
+        "(2) Heat 1 tbsp of oil in a frying pan and stir-fry the cabbage and bell pepper from step (1) over high heat, then remove. In the same pan, stir-fry the pork and green onion from step (1) over medium heat until the meat is browned, then remove.",
+        "(3) Heat the remaining oil in the pan, stir-fry A over medium heat until fragrant, then add B and bring to a boil.",
+        "(4) Return the pork and green onion from step (2) and toss together. Return the cabbage and bell pepper from step (2) and stir-fry. Stir in the potato starch slurry (C) to thicken.",
+        "*Adjust the amount of doubanjiang to your preference."
       ]
     },
     {
@@ -1101,18 +1609,38 @@
         {
           "text": "（１）卵は溶きほぐす。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/708304_direction_0_0.jpeg",
-          "image_path": "recipe-img/708304_step_01.jpeg"
+          "image_path": "recipe-img/708304_step_01.jpeg",
+          "text_en": "(1) Beat the egg."
         },
         {
           "text": "（２）鍋にご飯、Ａを入れて火にかけ、ご飯が汁を吸ってきたら、（１）の溶き卵を流し入れ、しょうゆで味を調える。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2021/08/708304_direction_1_0.jpeg",
-          "image_path": "recipe-img/708304_step_02.jpeg"
+          "image_path": "recipe-img/708304_step_02.jpeg",
+          "text_en": "(2) Place the rice and A in a pot and heat. Once the rice absorbs the liquid, pour in the beaten egg from step (1) and season with soy sauce."
         },
         {
           "text": "（３）器に盛り、のり、小ねぎを散らす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Serve in a bowl and top with nori and green onion."
         }
+      ],
+      "name_en": "Egg Rice Porridge (Zosui)",
+      "description_en": "A gentle and comforting egg rice porridge made simply with rice, eggs, and dashi broth.",
+      "ingredients_en": [
+        "cooked rice 100g",
+        "egg 1",
+        "A water 1 1/2 cups",
+        "A dashi stock granules 1/2 tsp",
+        "soy sauce 1/2 tsp",
+        "shredded nori to taste",
+        "sliced green onion to taste"
+      ],
+      "instructions_en": [
+        "(1) Beat the egg.",
+        "(2) Place the rice and A in a pot and heat. Once the rice absorbs the liquid, pour in the beaten egg from step (1) and season with soy sauce.",
+        "(3) Serve in a bowl and top with nori and green onion.",
+        "*From 'Our Family's Hondashi Recipes' (Gentosha Publishing)"
       ]
     },
     {
@@ -1143,13 +1671,30 @@
         {
           "text": "（１）鍋にＡを入れて火にかけ、ひと煮立ちしたら火から下ろす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Place A in a pot and heat. Once it comes to a boil, remove from heat."
         },
         {
           "text": "（２）器に盛ったうどんにアツアツのつゆをかけ、小ねぎをのせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Place udon in a bowl, pour the hot broth over it, and top with green onion."
         }
+      ],
+      "name_en": "Udon Noodle Broth",
+      "description_en": "Quick and easy homemade udon broth using dashi - a basic recipe you can whip up in no time.",
+      "ingredients_en": [
+        "pre-cooked udon noodles 2 portions",
+        "A water 2 1/2 cups",
+        "A soy sauce 2 tbsp",
+        "A dashi stock granules 2 tsp",
+        "A sake 1 tsp",
+        "A mirin 1/2 tsp",
+        "sliced green onion to taste"
+      ],
+      "instructions_en": [
+        "(1) Place A in a pot and heat. Once it comes to a boil, remove from heat.",
+        "(2) Place udon in a bowl, pour the hot broth over it, and top with green onion."
       ]
     },
     {
@@ -1185,23 +1730,47 @@
         {
           "text": "（１）鶏肉はひと口大に切る。キャベツはザク切りにし、玉ねぎはくし形切りにする。にんじんは短冊切りにする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/800912_direction_0_0.jpeg",
-          "image_path": "recipe-img/800912_step_01.jpeg"
+          "image_path": "recipe-img/800912_step_01.jpeg",
+          "text_en": "(1) Cut the chicken into bite-sized pieces. Roughly chop the cabbage. Cut the onion into wedges. Cut the carrot into thin rectangles."
         },
         {
           "text": "（２）ボウルに（１）の鶏肉、Ａを入れて混ぜ合わせ、１０分ほど漬け込む。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/800912_direction_1_0.jpeg",
-          "image_path": "recipe-img/800912_step_02.jpeg"
+          "image_path": "recipe-img/800912_step_02.jpeg",
+          "text_en": "(2) Place the chicken from step (1) and A in a bowl, mix well, and marinate for about 10 minutes."
         },
         {
           "text": "（３）ホットプレートを１６０～１７０℃に温め、ごま油をひき、（１）のキャベツ・玉ねぎ・にんじんを入れてサッと炒める。野菜がしんなりしたら、（１）の鶏肉を加えて炒め合わせ、肉に焼き色がついたら、フタをして蒸し焼きにする。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/800912_direction_2_0.jpeg",
-          "image_path": "recipe-img/800912_step_03.jpeg"
+          "image_path": "recipe-img/800912_step_03.jpeg",
+          "text_en": "(3) Heat a hot plate to 160-170 degrees C, add sesame oil, and briefly stir-fry the cabbage, onion, and carrot from step (1). Once the vegetables soften, add the chicken and stir-fry together. When the meat is browned, cover with a lid and steam-cook."
         },
         {
           "text": "（４）肉に火が通ったら、具材を寄せて中央を空け、チーズを加えて弱火にし、チーズが溶けるまで火を通す。",
           "image_url": "https://park.ajinomoto.co.jp/wp-content/uploads/2025/08/800912_direction_3_0.jpeg",
-          "image_path": "recipe-img/800912_step_04.jpeg"
+          "image_path": "recipe-img/800912_step_04.jpeg",
+          "text_en": "(4) Once the chicken is cooked through, push the ingredients to the sides, clear the center, add the cheese, and reduce to low heat. Cook until the cheese melts."
         }
+      ],
+      "name_en": "Cheese Dakgalbi",
+      "description_en": "Sweet and spicy chicken thigh paired with gooey melted cheese - the hugely popular cheese dakgalbi. Perfect for sharing on a hot plate.",
+      "ingredients_en": [
+        "chicken thigh 300g",
+        "cabbage 1/4 head (300g)",
+        "onion 1/2 (100g)",
+        "carrot 1/2 (90g)",
+        "A gochujang 6 tsp (30g)",
+        "A soy sauce 2 tbsp",
+        "A mirin 2 tbsp",
+        "A sugar 1 tbsp",
+        "shredded cheese 100g",
+        "sesame oil 2 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the chicken into bite-sized pieces. Roughly chop the cabbage. Cut the onion into wedges. Cut the carrot into thin rectangles.",
+        "(2) Place the chicken from step (1) and A in a bowl, mix well, and marinate for about 10 minutes.",
+        "(3) Heat a hot plate to 160-170 degrees C, add sesame oil, and briefly stir-fry the cabbage, onion, and carrot from step (1). Once the vegetables soften, add the chicken and stir-fry together. When the meat is browned, cover with a lid and steam-cook.",
+        "(4) Once the chicken is cooked through, push the ingredients to the sides, clear the center, add the cheese, and reduce to low heat. Cook until the cheese melts."
       ]
     },
     {
@@ -1234,18 +1803,38 @@
         {
           "text": "（１）豆腐はキッチンペーパーで包み、重しをして１５分ほど、水きりをする（時間外）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Wrap the tofu in paper towels, place a weight on top, and drain for about 15 minutes (not included in cooking time)."
         },
         {
           "text": "（２）鍋に湯を沸かし、ほうれん草を入れて１分ほどゆで、水にとり、水気をしぼって３ｃｍ長さに切る。にんじんは２ｃｍ長さの細切りにして下ゆでする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Bring a pot of water to a boil, add the spinach and boil for about 1 minute. Transfer to cold water, squeeze out excess water, and cut into 3cm lengths. Cut the carrot into thin strips about 2cm long and parboil."
         },
         {
           "text": "（３）ボウルに（１）の豆腐を入れ、泡立て器で混ぜる。なめらかになったら、Ａを加えて混ぜ合わせ、（２）のほうれん草・にんじんを加えてあえる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Place the drained tofu from step (1) in a bowl and mash with a whisk until smooth. Add A and mix well, then add the spinach and carrot from step (2) and toss to coat."
         }
+      ],
+      "name_en": "Spinach & Carrot Shira-ae",
+      "description_en": "A classic and comforting side dish of spinach and carrot dressed in a creamy tofu sauce.",
+      "ingredients_en": [
+        "silken tofu 1/2 block (150g)",
+        "spinach 200g",
+        "carrot 30g",
+        "A ground white sesame 1 tbsp",
+        "A light soy sauce 1 tbsp",
+        "A sugar 1/2 tbsp",
+        "A dashi stock granules 1/3 tsp",
+        "A salt a pinch"
+      ],
+      "instructions_en": [
+        "(1) Wrap the tofu in paper towels, place a weight on top, and drain for about 15 minutes (not included in cooking time).",
+        "(2) Bring a pot of water to a boil, add the spinach and boil for about 1 minute. Transfer to cold water, squeeze out excess water, and cut into 3cm lengths. Cut the carrot into thin strips about 2cm long and parboil.",
+        "(3) Place the drained tofu from step (1) in a bowl and mash with a whisk until smooth. Add A and mix well, then add the spinach and carrot from step (2) and toss to coat."
       ]
     },
     {
@@ -1276,18 +1865,36 @@
         {
           "text": "（１）スパゲッティは塩（分量外）を加えた熱湯で表示時間通りにゆで、ザルに上げて水気をきる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cook the spaghetti in boiling salted water (salt not included in ingredients) according to package directions. Drain in a colander."
         },
         {
           "text": "（２）（１）のスパゲッティが温かいうちにボウルに移し入れる。卵を割り入れ、「Ｂｉｓｔｒｏ　Ｄｏ」を加熱せずにそのまま加えて混ぜ合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) While the spaghetti from step (1) is still warm, transfer to a bowl. Crack in the egg, add the cheese cream sauce without heating, and mix together."
         },
         {
           "text": "（３）器に盛り、生ハムをのせ、粉チーズをかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Plate, top with prosciutto, and sprinkle with parmesan."
         }
+      ],
+      "name_en": "Rich Cheese Cream Carbonara",
+      "description_en": "A rich and creamy cheese cream carbonara that is easy to make at home.",
+      "ingredients_en": [
+        "spaghetti 200g",
+        "egg 1",
+        "cheese cream chicken saute sauce 1 box",
+        "prosciutto 3 slices",
+        "grated parmesan a pinch"
+      ],
+      "instructions_en": [
+        "(1) Cook the spaghetti in boiling salted water (salt not included in ingredients) according to package directions. Drain in a colander.",
+        "(2) While the spaghetti from step (1) is still warm, transfer to a bowl. Crack in the egg, add the cheese cream sauce without heating, and mix together.",
+        "(3) Plate, top with prosciutto, and sprinkle with parmesan.",
+        "*For 4 servings, double all ingredients."
       ]
     },
     {
@@ -1325,28 +1932,55 @@
         {
           "text": "（１）にらは３ｃｍ長さに切る。ピーナッツは粗く砕く。レモンはくし形に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cut the garlic chives into 3cm lengths. Roughly crush the peanuts. Cut the lemon into wedges."
         },
         {
           "text": "（２）そうめんは表示時間通りにゆでて冷水で洗い、ザルに上げて水気をよくきる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Cook the somen noodles according to package directions, rinse in cold water, and drain well in a colander."
         },
         {
           "text": "（３）フライパンにごま油を熱し、ひき肉を入れて炒める。肉に火が通ってきたら、むきえび、もやし、（１）のにらの順に加えて全体に火が通るまで炒め、「丸鶏がらスープ」を加えて混ぜ合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Heat sesame oil in a frying pan and stir-fry the ground pork. Once the meat starts to cook through, add the shrimp, bean sprouts, and chives from step (1) in order, and stir-fry until cooked. Add the chicken stock granules and mix."
         },
         {
           "text": "（４）（２）のそうめんを加えてほぐしながら炒め、Ａを加えて全体をサッと炒め合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Add the somen from step (2), loosen while stir-frying, then add A and quickly toss everything together."
         },
         {
           "text": "（５）器に盛り、好みで（１）のピーナッツを散らし、（１）のレモンを添える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Plate, scatter the peanuts from step (1) if desired, and serve with the lemon from step (1)."
         }
+      ],
+      "name_en": "Pad Thai-Style Somen Noodles",
+      "description_en": "Somen noodles stir-fried pad Thai-style, packed with vegetables and protein for a satisfying meal.",
+      "ingredients_en": [
+        "somen noodles 200g",
+        "ground pork 100g",
+        "peeled shrimp 60g",
+        "garlic chives 1/2 bunch (50g)",
+        "bean sprouts 1/2 bag (125g)",
+        "chicken stock granules 1 tsp",
+        "A fish sauce or soy sauce 2 tsp",
+        "A chicken stock granules 1 tsp",
+        "sesame oil 1 tbsp",
+        "peanuts, to taste to taste",
+        "lemon 1/4"
+      ],
+      "instructions_en": [
+        "(1) Cut the garlic chives into 3cm lengths. Roughly crush the peanuts. Cut the lemon into wedges.",
+        "(2) Cook the somen noodles according to package directions, rinse in cold water, and drain well in a colander.",
+        "(3) Heat sesame oil in a frying pan and stir-fry the ground pork. Once the meat starts to cook through, add the shrimp, bean sprouts, and chives from step (1) in order, and stir-fry until cooked. Add the chicken stock granules and mix.",
+        "(4) Add the somen from step (2), loosen while stir-frying, then add A and quickly toss everything together.",
+        "(5) Plate, scatter the peanuts from step (1) if desired, and serve with the lemon from step (1)."
       ]
     },
     {
@@ -1381,23 +2015,46 @@
         {
           "text": "（１）パクチーはザク切りにする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Roughly chop the cilantro."
         },
         {
           "text": "（２）鍋にたっぷりの湯を沸かしてそうめんを入れ、そうめんがほぐれたら、大豆もやしを加える。そうめんの表示時間通りにゆで、ザルに上げて水気をきる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Bring a large pot of water to a boil, add the somen, and once the noodles loosen, add the soybean sprouts. Cook according to the somen package directions, then drain in a colander."
         },
         {
           "text": "（３）鍋にＡを入れて火にかけ、煮立ったら、豚肉を加え、肉に火が通るまで２分ほどゆでる。アクを取り、Ｂを加えて混ぜ、ひと煮立ちさせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Place A in a pot and heat. Once it boils, add the pork and cook for about 2 minutes until done. Skim off scum, add B, stir, and bring to a brief boil."
         },
         {
           "text": "（４）器に（２）のそうめん・大豆もやしを盛り、（３）のスープを注ぎ、（３）の豚肉、（１）のパクチーをのせ、レモンを添える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Place the somen and soybean sprouts from step (2) in a bowl, pour the broth from step (3) over them, and top with the pork from step (3) and cilantro from step (1). Serve with lemon."
         }
+      ],
+      "name_en": "Pork Pho-Style Somen Noodles",
+      "description_en": "A pho-inspired somen noodle soup with pork and vegetables - a complete meal in one bowl that breaks the somen routine.",
+      "ingredients_en": [
+        "somen noodles 200g",
+        "soybean sprouts 1/2 bag",
+        "thinly sliced pork loin 120g",
+        "cilantro 1/2 bunch (25g)",
+        "A water 600ml",
+        "A sake 1 tbsp",
+        "B chicken stock granules 1 tbsp",
+        "B fish sauce 1 tsp",
+        "lemon wedges 2 pieces (30g)"
+      ],
+      "instructions_en": [
+        "(1) Roughly chop the cilantro.",
+        "(2) Bring a large pot of water to a boil, add the somen, and once the noodles loosen, add the soybean sprouts. Cook according to the somen package directions, then drain in a colander.",
+        "(3) Place A in a pot and heat. Once it boils, add the pork and cook for about 2 minutes until done. Skim off scum, add B, stir, and bring to a brief boil.",
+        "(4) Place the somen and soybean sprouts from step (2) in a bowl, pour the broth from step (3) over them, and top with the pork from step (3) and cilantro from step (1). Serve with lemon."
       ]
     },
     {
@@ -1430,28 +2087,50 @@
         {
           "text": "（１）なすはタテ半分に切り、さらに半分に切ってから、４～５ｃｍ幅に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cut the eggplant in half lengthwise, then in half again, and cut into 4-5cm widths."
         },
         {
           "text": "（２）フライパンに油、（１）のなすを入れて火にかけ、なすに油をなじませる。なすの皮を下に向け、フタをして２分蒸し焼きにする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Add oil and the eggplant from step (1) to a frying pan and heat. Coat the eggplant with oil, turn skin-side down, cover with a lid, and steam-cook for 2 minutes."
         },
         {
           "text": "（３）なすをフライパンの片側に寄せ、空いたスペースにひき肉を加えて炒める。火が通ったら、いったん火を止める。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Push the eggplant to one side of the pan, add the ground pork to the open space, and stir-fry. Once cooked through, turn off the heat."
         },
         {
           "text": "（４）「Ｃｏｏｋ　Ｄｏきょうの大皿」を加えて再び火をつけ、全体によくからめながら１分炒め合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Add the meat miso sauce, turn the heat back on, and stir-fry for 1 minute, coating everything well."
         },
         {
           "text": "（５）器に盛り、好みで小ねぎを散らす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Plate and scatter green onion on top if desired."
         }
+      ],
+      "name_en": "Eggplant with Meat Miso",
+      "description_en": "Eggplant topped with savory-spicy meat miso, ready in just 15 minutes. A blend of different misos creates rich, complex flavor that pairs perfectly with rice.",
+      "ingredients_en": [
+        "ground pork 200g",
+        "eggplant 4 (320g)",
+        "meat miso eggplant sauce 1 box (90g)",
+        "vegetable oil 1 tbsp",
+        "sliced green onion, to taste to taste"
+      ],
+      "instructions_en": [
+        "(1) Cut the eggplant in half lengthwise, then in half again, and cut into 4-5cm widths.",
+        "(2) Add oil and the eggplant from step (1) to a frying pan and heat. Coat the eggplant with oil, turn skin-side down, cover with a lid, and steam-cook for 2 minutes.",
+        "(3) Push the eggplant to one side of the pan, add the ground pork to the open space, and stir-fry. Once cooked through, turn off the heat.",
+        "(4) Add the meat miso sauce, turn the heat back on, and stir-fry for 1 minute, coating everything well.",
+        "(5) Plate and scatter green onion on top if desired.",
+        "*Be careful of oil and sauce splatter."
       ]
     },
     {
@@ -1490,28 +2169,56 @@
         {
           "text": "（１）豚肉は少し重ねながらタテ長に並べ、塩・こしょうをふる。　並べた豚肉の上にキャベツをのせ、豚肉の幅に合わせて左右を折りたたむ。手前からギュッと押さえながら巻き、手前にのせて押さえながらくるくると巻く。全体に軽く塩・こしょうをし、片栗粉をまぶす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Lay the pork slices slightly overlapping lengthwise and season with salt and pepper. Place cabbage on top of the pork, fold in the left and right sides to match the pork width. Roll tightly from the front, pressing down as you go. Lightly season the outside with salt and pepper, then dust with potato starch."
         },
         {
           "text": "（２）フライパンに「ピュアセレクト　マヨネーズ」を熱し、巻き終わりを下にして、２分ほど焼く。全面に焼き色がつくまで転がしながら、２分ほど焼く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Heat mayonnaise in a frying pan, place the rolls seam-side down, and cook for about 2 minutes. Roll them around and cook for another 2 minutes until all sides are browned."
         },
         {
           "text": "（３）水を加え、フタをして弱火で８分ほど蒸し焼きにする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Add water, cover with a lid, and steam-cook over low heat for about 8 minutes."
         },
         {
           "text": "（４）火が通ったら、粗熱を取り、食べやすい大きさに切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Once cooked through, let cool slightly and cut into easy-to-eat pieces."
         },
         {
           "text": "（５）器に盛り、混ぜ合わせたＡをかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Plate and drizzle with the mixed A sauce."
         }
+      ],
+      "name_en": "Cabbage Pork Rolls",
+      "description_en": "Crisp cabbage wrapped in pork belly and served with a special mayo sauce - simple yet irresistible.",
+      "ingredients_en": [
+        "cabbage 4 leaves",
+        "thinly sliced pork belly 200g",
+        "salt a pinch",
+        "pepper a pinch",
+        "potato starch 1 tbsp",
+        "water 2 tbsp",
+        "mayonnaise 1/2 tbsp",
+        "A mayonnaise 3 tbsp",
+        "A soy sauce 1 tsp",
+        "A milk 1/2 tsp",
+        "A salt a pinch",
+        "A pepper a pinch"
+      ],
+      "instructions_en": [
+        "(1) Lay the pork slices slightly overlapping lengthwise and season with salt and pepper. Place cabbage on top of the pork, fold in the left and right sides to match the pork width. Roll tightly from the front, pressing down as you go. Lightly season the outside with salt and pepper, then dust with potato starch.",
+        "(2) Heat mayonnaise in a frying pan, place the rolls seam-side down, and cook for about 2 minutes. Roll them around and cook for another 2 minutes until all sides are browned.",
+        "(3) Add water, cover with a lid, and steam-cook over low heat for about 8 minutes.",
+        "(4) Once cooked through, let cool slightly and cut into easy-to-eat pieces.",
+        "(5) Plate and drizzle with the mixed A sauce."
       ]
     },
     {
@@ -1544,28 +2251,50 @@
         {
           "text": "（１）鶏肉は小さめのひと口大に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cut the chicken into small bite-sized pieces."
         },
         {
           "text": "（２）じゃがいもは皮つきのままよく洗ってくし形切りにし、水にさらして水気をきる。耐熱皿にじゃがいもをのせてラップをかけ、電子レンジ（６００Ｗ）で６分加熱する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Wash the potatoes well with skin on and cut into wedges. Soak in water and drain. Place the potatoes on a heatproof plate, cover with plastic wrap, and microwave at 600W for 6 minutes."
         },
         {
           "text": "（３）熱したフライパンに油大さじ１を入れ、（２）のじゃがいもを加えて両面に焼き目がつくまで炒め、いったん皿に取り出す。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Heat a frying pan with 1 tbsp of oil, add the potatoes from step (2), and cook until browned on both sides. Remove to a plate."
         },
         {
           "text": "（４）同じフライパンに油大さじ１／２を入れ、（１）の鶏肉を加えてフタをして蒸し焼きにする。肉に火が通ったら、いったん火を止め、（３）のじゃがいもを戻し入れる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Add 1/2 tbsp of oil to the same pan, add the chicken from step (1), cover, and steam-cook. Once the chicken is cooked through, turn off the heat and return the potatoes from step (3)."
         },
         {
           "text": "（５）「Ｂｉｓｔｒｏ　Ｄｏ」を加えて再び火をつけ、ソースと具材がよくからむまで混ぜ合わせ、チーズをのせて溶けるまでフタをする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Add the creamy tomato sauce, turn the heat back on, and stir until the sauce coats the ingredients well. Top with cheese and cover until melted."
         }
+      ],
+      "name_en": "Creamy Tomato Chicken Potato Gratin",
+      "description_en": "A creamy tomato gratin with chicken and potatoes, featuring a sauce that blends ripe tomato acidity with smooth cream.",
+      "ingredients_en": [
+        "chicken thigh 300g",
+        "potato 300g",
+        "creamy tomato sauce 1 box",
+        "pizza cheese 50g",
+        "vegetable oil 1 1/2 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the chicken into small bite-sized pieces.",
+        "(2) Wash the potatoes well with skin on and cut into wedges. Soak in water and drain. Place the potatoes on a heatproof plate, cover with plastic wrap, and microwave at 600W for 6 minutes.",
+        "(3) Heat a frying pan with 1 tbsp of oil, add the potatoes from step (2), and cook until browned on both sides. Remove to a plate.",
+        "(4) Add 1/2 tbsp of oil to the same pan, add the chicken from step (1), cover, and steam-cook. Once the chicken is cooked through, turn off the heat and return the potatoes from step (3).",
+        "(5) Add the creamy tomato sauce, turn the heat back on, and stir until the sauce coats the ingredients well. Top with cheese and cover until melted.",
+        "*For a 500W microwave, heat for 7 minutes."
       ]
     },
     {
@@ -1601,23 +2330,47 @@
         {
           "text": "（１）さけは２～３等分に切り、「やさしお」をふる。ブロッコリーは熱湯でゆでる。玉ねぎは薄切りにする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cut the salmon into 2-3 pieces and season with salt. Boil the broccoli in hot water. Thinly slice the onion."
         },
         {
           "text": "（２）フライパンにバターを熱し、（１）のさけ・玉ねぎを入れて炒める。さけの両面に焼き色がついたら、薄力粉を加え、粉っぽさがなくなるまで炒める。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Heat butter in a frying pan, add the salmon and onion from step (1), and cook. Once the salmon is browned on both sides, add the flour and stir until no longer powdery."
         },
         {
           "text": "（３）牛乳を一気に加え、Ａを加えてとろみがつくまで加熱する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Add the milk all at once, then add A and cook until thickened."
         },
         {
           "text": "（４）耐熱皿に入れ、（１）のブロッコリーをのせて粉チーズをふり、オーブントースター（１２００Ｗ）で焼き色がつくまで５分焼く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Transfer to a heatproof dish, top with the broccoli from step (1), sprinkle with parmesan, and bake in a toaster oven at 1200W for about 5 minutes until golden."
         }
+      ],
+      "name_en": "Salmon & Broccoli Aonori Gratin",
+      "description_en": "A refreshing gratin with the aroma of aonori seaweed, made with fresh salmon and broccoli for a lighter dish.",
+      "ingredients_en": [
+        "fresh salmon fillet 2 pieces (160g)",
+        "salt a pinch",
+        "broccoli 4 florets (60g)",
+        "onion 1/4 (50g)",
+        "all-purpose flour 2 tbsp",
+        "milk 250ml",
+        "A consomme cube (reduced sodium) 1",
+        "A aonori seaweed flakes 2 tsp",
+        "grated parmesan 1 tbsp",
+        "butter 20g"
+      ],
+      "instructions_en": [
+        "(1) Cut the salmon into 2-3 pieces and season with salt. Boil the broccoli in hot water. Thinly slice the onion.",
+        "(2) Heat butter in a frying pan, add the salmon and onion from step (1), and cook. Once the salmon is browned on both sides, add the flour and stir until no longer powdery.",
+        "(3) Add the milk all at once, then add A and cook until thickened.",
+        "(4) Transfer to a heatproof dish, top with the broccoli from step (1), sprinkle with parmesan, and bake in a toaster oven at 1200W for about 5 minutes until golden."
       ]
     },
     {
@@ -1653,23 +2406,47 @@
         {
           "text": "（１）豚肉に薄力粉をまぶす。トマトはくし形切りにする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Dust the pork with flour. Cut the tomato into wedges."
         },
         {
           "text": "（２）フライパンに油を熱し、（１）の豚肉を入れ、両面に焼き色がつくまで焼く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Heat oil in a frying pan, add the pork from step (1), and cook until browned on both sides."
         },
         {
           "text": "（３）Ａを加え、全体を炒めながらからめる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Add A and stir-fry, coating the pork with the glaze."
         },
         {
           "text": "（４）器に盛り、グリーンリーフ、（１）のトマトをのせ、豚肉の表面に「やさしお」をふる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Plate, add green leaf lettuce and the tomato from step (1), and sprinkle a pinch of salt on the pork surface."
         }
+      ],
+      "name_en": "Pork Oyster Teriyaki",
+      "description_en": "Pork teriyaki glazed with oyster sauce - rich and flavorful even with reduced sodium.",
+      "ingredients_en": [
+        "pork loin (for ginger pork) 6 slices",
+        "all-purpose flour 1 tbsp",
+        "A mirin 2 tbsp",
+        "A oyster sauce (reduced sodium) 1 tbsp",
+        "A sake 1 tbsp",
+        "A soy sauce 1/2 tsp",
+        "salt a pinch",
+        "vegetable oil 1 tbsp",
+        "green leaf lettuce to taste",
+        "tomato 1/2"
+      ],
+      "instructions_en": [
+        "(1) Dust the pork with flour. Cut the tomato into wedges.",
+        "(2) Heat oil in a frying pan, add the pork from step (1), and cook until browned on both sides.",
+        "(3) Add A and stir-fry, coating the pork with the glaze.",
+        "(4) Plate, add green leaf lettuce and the tomato from step (1), and sprinkle a pinch of salt on the pork surface."
       ]
     },
     {
@@ -1700,13 +2477,30 @@
         {
           "text": "（１）えびは熱湯で２分ゆでる。大根はせん切りにし、水菜は４～５ｃｍ幅に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Boil the shrimp in hot water for 2 minutes. Cut the daikon into thin strips (julienne) and cut the mizuna into 4-5 cm lengths."
         },
         {
           "text": "（２）ボウルにＡを入れてよく混ぜ、（１）の大根・水菜・えびを加えて全体をあえる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Combine A in a bowl and mix well. Add the daikon, mizuna, and shrimp from step (1) and toss everything together."
         }
+      ],
+      "name_en": "Daikon & Mizuna Salad with Chinese Dressing",
+      "description_en": "A crisp daikon and mizuna salad with a Chinese-style oyster sauce dressing - crunchy and flavorful with less sodium.",
+      "ingredients_en": [
+        "daikon radish 8cm (200g)",
+        "mizuna greens 1 bunch (40g)",
+        "peeled shrimp (small) 6 pieces (60g)",
+        "A sesame oil 1 tbsp",
+        "A vinegar 1 tbsp",
+        "A reduced-sodium oyster sauce 2 tsp",
+        "A prepared mustard 1/4 tsp"
+      ],
+      "instructions_en": [
+        "(1) Boil the shrimp in hot water for 2 minutes. Cut the daikon into thin strips (julienne) and cut the mizuna into 4-5 cm lengths.",
+        "(2) Combine A in a bowl and mix well. Add the daikon, mizuna, and shrimp from step (1) and toss everything together."
       ]
     },
     {
@@ -1745,23 +2539,50 @@
         {
           "text": "（１）鶏肉はたたいて厚さを均一にし、半分に切ってビニール袋に入れる。Ａを加えて肉と一緒にもみ、冷蔵庫で３０分以上漬ける（時間外）。水菜は食べやすい長さに切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Pound the chicken to an even thickness, cut in half, and place in a plastic bag. Add A and massage into the meat, then marinate in the refrigerator for at least 30 minutes (not included in cooking time). Cut the mizuna into bite-sized lengths."
         },
         {
           "text": "（２）トマトは１ｃｍ角に切ってボウルに入れ、Ｂを加えて混ぜ合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Cut the tomato into 1 cm cubes, place in a bowl, add B and mix together."
         },
         {
           "text": "（３）（１）の鶏肉に「やさしお」をふり、片栗粉をまぶす。フライパンに多めの油を熱し、鶏肉を入れ、両面がカリッとするまで揚げ焼きにし、食べやすい大きさに切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Sprinkle the chicken from step (1) with reduced-sodium salt and coat with potato starch. Heat a generous amount of oil in a frying pan, add the chicken, and pan-fry until both sides are crispy. Cut into bite-sized pieces."
         },
         {
           "text": "（４）器に（１）の水菜を敷き、（３）を盛り、（２）をかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Line a plate with the mizuna from step (1), arrange step (3) on top, and drizzle with step (2)."
         }
+      ],
+      "name_en": "Crispy Fried Chicken with Tomato Oyster Sauce",
+      "description_en": "Crispy fried chicken with a tomato-oyster sauce that perfectly balances tangy and rich flavors, all with less sodium.",
+      "ingredients_en": [
+        "chicken breast 1 piece (180g)",
+        "A grated garlic 1/2 clove (4g)",
+        "A grated ginger 1/2 knob (5g)",
+        "A sake 1 tbsp",
+        "reduced-sodium salt a pinch",
+        "potato starch 3 tbsp",
+        "tomato 1 (200g)",
+        "B reduced-sodium oyster sauce 1 tbsp",
+        "B sesame oil 1 tbsp",
+        "B vinegar 1/2 tbsp",
+        "B sugar 1/2 tsp",
+        "vegetable oil to taste",
+        "mizuna greens 1 bunch (40g)"
+      ],
+      "instructions_en": [
+        "(1) Pound the chicken to an even thickness, cut in half, and place in a plastic bag. Add A and massage into the meat, then marinate in the refrigerator for at least 30 minutes (not included in cooking time). Cut the mizuna into bite-sized lengths.",
+        "(2) Cut the tomato into 1 cm cubes, place in a bowl, add B and mix together.",
+        "(3) Sprinkle the chicken from step (1) with reduced-sodium salt and coat with potato starch. Heat a generous amount of oil in a frying pan, add the chicken, and pan-fry until both sides are crispy. Cut into bite-sized pieces.",
+        "(4) Line a plate with the mizuna from step (1), arrange step (3) on top, and drizzle with step (2)."
       ]
     },
     {
@@ -1800,23 +2621,50 @@
         {
           "text": "（１）玉ねぎ、にんにくはみじん切りにする。チーズは８等分の角切りにする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Finely chop the onion and garlic. Cut the cheese into 8 equal cubes."
         },
         {
           "text": "（２）ボウルに大豆の水煮を入れてめん棒などでつぶし、（１）の玉ねぎ・にんにく、Ａを加えてよく混ぜ、８等分にする。（１）のチーズを加えて小さな小判型にし、薄力粉、溶き卵、パン粉を順につける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Place the boiled soybeans in a bowl and mash with a rolling pin or similar tool. Add the onion and garlic from step (1) along with A, mix well, and divide into 8 portions. Add the cheese from step (1) and shape into small oval patties. Coat in order with flour, beaten egg, and panko."
         },
         {
           "text": "（３）フライパンに多めの油を熱し、（２）を入れてきつね色になるまで裏表返しながら揚げる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Heat a generous amount of oil in a frying pan, add step (2), and fry, turning occasionally, until golden brown."
         },
         {
           "text": "（４）器に盛り、ベビーリーフをのせ、ケチャップを添える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Arrange on a plate, top with baby greens, and serve with ketchup."
         }
+      ],
+      "name_en": "Soybean Curry Cheese Croquettes",
+      "description_en": "Croquettes made with mashed soybeans, curry seasoning, and melty cheese - hearty and satisfying with less sodium.",
+      "ingredients_en": [
+        "boiled soybeans 200g",
+        "onion 1/4 (50g)",
+        "garlic 1/2 clove (4g)",
+        "processed cheese 40g",
+        "A potato starch 2 tsp",
+        "A curry powder 1 tsp",
+        "A reduced-sodium salt a pinch",
+        "all-purpose flour 2 tsp",
+        "beaten egg 1",
+        "panko breadcrumbs 1/2 cup (20g)",
+        "vegetable oil to taste",
+        "baby greens 1 pack (25g)",
+        "ketchup 2 tsp (10g)"
+      ],
+      "instructions_en": [
+        "(1) Finely chop the onion and garlic. Cut the cheese into 8 equal cubes.",
+        "(2) Place the boiled soybeans in a bowl and mash with a rolling pin or similar tool. Add the onion and garlic from step (1) along with A, mix well, and divide into 8 portions. Add the cheese from step (1) and shape into small oval patties. Coat in order with flour, beaten egg, and panko.",
+        "(3) Heat a generous amount of oil in a frying pan, add step (2), and fry, turning occasionally, until golden brown.",
+        "(4) Arrange on a plate, top with baby greens, and serve with ketchup."
       ]
     },
     {
@@ -1851,23 +2699,46 @@
         {
           "text": "（１）ささ身は筋を取ってそぎ切りにし、「やさしお」をふって片栗粉をまぶす。レモンはいちょう切りにし、しそ２枚はせん切りにし、残りは飾り用にとっておく。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Remove the tendons from the chicken tenderloins, slice diagonally, sprinkle with reduced-sodium salt, and coat with potato starch. Cut the lemon into quarter-rounds. Julienne 2 shiso leaves and set the rest aside for garnish."
         },
         {
           "text": "（２）大根はすりおろし、軽く水気をきってボウルに入れ、（１）のレモン・せん切りにしたしそ、Ａを加えて混ぜ合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Grate the daikon and lightly squeeze out the excess water. Place in a bowl, add the lemon and julienned shiso from step (1) along with A, and mix together."
         },
         {
           "text": "（３）鍋に湯を沸かし、（１）のささ身を入れて火が通るまで５分加熱し、氷水にさらして冷やし、水気をきる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Bring a pot of water to a boil, add the chicken from step (1), and cook for 5 minutes until done. Transfer to ice water to cool, then drain well."
         },
         {
           "text": "（４）器に（１）のとっておいたしそを敷き、（３）を盛り、（２）をのせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Line a plate with the reserved shiso leaves from step (1), arrange step (3) on top, and spoon step (2) over it."
         }
+      ],
+      "name_en": "Crystal Chicken with Lemon Grated Daikon",
+      "description_en": "Silky poached chicken with a refreshing lemon and grated daikon sauce - smooth, light, and lower in sodium.",
+      "ingredients_en": [
+        "chicken tenderloin 3 pieces (120g)",
+        "reduced-sodium salt a pinch",
+        "potato starch 2 tbsp",
+        "daikon radish 6cm (150g)",
+        "lemon slices 2 (20g)",
+        "shiso leaves 5 (5g)",
+        "A reduced-sodium dashi stock powder 1 tsp",
+        "A lemon juice 1 tsp",
+        "A soy sauce 1/2 tsp"
+      ],
+      "instructions_en": [
+        "(1) Remove the tendons from the chicken tenderloins, slice diagonally, sprinkle with reduced-sodium salt, and coat with potato starch. Cut the lemon into quarter-rounds. Julienne 2 shiso leaves and set the rest aside for garnish.",
+        "(2) Grate the daikon and lightly squeeze out the excess water. Place in a bowl, add the lemon and julienned shiso from step (1) along with A, and mix together.",
+        "(3) Bring a pot of water to a boil, add the chicken from step (1), and cook for 5 minutes until done. Transfer to ice water to cool, then drain well.",
+        "(4) Line a plate with the reserved shiso leaves from step (1), arrange step (3) on top, and spoon step (2) over it."
       ]
     },
     {
@@ -1901,18 +2772,39 @@
         {
           "text": "（１）キャベツはザク切りする。アスパラは根元の固い部分を切り落とし、斜め切りにする。にんにくはみじん切りにする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Roughly chop the cabbage. Trim the tough ends of the asparagus and slice diagonally. Finely chop the garlic."
         },
         {
           "text": "（２）フライパンにオリーブオイルを熱し、（１）のにんにくを入れて弱火で炒める。香りが立ったら、（１）のアスパラ、桜えびを加えて１～２分炒め、（１）のキャベツを加えて全体をサッと炒める。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Heat olive oil in a frying pan, add the garlic from step (1), and saute over low heat. Once fragrant, add the asparagus and sakura shrimp from step (1), stir-fry for 1-2 minutes, then add the cabbage from step (1) and briefly stir-fry everything together."
         },
         {
           "text": "（３）Ａを加え、フタをしてキャベツがしんなりして「コンソメ」が溶けるまで時々混ぜながら加熱し、「やさしお」、ブラックペッパーで味を調える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Add A, cover, and cook, stirring occasionally, until the cabbage is tender and the consomme has dissolved. Season with reduced-sodium salt and black pepper."
         }
+      ],
+      "name_en": "Cabbage, Asparagus & Sakura Shrimp Aglio e Olio",
+      "description_en": "A simple aglio e olio that highlights the natural flavors of cabbage, asparagus, and sakura shrimp.",
+      "ingredients_en": [
+        "cabbage 1/4 head (300g)",
+        "green asparagus 4 stalks (80g)",
+        "dried sakura shrimp 2 tbsp (6g)",
+        "garlic 1 clove (8g)",
+        "A white wine or cooking sake 1/2 tbsp",
+        "A consomme cube (reduced-sodium) 1",
+        "reduced-sodium salt a pinch",
+        "black pepper a pinch",
+        "olive oil 2 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Roughly chop the cabbage. Trim the tough ends of the asparagus and slice diagonally. Finely chop the garlic.",
+        "(2) Heat olive oil in a frying pan, add the garlic from step (1), and saute over low heat. Once fragrant, add the asparagus and sakura shrimp from step (1), stir-fry for 1-2 minutes, then add the cabbage from step (1) and briefly stir-fry everything together.",
+        "(3) Add A, cover, and cook, stirring occasionally, until the cabbage is tender and the consomme has dissolved. Season with reduced-sodium salt and black pepper."
       ]
     },
     {
@@ -1947,18 +2839,40 @@
         {
           "text": "（１）春菊は根元の固い部分を切り落とし、３～４ｃｍ幅に切る。アボカドは薄切りにし、ミックスナッツは粗く刻む。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Trim the tough stems from the chrysanthemum greens and cut into 3-4 cm lengths. Thinly slice the avocado and roughly chop the mixed nuts."
         },
         {
           "text": "（２）Ａは混ぜ合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Mix A together."
         },
         {
           "text": "（３）器に（１）の春菊を盛り、（１）のアボカド・ミックスナッツ、温泉卵をのせ、粉チーズをふり、（２）をかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Arrange the chrysanthemum greens from step (1) on a plate. Top with the avocado and mixed nuts from step (1) and the soft-boiled egg. Sprinkle with Parmesan cheese and drizzle with step (2)."
         }
+      ],
+      "name_en": "Chrysanthemum Greens Caesar Salad with Soft-Boiled Egg",
+      "description_en": "A unique Caesar salad made with chrysanthemum greens and a soft-boiled egg, with a lighter dressing you can make from pantry staples.",
+      "ingredients_en": [
+        "chrysanthemum greens 1/2 bunch (100g)",
+        "avocado 1/2 (100g)",
+        "soft-boiled egg (onsen tamago) 1 (50g)",
+        "mixed nuts 2 tbsp (20g)",
+        "grated Parmesan cheese 1 tbsp (6g)",
+        "A mayonnaise 1 tbsp",
+        "A milk 1/2 tbsp",
+        "A lemon juice 1/2 tsp",
+        "A reduced-sodium salt a pinch",
+        "A black pepper a pinch"
+      ],
+      "instructions_en": [
+        "(1) Trim the tough stems from the chrysanthemum greens and cut into 3-4 cm lengths. Thinly slice the avocado and roughly chop the mixed nuts.",
+        "(2) Mix A together.",
+        "(3) Arrange the chrysanthemum greens from step (1) on a plate. Top with the avocado and mixed nuts from step (1) and the soft-boiled egg. Sprinkle with Parmesan cheese and drizzle with step (2)."
       ]
     },
     {
@@ -1997,23 +2911,50 @@
         {
           "text": "（１）豚肉、豆腐は食べやすい大きさに切る。小ねぎは５ｃｍ長さに切り、にんにくはすりおろす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cut the pork and tofu into bite-sized pieces. Cut the green onions into 5 cm lengths and grate the garlic."
         },
         {
           "text": "（２）鍋にごま油を熱し、（１）の豚肉を入れて色が変わるまで炒める。凍ったままのシーフードミックス、（１）のにんにく、酒を加え、フタをして１～２分加熱する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Heat sesame oil in a pot, add the pork from step (1), and stir-fry until the color changes. Add the frozen seafood mix (still frozen), the garlic from step (1), and sake. Cover and cook for 1-2 minutes."
         },
         {
           "text": "（３）（１）の豆腐・小ねぎ、Ａを加えて５分ほど煮、卵を割り落とし、好みの固さになるまで加熱する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Add the tofu and green onions from step (1) along with A, and simmer for about 5 minutes. Crack in the eggs and cook until they reach the desired doneness."
         },
         {
           "text": "（４）器に盛り、一味唐がらしをふる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Serve in bowls and sprinkle with red chili pepper flakes."
         }
+      ],
+      "name_en": "Rich Sundubu Jjigae (Soft Tofu Stew)",
+      "description_en": "A bold and hearty soft tofu stew with full-bodied flavor and reduced sodium.",
+      "ingredients_en": [
+        "frozen seafood mix 80g",
+        "pork belly, thinly sliced 80g",
+        "firm tofu 1/2 block (150g)",
+        "green onions 4 stalks (28g)",
+        "eggs 2 (120g)",
+        "garlic 1 clove (8g)",
+        "sake 1 tbsp",
+        "A water 1-1/2 cups",
+        "A reduced-sodium chicken stock powder 2 tsp",
+        "A doubanjiang (chili bean paste) 1 tsp",
+        "A soy sauce 1/2 tsp",
+        "sesame oil 1 tbsp",
+        "ichimi togarashi (red chili pepper flakes) 1/3 tsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the pork and tofu into bite-sized pieces. Cut the green onions into 5 cm lengths and grate the garlic.",
+        "(2) Heat sesame oil in a pot, add the pork from step (1), and stir-fry until the color changes. Add the frozen seafood mix (still frozen), the garlic from step (1), and sake. Cover and cook for 1-2 minutes.",
+        "(3) Add the tofu and green onions from step (1) along with A, and simmer for about 5 minutes. Crack in the eggs and cook until they reach the desired doneness.",
+        "(4) Serve in bowls and sprinkle with red chili pepper flakes."
       ]
     },
     {
@@ -2040,13 +2981,26 @@
         {
           "text": "（１）じゃがいもは皮をよく洗い、芽を取り除き、皮つきのままふんわりラップをして電子レンジ（６００Ｗ）で中に火が通るまで４～５分加熱し、十字に切り込みを入れる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Wash the potatoes well, remove any sprouts, and microwave skin-on, loosely wrapped in plastic wrap, at 600W for 4-5 minutes until cooked through. Cut a cross-shaped slit in the top."
         },
         {
           "text": "（２）器に盛り、熱いうちにバターをのせ、「オイスターソース」をかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Place on a plate, top with butter while still hot, and drizzle with oyster sauce."
         }
+      ],
+      "name_en": "Potato with Oyster Butter",
+      "description_en": "A surprisingly delicious combination of baked potato topped with butter and oyster sauce.",
+      "ingredients_en": [
+        "potato 2 (300g)",
+        "butter 20g",
+        "reduced-sodium oyster sauce 2 tsp"
+      ],
+      "instructions_en": [
+        "(1) Wash the potatoes well, remove any sprouts, and microwave skin-on, loosely wrapped in plastic wrap, at 600W for 4-5 minutes until cooked through. Cut a cross-shaped slit in the top.",
+        "(2) Place on a plate, top with butter while still hot, and drizzle with oyster sauce."
       ]
     },
     {
@@ -2074,18 +3028,33 @@
         {
           "text": "（１）チンゲン菜は根元からタテ４～６等分に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cut the bok choy lengthwise from the base into 4-6 pieces."
         },
         {
           "text": "（２）鍋に湯を沸かし、（１）のチンゲン菜を１分ほどゆで、水気をきる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Bring a pot of water to a boil, blanch the bok choy from step (1) for about 1 minute, and drain well."
         },
         {
           "text": "（３）器に盛り、Ａをかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Arrange on a plate and drizzle with A."
         }
+      ],
+      "name_en": "Blanched Bok Choy",
+      "description_en": "A quick side dish for when you need one more plate - just blanch the bok choy and drizzle with sauce.",
+      "ingredients_en": [
+        "bok choy 2 stalks (200g)",
+        "A reduced-sodium oyster sauce 1 tbsp",
+        "A sesame oil 1 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the bok choy lengthwise from the base into 4-6 pieces.",
+        "(2) Bring a pot of water to a boil, blanch the bok choy from step (1) for about 1 minute, and drain well.",
+        "(3) Arrange on a plate and drizzle with A."
       ]
     },
     {
@@ -2116,23 +3085,42 @@
         {
           "text": "（１）豚肉はひと口大に切る。ピーマンは５ｍｍ幅の細切りにする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cut the pork into bite-sized pieces. Slice the bell pepper into 5 mm thin strips."
         },
         {
           "text": "（２）フライパンにもやしを入れて油大さじ１を回しかけ、火をつけて炒める。もやしに火が通ったら、いったん取り出す。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Place the bean sprouts in a frying pan, drizzle with 1 tbsp oil, turn on the heat, and stir-fry. Once the bean sprouts are cooked, remove from the pan."
         },
         {
           "text": "（３）フライパンに油大さじ１を熱し、（１）の豚肉・ピーマンを入れて炒める。肉の色が変わってきたら、火を止め、「香味ペースト」を加えて炒め合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Heat 1 tbsp oil in the frying pan, add the pork and bell pepper from step (1), and stir-fry. When the meat changes color, turn off the heat, add the aromatic seasoning paste, and toss to combine."
         },
         {
           "text": "（４）（２）のもやしを戻し入れ、サッと炒め合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Return the bean sprouts from step (2) to the pan and quickly stir-fry together."
         }
+      ],
+      "name_en": "3-Ingredient Pork Stir-Fry",
+      "description_en": "Just 3 ingredients for an easy and flavorful pork stir-fry that makes everyday vegetables taste amazing.",
+      "ingredients_en": [
+        "pork offcuts 120g",
+        "green bell pepper 1 (30g)",
+        "bean sprouts 1 bag (200g)",
+        "aromatic seasoning paste 15cm squeeze (10.5g)",
+        "vegetable oil 2 tbsp"
+      ],
+      "instructions_en": [
+        "(1) Cut the pork into bite-sized pieces. Slice the bell pepper into 5 mm thin strips.",
+        "(2) Place the bean sprouts in a frying pan, drizzle with 1 tbsp oil, turn on the heat, and stir-fry. Once the bean sprouts are cooked, remove from the pan.",
+        "(3) Heat 1 tbsp oil in the frying pan, add the pork and bell pepper from step (1), and stir-fry. When the meat changes color, turn off the heat, add the aromatic seasoning paste, and toss to combine.",
+        "(4) Return the bean sprouts from step (2) to the pan and quickly stir-fry together."
       ]
     },
     {
@@ -2161,18 +3149,34 @@
         {
           "text": "（１）「氷みぞれつゆ」は外袋から内袋を取り出して冷凍庫に平らに置き、２４時間以上凍らせる（時間外）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Remove the inner packet from the outer bag of the frozen iced dashi sauce, lay it flat in the freezer, and freeze for at least 24 hours (not included in cooking time)."
         },
         {
           "text": "（２）そうめんはゆでて水で洗い、よく水をきって器に盛る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Cook the somen noodles, rinse under water, drain well, and place in a serving bowl."
         },
         {
           "text": "（３）（１）の「氷みぞれつゆ」を袋のまま細かく割りほぐし、（２）の上にかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) While still in the packet, break the frozen iced dashi sauce into small pieces and pour over step (2)."
         }
+      ],
+      "name_en": "Iced Somen with Bonito Dashi",
+      "description_en": "Chilled somen noodles served on ice with a rich bonito dashi broth blended with kombu and iriko for deep flavor.",
+      "ingredients_en": [
+        "somen noodles 1 bundle (50g)",
+        "frozen iced dashi sauce (bonito dashi) 1 packet"
+      ],
+      "instructions_en": [
+        "(1) Remove the inner packet from the outer bag of the frozen iced dashi sauce, lay it flat in the freezer, and freeze for at least 24 hours (not included in cooking time).",
+        "(2) Cook the somen noodles, rinse under water, drain well, and place in a serving bowl.",
+        "(3) While still in the packet, break the frozen iced dashi sauce into small pieces and pour over step (2).",
+        "* Gently mix and enjoy while crushing the ice.",
+        "* Optionally garnish with chopped green onions and myoga ginger."
       ]
     },
     {
@@ -2201,18 +3205,34 @@
         {
           "text": "（１）「氷みぞれつゆ」は外袋から内袋を取り出して冷凍庫に平らに置き、２４時間以上凍らせる（時間外）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Remove the inner packet from the outer bag of the frozen iced dashi sauce, lay it flat in the freezer, and freeze for at least 24 hours (not included in cooking time)."
         },
         {
           "text": "（２）そうめんはゆでて水で洗い、よく水をきって器に盛る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Cook the somen noodles, rinse under water, drain well, and place in a serving bowl."
         },
         {
           "text": "（３）（１）の「氷みぞれつゆ」を袋のまま細かく割りほぐし、（２）の上にかける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) While still in the packet, break the frozen iced dashi sauce into small pieces and pour over step (2)."
         }
+      ],
+      "name_en": "Iced Somen with Chicken Dashi & Yuzu",
+      "description_en": "Chilled somen noodles in a triple dashi broth of chicken, kombu, and scallop, brightened with yuzu juice.",
+      "ingredients_en": [
+        "somen noodles 1 bundle (50g)",
+        "frozen iced dashi sauce (chicken dashi with yuzu) 1 packet"
+      ],
+      "instructions_en": [
+        "(1) Remove the inner packet from the outer bag of the frozen iced dashi sauce, lay it flat in the freezer, and freeze for at least 24 hours (not included in cooking time).",
+        "(2) Cook the somen noodles, rinse under water, drain well, and place in a serving bowl.",
+        "(3) While still in the packet, break the frozen iced dashi sauce into small pieces and pour over step (2).",
+        "* Gently mix and enjoy while crushing the ice.",
+        "* Optionally garnish with daikon sprouts and sudachi citrus."
       ]
     },
     {
@@ -2251,38 +3271,68 @@
         {
           "text": "（１）クッキーを砕いてボウルに入れ、バター、牛乳とともに手で練る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Crush the cookies and place in a bowl. Mix with butter and milk, kneading by hand."
         },
         {
           "text": "（２）型（直経２２ｃｍのクラフティ型）にバターを薄く塗り、（１）の生地を厚さ約４ｍｍに<br />パレットで敷き込み、冷凍庫で約１５～２０分冷やす。オーブンは１８０℃に予熱する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Thinly grease a mold (22 cm diameter clafoutis dish) with butter. Spread the dough from step (1) to about 4 mm thickness using a palette knife, and chill in the freezer for about 15-20 minutes. Preheat the oven to 180 degrees C."
         },
         {
           "text": "（３）ボウルに卵を割りほぐし、グラニュー糖を加えて泡立て器でよく混ぜる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Crack the eggs into a bowl, add the granulated sugar, and mix well with a whisk."
         },
         {
           "text": "（４）サワークリームを加えて、ダマにならないようによく混ぜ、生クリームとキルシュ<br />を加え、軽く混ぜ合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Add the sour cream and mix well to avoid lumps. Add the heavy cream and kirsch, and lightly mix together."
         },
         {
           "text": "（５）（２）の型に（４）の生地を八分目まで流し、１８０℃のオーブンで約２０～２５分焼く。<br />いちごはぬれぶきんで汚れを取り、ヘタは取る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Pour the batter from step (4) into the mold from step (2) until about 80% full, and bake in the oven at 180 degrees C for about 20-25 minutes. Wipe the strawberries clean with a damp cloth and remove the hulls."
         },
         {
           "text": "（６）（５）が八分通り焼けたら（ふっくらと外側に火が通った状態）オーブンから出して、<br />いちごを押しつけるようにして並べる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(6) When step (5) is about 80% baked (puffy with the edges set), remove from the oven and press the strawberries into the surface in rows."
         },
         {
           "text": "（７）残りの生地をいちごの間に、スプーンで流し入れ、再び１８０℃のオーブンに入れて<br />約１５分、表面に焦げ目がつき、いちごから果汁が出るまで焼く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(7) Spoon the remaining batter between the strawberries, return to the oven at 180 degrees C, and bake for about 15 more minutes until the surface is golden brown and the strawberries release their juices."
         }
+      ],
+      "name_en": "Strawberry Clafoutis",
+      "description_en": "A delightful strawberry clafoutis that tastes wonderful served warm or chilled.",
+      "ingredients_en": [
+        "store-bought cookies 130g",
+        "unsalted butter 25g",
+        "milk 2 tsp",
+        "eggs (L size) 2-1/2",
+        "granulated sugar 145g",
+        "sour cream 180g",
+        "heavy cream 125ml",
+        "kirsch 12ml",
+        "strawberries 20",
+        "butter to taste"
+      ],
+      "instructions_en": [
+        "(1) Crush the cookies and place in a bowl. Mix with butter and milk, kneading by hand.",
+        "(2) Thinly grease a mold (22 cm diameter clafoutis dish) with butter. Spread the dough from step (1) to about 4 mm thickness using a palette knife, and chill in the freezer for about 15-20 minutes. Preheat the oven to 180 degrees C.",
+        "(3) Crack the eggs into a bowl, add the granulated sugar, and mix well with a whisk.",
+        "(4) Add the sour cream and mix well to avoid lumps. Add the heavy cream and kirsch, and lightly mix together.",
+        "(5) Pour the batter from step (4) into the mold from step (2) until about 80% full, and bake in the oven at 180 degrees C for about 20-25 minutes. Wipe the strawberries clean with a damp cloth and remove the hulls.",
+        "(6) When step (5) is about 80% baked (puffy with the edges set), remove from the oven and press the strawberries into the surface in rows.",
+        "(7) Spoon the remaining batter between the strawberries, return to the oven at 180 degrees C, and bake for about 15 more minutes until the surface is golden brown and the strawberries release their juices."
       ]
     },
     {
@@ -2322,33 +3372,63 @@
         {
           "text": "（１）Ａ、Ｂはそれぞれ合わせ、ふやかしておく。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Combine A and B separately and let the gelatin soften."
         },
         {
           "text": "（２）鍋に水カップ２／３を入れて火にかけ、Ａを加えて沸騰させないように注意しながら溶かす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Put 2/3 cup water in a pot and heat. Add A and dissolve, being careful not to bring to a boil."
         },
         {
           "text": "（３）火を止め、「パルスイート」、レモン汁を加え、型（直径１８ｃｍキャセロール型）に流し入れ、冷やし固める（時間外）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Remove from heat, add the sweetener and lemon juice, pour into a mold (18 cm diameter casserole dish), and refrigerate until set (not included in cooking time)."
         },
         {
           "text": "（４）鍋に水カップ１／４を入れて火にかけ、Ｂを加えて溶かし、粗熱を取り、「パルスイート」を加える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Put 1/4 cup water in a pot and heat. Add B and dissolve. Let cool slightly, then add the sweetener."
         },
         {
           "text": "（５）いちごはつぶし、生クリームは泡立て、（４）に加える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Mash the strawberries. Whip the heavy cream and fold both into step (4)."
         },
         {
           "text": "（６）（３）が固まったら、その上にいちごの輪切りを並べ、（５）を流し入れて冷やし固める（時間外）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(6) Once step (3) has set, arrange strawberry slices on top, pour in step (5), and refrigerate until set (not included in cooking time)."
         }
+      ],
+      "name_en": "Strawberry Bavarian Cream",
+      "description_en": "A creamy and elegant Bavarian cream dessert made with fresh strawberries and whipped cream.",
+      "ingredients_en": [
+        "A powdered gelatin 1 tbsp",
+        "A water 2 tbsp",
+        "water 2/3 cup",
+        "zero-calorie sweetener 2 tsp",
+        "lemon juice 1 tsp",
+        "B powdered gelatin 1 tbsp",
+        "B water 2 tbsp",
+        "water 1/4 cup",
+        "zero-calorie sweetener 1 tbsp",
+        "strawberries 120g",
+        "heavy cream 1 cup",
+        "strawberries 8"
+      ],
+      "instructions_en": [
+        "(1) Combine A and B separately and let the gelatin soften.",
+        "(2) Put 2/3 cup water in a pot and heat. Add A and dissolve, being careful not to bring to a boil.",
+        "(3) Remove from heat, add the sweetener and lemon juice, pour into a mold (18 cm diameter casserole dish), and refrigerate until set (not included in cooking time).",
+        "(4) Put 1/4 cup water in a pot and heat. Add B and dissolve. Let cool slightly, then add the sweetener.",
+        "(5) Mash the strawberries. Whip the heavy cream and fold both into step (4).",
+        "(6) Once step (3) has set, arrange strawberry slices on top, pour in step (5), and refrigerate until set (not included in cooking time)."
       ]
     },
     {
@@ -2383,28 +3463,52 @@
         {
           "text": "（１）ボウルに卵白を入れてよく泡立てる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Place the egg whites in a bowl and whip until stiff peaks form."
         },
         {
           "text": "（２）別のボウルに卵黄を溶き、グラニュー糖を加えて混ぜ、（１）の１／３量を加えて泡立て、<br />残りの（１）を加えてサックリ混ぜる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) In a separate bowl, beat the egg yolks, add the granulated sugar and mix. Fold in 1/3 of step (1) and whisk, then add the remaining step (1) and fold gently."
         },
         {
           "text": "（３）いちごにＡを混ぜ合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Toss the strawberries with A."
         },
         {
           "text": "（４）熱したホットプレートに（２）の生地の半量を丸く流す。生地の手前側半分に<br />（３）のいちごの半量をのせ、二つ折りにする。同様にもう１枚作る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Pour half the batter from step (2) into a circle on a heated hot plate. Place half the strawberries from step (3) on the front half of the batter and fold in half. Repeat to make a second omelette."
         },
         {
           "text": "（５）器に盛り、いったアーモンドスライスをのせ、「パルスイート」をふる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Serve on a plate, top with toasted sliced almonds, and dust with sweetener."
         }
+      ],
+      "name_en": "Strawberry Omelette Cake",
+      "description_en": "A fun strawberry omelette cake made on a hot plate - perfect for cooking together at the table.",
+      "ingredients_en": [
+        "egg yolks 2",
+        "granulated sugar 2 tsp",
+        "egg whites 2",
+        "strawberries 8",
+        "A zero-calorie sweetener a pinch",
+        "A kirsch a pinch",
+        "sliced almonds a pinch",
+        "zero-calorie sweetener a pinch"
+      ],
+      "instructions_en": [
+        "(1) Place the egg whites in a bowl and whip until stiff peaks form.",
+        "(2) In a separate bowl, beat the egg yolks, add the granulated sugar and mix. Fold in 1/3 of step (1) and whisk, then add the remaining step (1) and fold gently.",
+        "(3) Toss the strawberries with A.",
+        "(4) Pour half the batter from step (2) into a circle on a heated hot plate. Place half the strawberries from step (3) on the front half of the batter and fold in half. Repeat to make a second omelette.",
+        "(5) Serve on a plate, top with toasted sliced almonds, and dust with sweetener."
       ]
     },
     {
@@ -2436,13 +3540,31 @@
         {
           "text": "（１）グリーンアスパラは４～５ｃｍ長さに切り、熱湯で色よくゆで、冷水にとって手早く冷まし、水気をしっかりきる。いちごはヘタを取り、くし形に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Cut the green asparagus into 4-5 cm lengths, boil until vibrant green, transfer to cold water to cool quickly, and drain well. Remove the hulls from the strawberries and cut into wedges."
         },
         {
           "text": "（２）Ａを混ぜ合わせ、（１）のグリーンアスパラ・いちごをあえる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Mix the A ingredients together, then toss with the asparagus and strawberries from step (1)."
         }
+      ],
+      "name_en": "Asparagus & Strawberry Salad",
+      "description_en": "A colorful salad pairing fresh green asparagus with sweet strawberries for a refreshing side dish.",
+      "ingredients_en": [
+        "green asparagus 1 bunch",
+        "strawberry 6 (net weight 100g)",
+        "A olive oil (extra virgin) 1 tbsp",
+        "A vinegar 1 tbsp",
+        "A sugar 1/2 tsp",
+        "A umami seasoning a pinch",
+        "A salt a pinch",
+        "A pepper a pinch"
+      ],
+      "instructions_en": [
+        "(1) Cut the green asparagus into 4-5 cm lengths, boil until vibrant green, transfer to cold water to cool quickly, and drain well. Remove the hulls from the strawberries and cut into wedges.",
+        "(2) Mix the A ingredients together, then toss with the asparagus and strawberries from step (1)."
       ]
     },
     {
@@ -2485,48 +3607,84 @@
         {
           "text": "（１）クレープを作る。バターは電子レンジ（５００Ｗ）で約３０秒加熱し、溶かしておく。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Make the crepes. Heat the butter in a microwave (500W) for about 30 seconds to melt it."
         },
         {
           "text": "（２）ボウルにＡをふるい入れ、卵を加えて混ぜ合わせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Sift the A ingredients into a bowl, add the eggs, and mix together."
         },
         {
           "text": "（３）牛乳の半量、（１）の溶かしバターを加えてよく混ぜ合わせ、残りの牛乳、バニラエッセンスを加え、生地をなじませる。（３０分以上置くと生地ののびがよくなります）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Add half the milk and the melted butter from step (1), mix well, then add the remaining milk and vanilla extract to let the batter rest. (Resting for 30 minutes or more improves the batter's consistency.)"
         },
         {
           "text": "（４）直径２０～２２ｃｍのフライパンにキッチンペーパーで薄く油を塗り、中火にする。（３）の生地をおたま１杯分位の生地を流し入れ、フライパンを回し、一面に広げる（または玉じゃくしの底で円を描くように生地を広げる）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Lightly grease a 20-22 cm diameter frying pan with oil using a paper towel and heat over medium heat. Pour about one ladleful of batter from step (3) into the pan, swirl to spread evenly across the surface (or spread the batter in a circular motion using the bottom of a ladle)."
         },
         {
           "text": "（５）フチが乾いてきたら竹串でまわりをなぞり、裏返し、１０秒位焼き、取り出す。同様にして生地をすべて焼き、冷ましておく（約１５枚焼ける）。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) When the edges begin to dry, trace around them with a bamboo skewer, flip the crepe, cook for about 10 seconds, and remove. Repeat with the remaining batter and let cool (makes about 15 crepes)."
         },
         {
           "text": "（６）いちご１０粒は粗みじん切りにし、残りは飾り用にタテ半分に切り、３等分に切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(6) Roughly chop 10 strawberries. Cut the remaining strawberries in half lengthwise, then into thirds for decoration."
         },
         {
           "text": "（７）ボウルにＢを入れ、氷水にあてながら泡立て、八分立てのホイップクリームを作る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(7) Put B ingredients in a bowl and whip over ice water until stiff peaks form."
         },
         {
           "text": "（８）（５）のクレープ１枚を広げ、（７）のホイップクリームを塗り、粗みじん切りにしたいちごを適量散らし、クレープを上に重ねる。これを交互にくり返す。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(8) Lay out one crepe from step (5), spread whipped cream from step (7), scatter some chopped strawberries, and place another crepe on top. Repeat this layering process."
         },
         {
           "text": "（９）一番上に残りのホイップクリームで輪を描き、その上に飾り用のいちご、ミントの葉を飾る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(9) On the top, pipe the remaining whipped cream in a circle, and decorate with the reserved strawberries and mint leaves."
         }
+      ],
+      "name_en": "Strawberry Mille Crepe",
+      "description_en": "Layers of thin crepes stacked with fresh strawberries and whipped cream for a beautiful mille crepe dessert.",
+      "ingredients_en": [
+        "egg 2",
+        "A cake flour 100g",
+        "A sugar 30g",
+        "milk 250ml",
+        "butter 30g",
+        "vanilla extract a pinch",
+        "strawberry 16-20 (1 pack)",
+        "B heavy cream 1 cup",
+        "B sugar 40g",
+        "mint leaves (for garnish) to taste",
+        "vegetable oil a pinch"
+      ],
+      "instructions_en": [
+        "(1) Make the crepes. Heat the butter in a microwave (500W) for about 30 seconds to melt it.",
+        "(2) Sift the A ingredients into a bowl, add the eggs, and mix together.",
+        "(3) Add half the milk and the melted butter from step (1), mix well, then add the remaining milk and vanilla extract to let the batter rest. (Resting for 30 minutes or more improves the batter's consistency.)",
+        "(4) Lightly grease a 20-22 cm diameter frying pan with oil using a paper towel and heat over medium heat. Pour about one ladleful of batter from step (3) into the pan, swirl to spread evenly across the surface (or spread the batter in a circular motion using the bottom of a ladle).",
+        "(5) When the edges begin to dry, trace around them with a bamboo skewer, flip the crepe, cook for about 10 seconds, and remove. Repeat with the remaining batter and let cool (makes about 15 crepes).",
+        "(6) Roughly chop 10 strawberries. Cut the remaining strawberries in half lengthwise, then into thirds for decoration.",
+        "(7) Put B ingredients in a bowl and whip over ice water until stiff peaks form.",
+        "(8) Lay out one crepe from step (5), spread whipped cream from step (7), scatter some chopped strawberries, and place another crepe on top. Repeat this layering process.",
+        "(9) On the top, pipe the remaining whipped cream in a circle, and decorate with the reserved strawberries and mint leaves.",
+        "* Instead of strawberries, you can also use bananas, kiwi, chocolate, or other favorite fruits and sweets."
       ]
     },
     {
@@ -2562,33 +3720,59 @@
         {
           "text": "（１）いちごはヘタを取っておく。ホワイトチョコレートは刻んで、湯せんにかけて溶かす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Remove the hulls from the strawberries. Chop the white chocolate and melt it in a double boiler."
         },
         {
           "text": "（２）（１）のいちごに先端から竹串を刺し、先端を残して（１）のチョコレートをからめ、<br />安定するコップなどに立てかけて乾かす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Insert a bamboo skewer into each strawberry from the tip, coat with the melted chocolate from step (1) leaving the tip exposed, and stand upright in a cup to dry."
         },
         {
           "text": "（３）白あんは１２等分にして円形状に平たくのばし、（２）のいちごを先端を残して包む。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Divide the white bean paste into 12 equal portions, flatten each into a disc, and wrap around the strawberries from step (2), leaving the tips exposed."
         },
         {
           "text": "（４）耐熱ボウルに白玉粉を入れ、水を少しずつ加えながら、なめらかになるまで混ぜ、Ａを<br />加えて、さらに混ぜ合わせる。ラップをかけて電子レンジ（６００Ｗ）で２分加熱する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(4) Put the shiratamako in a heatproof bowl, gradually add water while mixing until smooth, then add the A ingredients and mix further. Cover with plastic wrap and microwave (600W) for 2 minutes."
         },
         {
           "text": "（５）途中一度取り出し、木べらで均一に混ぜ、全体が半透明になるまでさらに２～３分程<br />加熱する。片栗粉を敷いたバットにあけ、全体を１２等分にする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(5) Remove partway through, stir evenly with a wooden spatula, and microwave for another 2-3 minutes until the mixture becomes translucent throughout. Turn out onto a tray dusted with potato starch and divide into 12 equal portions."
         },
         {
           "text": "（６）手で（５）を平らにのばし、（３）のいちごに先端が中心になるようにかぶせ、<br />とじ目をしっかりととじる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(6) Flatten each portion of mochi from step (5) by hand, place over the strawberries from step (3) with the tip centered, and pinch the seams tightly closed."
         }
+      ],
+      "name_en": "Strawberry Chocolate Daifuku",
+      "description_en": "Soft mochi filled with white bean paste, white chocolate-coated strawberry, and a sweet chewy wrapper.",
+      "ingredients_en": [
+        "strawberry 12",
+        "white bean paste (store-bought) 200g",
+        "white chocolate 60g",
+        "shiratamako (glutinous rice flour) 100g",
+        "water 110ml",
+        "A sugar 30g",
+        "A zero-calorie sweetener 10g",
+        "potato starch to taste"
+      ],
+      "instructions_en": [
+        "(1) Remove the hulls from the strawberries. Chop the white chocolate and melt it in a double boiler.",
+        "(2) Insert a bamboo skewer into each strawberry from the tip, coat with the melted chocolate from step (1) leaving the tip exposed, and stand upright in a cup to dry.",
+        "(3) Divide the white bean paste into 12 equal portions, flatten each into a disc, and wrap around the strawberries from step (2), leaving the tips exposed.",
+        "(4) Put the shiratamako in a heatproof bowl, gradually add water while mixing until smooth, then add the A ingredients and mix further. Cover with plastic wrap and microwave (600W) for 2 minutes.",
+        "(5) Remove partway through, stir evenly with a wooden spatula, and microwave for another 2-3 minutes until the mixture becomes translucent throughout. Turn out onto a tray dusted with potato starch and divide into 12 equal portions.",
+        "(6) Flatten each portion of mochi from step (5) by hand, place over the strawberries from step (3) with the tip centered, and pinch the seams tightly closed."
       ]
     },
     {
@@ -2621,18 +3805,38 @@
         {
           "text": "（１）いちごはヘタを取り除く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Remove the hulls from the strawberries."
         },
         {
           "text": "（２）耐熱の密閉容器に（１）のいちご、「パルスイート」を入れて菜ばしで軽く混ぜ、<br />レモン汁、水を加え、フタをせずに電子レンジ（６００Ｗ）で５分加熱し、<br />そのまま冷まし（時間外）、いちごシロップを作る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Place the strawberries from step (1) and the sweetener in a heatproof airtight container, stir lightly with cooking chopsticks, add lemon juice and water, and microwave (600W) uncovered for 5 minutes. Let cool as-is to make strawberry syrup."
         },
         {
           "text": "（３）グラスに（２）のいちごシロップ９０ｍｌを注ぎ、冷たい牛乳９０ｍｌで割る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Pour 90ml of the strawberry syrup from step (2) into a glass and mix with 90ml of cold milk."
         }
+      ],
+      "name_en": "Strawberry Syrup Milk",
+      "description_en": "A sweet strawberry syrup diluted with cold milk, featuring the lovely color and aroma of fresh strawberries.",
+      "ingredients_en": [
+        "strawberry 400g",
+        "low-calorie sweetener 100g",
+        "lemon juice 3 tbsp",
+        "water 2 cups",
+        "milk 900ml"
+      ],
+      "instructions_en": [
+        "(1) Remove the hulls from the strawberries.",
+        "(2) Place the strawberries from step (1) and the sweetener in a heatproof airtight container, stir lightly with cooking chopsticks, add lemon juice and water, and microwave (600W) uncovered for 5 minutes. Let cool as-is to make strawberry syrup.",
+        "(3) Pour 90ml of the strawberry syrup from step (2) into a glass and mix with 90ml of cold milk.",
+        "* Best enjoyed from the second day onward.",
+        "* Can also be mixed with an equal amount of sparkling water.",
+        "* Store covered in the refrigerator for up to 1 month. After 1 week, remove the strawberries. The removed strawberries can be eaten with yogurt."
       ]
     },
     {
@@ -2660,13 +3864,27 @@
         {
           "text": "（１）いちごはヘタを取る。 ",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Remove the hulls from the strawberries."
         },
         {
           "text": "（２）大きめの耐熱ボウルに（１）のいちご、「パルスイート」、レモン汁を入れて混ぜ合わせ、ラップをかけずに電子レンジ（６００Ｗ）で６分加熱し、アクを取り、一度混ぜ合わせ、さらに４分加熱する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Place the strawberries from step (1), sweetener, and lemon juice in a large heatproof bowl, mix together, and microwave (600W) uncovered for 6 minutes. Skim off any foam, stir, then microwave for another 4 minutes."
         }
+      ],
+      "name_en": "Easy Healthy Strawberry Jam",
+      "description_en": "A quick microwave strawberry jam made with low-calorie sweetener and a touch of lemon juice.",
+      "ingredients_en": [
+        "strawberry (net weight) 14 (200g)",
+        "low-calorie sweetener 2 tbsp",
+        "lemon juice 1/2 tsp"
+      ],
+      "instructions_en": [
+        "(1) Remove the hulls from the strawberries.",
+        "(2) Place the strawberries from step (1), sweetener, and lemon juice in a large heatproof bowl, mix together, and microwave (600W) uncovered for 6 minutes. Skim off any foam, stir, then microwave for another 4 minutes.",
+        "* Jam made with low-calorie sweetener has a shorter shelf life than jam made with sugar, so consume promptly."
       ]
     },
     {
@@ -2698,18 +3916,37 @@
         {
           "text": "（１）玉ねぎを薄切りにし、バターで弱火から中火でじっくり炒めて飴色にする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Thinly slice the onions and slowly saute in butter over low to medium heat until deeply caramelized."
         },
         {
           "text": "（２）薄力粉を加えて軽く炒め、ブイヨンを注いで20分ほど煮る。塩・こしょうで調える。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Add the flour and stir briefly, then pour in the bouillon and simmer for about 20 minutes. Season with salt and pepper."
         },
         {
           "text": "（３）器に注ぎ、バゲットとチーズをのせてオーブンで焼き色を付ける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Ladle into oven-safe bowls, top with baguette slices and cheese, and broil until golden."
         }
+      ],
+      "name_en": "French Onion Soup",
+      "description_en": "A classic Parisian bistro soup featuring deeply caramelized onions topped with crusty bread and melted cheese.",
+      "ingredients_en": [
+        "onion 3",
+        "butter 20g",
+        "cake flour 1 tsp",
+        "bouillon 700ml",
+        "baguette 4 slices",
+        "Gruyere cheese 60g",
+        "salt and pepper a pinch"
+      ],
+      "instructions_en": [
+        "(1) Thinly slice the onions and slowly saute in butter over low to medium heat until deeply caramelized.",
+        "(2) Add the flour and stir briefly, then pour in the bouillon and simmer for about 20 minutes. Season with salt and pepper.",
+        "(3) Ladle into oven-safe bowls, top with baguette slices and cheese, and broil until golden."
       ]
     },
     {
@@ -2740,18 +3977,36 @@
         {
           "text": "（１）パンにバターとマスタードを塗り、ハムとチーズをはさんでサンドする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Spread butter and mustard on the bread, then sandwich with ham and cheese."
         },
         {
           "text": "（２）表面にベシャメルソースとチーズをのせる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Spread bechamel sauce and cheese on top."
         },
         {
           "text": "（３）オーブンまたはトースターで焼き、表面に焼き色を付ける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Bake in the oven or toaster until the surface is golden brown."
         }
+      ],
+      "name_en": "Croque-Monsieur",
+      "description_en": "A toasted ham and cheese sandwich with bechamel sauce, a staple of Parisian cafe culture.",
+      "ingredients_en": [
+        "bread 4 slices",
+        "ham 2 slices",
+        "Gruyere or Emmental cheese 80g",
+        "butter 10g",
+        "bechamel sauce 80g",
+        "whole grain mustard 1 tsp"
+      ],
+      "instructions_en": [
+        "(1) Spread butter and mustard on the bread, then sandwich with ham and cheese.",
+        "(2) Spread bechamel sauce and cheese on top.",
+        "(3) Bake in the oven or toaster until the surface is golden brown."
       ]
     },
     {
@@ -2781,18 +4036,35 @@
         {
           "text": "（１）バゲットを横に切り込みを入れて開く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Slice the baguette open lengthwise."
         },
         {
           "text": "（２）内側にバターをたっぷり塗り、好みでマスタードを薄く塗る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Spread a generous amount of butter on the inside, and add a thin layer of mustard if desired."
         },
         {
           "text": "（３）ハムをはさんで食べやすい長さに切る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Fill with ham and cut into easy-to-eat lengths."
         }
+      ],
+      "name_en": "Jambon-Beurre",
+      "description_en": "A simple Parisian baguette sandwich with quality butter and ham, an everyday staple in France.",
+      "ingredients_en": [
+        "baguette 1",
+        "unsalted butter 30g",
+        "jambon de Paris (boneless ham) 120g",
+        "Dijon mustard a pinch (optional)",
+        "cornichons to taste (optional)"
+      ],
+      "instructions_en": [
+        "(1) Slice the baguette open lengthwise.",
+        "(2) Spread a generous amount of butter on the inside, and add a thin layer of mustard if desired.",
+        "(3) Fill with ham and cut into easy-to-eat lengths."
       ]
     },
     {
@@ -2826,18 +4098,39 @@
         {
           "text": "（１）仔牛肉を下ゆでしてアクを除き、玉ねぎ・にんじん・ローリエとともにやわらかく煮る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Parboil the veal to remove scum, then simmer until tender with the onion, carrot, and bay leaf."
         },
         {
           "text": "（２）マッシュルームを加えてさらに煮る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Add the mushrooms and continue simmering."
         },
         {
           "text": "（３）卵黄と生クリーム、レモン汁を合わせて火を止めた鍋に加え、とろみをつける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Combine the egg yolk, heavy cream, and lemon juice, remove the pot from heat, and stir the mixture in to thicken the sauce."
         }
+      ],
+      "name_en": "Blanquette de Veau",
+      "description_en": "A traditional veal stew in a creamy white sauce, a beloved home-style dish from the Ile-de-France region.",
+      "ingredients_en": [
+        "veal (shoulder or shank) 700g",
+        "onion 1",
+        "carrot 1",
+        "mushroom 150g",
+        "heavy cream 100ml",
+        "egg yolk 1",
+        "lemon juice 2 tsp",
+        "bay leaf 1",
+        "salt and pepper a pinch"
+      ],
+      "instructions_en": [
+        "(1) Parboil the veal to remove scum, then simmer until tender with the onion, carrot, and bay leaf.",
+        "(2) Add the mushrooms and continue simmering.",
+        "(3) Combine the egg yolk, heavy cream, and lemon juice, remove the pot from heat, and stir the mixture in to thicken the sauce."
       ]
     },
     {
@@ -2869,18 +4162,37 @@
         {
           "text": "（１）じゃがいもをゆでてつぶし、牛乳とバターでマッシュポテトを作る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Boil and mash the potatoes with milk and butter to make mashed potatoes."
         },
         {
           "text": "（２）玉ねぎと牛ひき肉を炒め、塩・こしょうで調味する。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Saute the onion and ground beef, and season with salt and pepper."
         },
         {
           "text": "（３）耐熱皿に肉、マッシュポテトの順に重ね、チーズをのせて焼く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Layer the meat and mashed potatoes in a baking dish, top with cheese, and bake."
         }
+      ],
+      "name_en": "Hachis Parmentier",
+      "description_en": "A French shepherd's pie layering seasoned ground beef with creamy mashed potatoes, topped with cheese and baked.",
+      "ingredients_en": [
+        "ground beef 400g",
+        "onion 1",
+        "potato 600g",
+        "milk 120ml",
+        "butter 30g",
+        "cheese 50g",
+        "salt and pepper a pinch"
+      ],
+      "instructions_en": [
+        "(1) Boil and mash the potatoes with milk and butter to make mashed potatoes.",
+        "(2) Saute the onion and ground beef, and season with salt and pepper.",
+        "(3) Layer the meat and mashed potatoes in a baking dish, top with cheese, and bake."
       ]
     },
     {
@@ -2911,18 +4223,36 @@
         {
           "text": "（１）玉ねぎをバターでしんなりするまで炒める。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Saute the onion in butter until soft."
         },
         {
           "text": "（２）グリーンピースとブイヨンを加えて柔らかくなるまで煮る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Add the green peas and bouillon, and simmer until tender."
         },
         {
           "text": "（３）ミキサーでなめらかにし、生クリームを加えて温める。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Blend until smooth, add the heavy cream, and heat through."
         }
+      ],
+      "name_en": "Potage Saint-Germain",
+      "description_en": "A smooth and velvety green pea soup, a French classic named after the Saint-Germain area.",
+      "ingredients_en": [
+        "green peas 300g",
+        "onion 1/2",
+        "butter 15g",
+        "bouillon 700ml",
+        "heavy cream 80ml",
+        "salt and pepper a pinch"
+      ],
+      "instructions_en": [
+        "(1) Saute the onion in butter until soft.",
+        "(2) Add the green peas and bouillon, and simmer until tender.",
+        "(3) Blend until smooth, add the heavy cream, and heat through."
       ]
     },
     {
@@ -2953,18 +4283,36 @@
         {
           "text": "（１）リング状に絞ったシュー生地にアーモンドを散らして焼く。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Pipe the choux pastry into a ring shape, scatter with sliced almonds, and bake."
         },
         {
           "text": "（２）プラリネ入りのクリームを作って冷やす。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Make the praline cream and chill."
         },
         {
           "text": "（３）シューを横に切ってクリームを絞り、粉砂糖を振る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Slice the choux ring in half horizontally, pipe in the cream, and dust with powdered sugar."
         }
+      ],
+      "name_en": "Paris-Brest",
+      "description_en": "A ring-shaped choux pastry filled with praline cream, created to celebrate the Paris-Brest bicycle race.",
+      "ingredients_en": [
+        "choux pastry (egg 3, cake flour 90g, butter 70g, water 150ml)",
+        "praline paste 80g",
+        "pastry cream 250g",
+        "heavy cream 100ml",
+        "sliced almonds 20g",
+        "powdered sugar a pinch"
+      ],
+      "instructions_en": [
+        "(1) Pipe the choux pastry into a ring shape, scatter with sliced almonds, and bake.",
+        "(2) Make the praline cream and chill.",
+        "(3) Slice the choux ring in half horizontally, pipe in the cream, and dust with powdered sugar."
       ]
     },
     {
@@ -2995,18 +4343,36 @@
         {
           "text": "（１）パイ生地を焼き、土台を作る。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Bake the puff pastry to form the base."
         },
         {
           "text": "（２）シューを作ってカスタードを詰め、カラメルで土台に並べる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Make the cream puffs, fill with pastry cream, and arrange on the base using caramel."
         },
         {
           "text": "（３）中央にクリームを絞って仕上げる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Pipe cream in the center to finish."
         }
+      ],
+      "name_en": "Saint-Honore Cake",
+      "description_en": "A traditional French pastry named after rue Saint-Honore in Paris, combining puff pastry, cream puffs, and caramel.",
+      "ingredients_en": [
+        "puff pastry sheet 1",
+        "small cream puffs 12",
+        "pastry cream 250g",
+        "heavy cream 150ml",
+        "sugar 80g",
+        "water 20ml"
+      ],
+      "instructions_en": [
+        "(1) Bake the puff pastry to form the base.",
+        "(2) Make the cream puffs, fill with pastry cream, and arrange on the base using caramel.",
+        "(3) Pipe cream in the center to finish."
       ]
     },
     {
@@ -3036,18 +4402,35 @@
         {
           "text": "（１）生地を焼いて3枚にスライスする。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Bake the sponge and slice into 3 layers."
         },
         {
           "text": "（２）シロップを含ませ、ガナッシュとバタークリームを交互に重ねる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) Soak each layer with coffee syrup, then alternate layers of ganache and buttercream."
         },
         {
           "text": "（３）表面をグラサージュで覆い、冷やして切り分ける。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Cover the surface with chocolate glaze, chill, and cut into portions."
         }
+      ],
+      "name_en": "Opera Cake",
+      "description_en": "A layered Parisian cake with alternating coffee and chocolate flavors, a signature dessert of French patisseries.",
+      "ingredients_en": [
+        "almond sponge (joconde) 1 cake",
+        "coffee syrup 120ml",
+        "ganache 250g",
+        "coffee buttercream 250g",
+        "chocolate glaze 150g"
+      ],
+      "instructions_en": [
+        "(1) Bake the sponge and slice into 3 layers.",
+        "(2) Soak each layer with coffee syrup, then alternate layers of ganache and buttercream.",
+        "(3) Cover the surface with chocolate glaze, chill, and cut into portions."
       ]
     },
     {
@@ -3078,18 +4461,36 @@
         {
           "text": "（１）粉、砂糖、塩、イースト、卵で生地をこね、バターを加えてさらにこねる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(1) Knead the flour, sugar, salt, yeast, and eggs into a dough, then add the butter and continue kneading."
         },
         {
           "text": "（２）一次発酵後に分割して型に並べ、二次発酵させる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(2) After the first rise, divide the dough, arrange in a loaf pan, and let rise a second time."
         },
         {
           "text": "（３）表面に溶き卵を塗り、オーブンで焼き上げる。",
           "image_url": null,
-          "image_path": null
+          "image_path": null,
+          "text_en": "(3) Brush the surface with egg wash and bake in the oven."
         }
+      ],
+      "name_en": "Brioche de Nanterre",
+      "description_en": "A rich, buttery brioche baked in a loaf pan, originating from Nanterre on the western outskirts of Paris.",
+      "ingredients_en": [
+        "bread flour 300g",
+        "sugar 35g",
+        "salt 5g",
+        "dry yeast 6g",
+        "egg 3",
+        "butter 150g"
+      ],
+      "instructions_en": [
+        "(1) Knead the flour, sugar, salt, yeast, and eggs into a dough, then add the butter and continue kneading.",
+        "(2) After the first rise, divide the dough, arrange in a loaf pan, and let rise a second time.",
+        "(3) Brush the surface with egg wash and bake in the oven."
       ]
     }
   ]
