@@ -13,7 +13,7 @@
 import { stripHtmlInline } from "@/utils/recipe";
 import type { Recipe } from "@/types/recipe";
 import { buildRecipeGantt, type GanttTask } from "@/utils/gantt";
-import { postJsonVps, shouldUseVpsProxy } from "@/services/vpsClient";
+import { postJsonVps, shouldUseServerProxy } from "@/services/vpsClient";
 import { callAnthropicMessages } from "@/services/anthropicClient";
 
 // ─── Types ──────────────────────────────────────────
@@ -64,17 +64,7 @@ export const RECIPE_COLORS = [
 ];
 
 const CONTAMINATION_KEYWORDS: Record<string, string[]> = {
-  raw_meat: [
-    "肉",
-    "牛肉",
-    "豚肉",
-    "鶏肉",
-    "ひき肉",
-    "合いびき",
-    "バラ肉",
-    "ロース",
-    "もも肉",
-  ],
+  raw_meat: ["肉", "牛肉", "豚肉", "鶏肉", "ひき肉", "合いびき", "バラ肉", "ロース", "もも肉"],
   raw_fish: ["魚", "刺身", "サーモン", "マグロ", "エビ", "イカ", "貝"],
   vegetables: [
     "野菜",
@@ -116,11 +106,9 @@ async function analyzeRecipeWithLLM(
   ingredients: string[],
   steps: Array<{ text: string }>,
 ): Promise<StepResource[]> {
-  const useVps = shouldUseVpsProxy();
+  const useVps = shouldUseServerProxy();
 
-  const stepsText = steps
-    .map((s, i) => `${i + 1}. ${stripHtmlInline(s.text)}`)
-    .join("\n");
+  const stepsText = steps.map((s, i) => `${i + 1}. ${stripHtmlInline(s.text)}`).join("\n");
   const ingredientsText = ingredients.join(", ");
 
   const prompt = `レシピの各工程を解析し、必要に応じて細かいサブステップに分割してください。
@@ -172,10 +160,9 @@ JSONの配列のみを出力してください。マークダウンのコード�
 ]`;
 
   if (useVps) {
-    const data = await postJsonVps<{ steps: StepResource[] }>(
-      "/vps/scheduler/analyze-recipe",
-      { prompt },
-    );
+    const data = await postJsonVps<{ steps: StepResource[] }>("/vps/scheduler/analyze-recipe", {
+      prompt,
+    });
     return data.steps;
   }
 
@@ -206,9 +193,7 @@ function classifyStep(text: string): {
 } {
   const clean = stripHtmlInline(text);
   return {
-    uses_stove:
-      /[焼炒煮沸茹蒸]/.test(clean) ||
-      /コンロ|火にかけ|フライパン|鍋/.test(clean),
+    uses_stove: /[焼炒煮沸茹蒸]/.test(clean) || /コンロ|火にかけ|フライパン|鍋/.test(clean),
     uses_cutting_board: /[切刻]/.test(clean) || /みじん/.test(clean),
     requires_attention: !/煮込|蒸らし|放置|浸[しけ]|冷ま/.test(clean),
   };
@@ -304,10 +289,7 @@ function isResourceAvailable(
 /**
  * 貪欲法スケジューリング (scheduler.py:130-232)
  */
-function greedySchedule(
-  allTasks: SchedulerTask[],
-  stoveBurners: number,
-): SchedulerTask[] {
+function greedySchedule(allTasks: SchedulerTask[], stoveBurners: number): SchedulerTask[] {
   // レシピごとにグループ化
   const tasksByRecipe = new Map<string, SchedulerTask[]>();
   for (const task of allTasks) {
@@ -357,29 +339,16 @@ function greedySchedule(
       const earliestStart = recipeEndTimes.get(recipeId) ?? 0;
 
       // 最早開始時刻を探索 (上限500分)
-      for (
-        let tryStart = earliestStart;
-        tryStart < earliestStart + 500;
-        tryStart++
-      ) {
+      for (let tryStart = earliestStart; tryStart < earliestStart + 500; tryStart++) {
         const end = tryStart + task.duration;
 
-        if (
-          task.uses_stove &&
-          !isResourceAvailable(stoveUsage, tryStart, end, stoveBurners)
-        ) {
+        if (task.uses_stove && !isResourceAvailable(stoveUsage, tryStart, end, stoveBurners)) {
           continue;
         }
-        if (
-          task.uses_cutting_board &&
-          !isResourceAvailable(cuttingBoardUsage, tryStart, end, 1)
-        ) {
+        if (task.uses_cutting_board && !isResourceAvailable(cuttingBoardUsage, tryStart, end, 1)) {
           continue;
         }
-        if (
-          task.requires_attention &&
-          !isResourceAvailable(attentionUsage, tryStart, end, 1)
-        ) {
+        if (task.requires_attention && !isResourceAvailable(attentionUsage, tryStart, end, 1)) {
           continue;
         }
 
@@ -398,8 +367,7 @@ function greedySchedule(
     const endTime = bestStart + bestTask.duration;
 
     if (bestTask.uses_stove) stoveUsage.push([bestStart, endTime]);
-    if (bestTask.uses_cutting_board)
-      cuttingBoardUsage.push([bestStart, endTime]);
+    if (bestTask.uses_cutting_board) cuttingBoardUsage.push([bestStart, endTime]);
     if (bestTask.requires_attention) attentionUsage.push([bestStart, endTime]);
 
     recipeEndTimes.set(bestRecipeId, endTime);
@@ -436,8 +404,7 @@ function findWashInsertions(
     if (category === "none") continue;
 
     const needsWash =
-      (currentContamination === "raw_meat" ||
-        currentContamination === "raw_fish") &&
+      (currentContamination === "raw_meat" || currentContamination === "raw_fish") &&
       category !== "raw_meat" &&
       category !== "raw_fish" &&
       category !== "none";
@@ -534,9 +501,7 @@ function buildTasksFromGantt(recipe: Recipe, color: string): SchedulerTask[] {
           ? "cook_active"
           : "cook_passive"
         : "prep",
-      contamination: classified.uses_cutting_board
-        ? classifyContamination(description)
-        : "none",
+      contamination: classified.uses_cutting_board ? classifyContamination(description) : "none",
       tips: "",
     };
   });
@@ -546,20 +511,13 @@ function buildTasksFromGantt(recipe: Recipe, color: string): SchedulerTask[] {
 /**
  * LLMでタスクを構築
  */
-async function buildTasksFromLLM(
-  recipe: Recipe,
-  color: string,
-): Promise<SchedulerTask[]> {
+async function buildTasksFromLLM(recipe: Recipe, color: string): Promise<SchedulerTask[]> {
   const ingredients = recipe.ingredients ?? [];
   const steps: Array<{ text: string }> = recipe.instruction_steps?.length
     ? recipe.instruction_steps.map((s) => ({ text: s.text }))
     : (recipe.instructions ?? []).map((text) => ({ text }));
 
-  const stepResources = await analyzeRecipeWithLLM(
-    recipe.name,
-    ingredients,
-    steps,
-  );
+  const stepResources = await analyzeRecipeWithLLM(recipe.name, ingredients, steps);
 
   const tasks = stepResources.map((sr) => {
     const needsAttention = sr.requires_attention || sr.step_index === 0;
@@ -574,14 +532,8 @@ async function buildTasksFromLLM(
       requires_attention: needsAttention,
       start_time: 0,
       color,
-      task_type: sr.uses_stove
-        ? needsAttention
-          ? "cook_active"
-          : "cook_passive"
-        : "prep",
-      contamination: sr.uses_cutting_board
-        ? classifyContamination(sr.step_description)
-        : "none",
+      task_type: sr.uses_stove ? (needsAttention ? "cook_active" : "cook_passive") : "prep",
+      contamination: sr.uses_cutting_board ? classifyContamination(sr.step_description) : "none",
       tips: sr.tips ?? "",
     };
   });
@@ -604,7 +556,7 @@ export async function scheduleMultipleRecipes(
 ): Promise<MultiRecipeSchedule> {
   const effectiveAlgorithm: SchedulerAlgorithmType =
     algorithm === "auto" && recipes.length === 3 ? "greedy" : algorithm;
-  const useVps = shouldUseVpsProxy();
+  const useVps = shouldUseServerProxy();
   let useLLMInLocalFallback = useVps && effectiveAlgorithm !== "claude_e2e";
 
   // VPS API経由でスケジューリング（高度なアルゴリズムを使用）
@@ -656,8 +608,8 @@ export async function scheduleMultipleRecipes(
       };
     } catch (e) {
       console.warn("VPS scheduler API failed, using local fallback:", e);
-      // claude_e2eの失敗時は追加のLLM呼び出しをせず、ローカルルールベースへフォールバック
-      if (effectiveAlgorithm === "claude_e2e") useLLMInLocalFallback = false;
+      // VPS経由の失敗時はローカルのルールベースへフォールバック
+      useLLMInLocalFallback = false;
     }
   }
 
@@ -675,10 +627,7 @@ export async function scheduleMultipleRecipes(
         allTasks.push(...tasks);
         continue;
       } catch (e) {
-        console.warn(
-          `LLM analysis failed for ${recipe.name}, using fallback:`,
-          e,
-        );
+        console.warn(`LLM analysis failed for ${recipe.name}, using fallback:`, e);
       }
     }
     // フォールバック: ルールベース
@@ -692,9 +641,7 @@ export async function scheduleMultipleRecipes(
   const corrected = applyHygieneCorrection(scheduled);
 
   const totalTime =
-    corrected.length > 0
-      ? Math.max(...corrected.map((t) => t.start_time + t.duration))
-      : 0;
+    corrected.length > 0 ? Math.max(...corrected.map((t) => t.start_time + t.duration)) : 0;
 
   return {
     tasks: corrected,

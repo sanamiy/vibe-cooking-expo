@@ -25,18 +25,7 @@ function synthesizeSpeechToWav(targetPath, text) {
   const filter = `flite=text='${safeText}':voice=slt`;
   const ffmpeg = spawnSync(
     "ffmpeg",
-    [
-      "-y",
-      "-f",
-      "lavfi",
-      "-i",
-      filter,
-      "-ar",
-      "16000",
-      "-ac",
-      "1",
-      targetPath,
-    ],
+    ["-y", "-f", "lavfi", "-i", filter, "-ar", "16000", "-ac", "1", targetPath],
     { encoding: "utf8" },
   );
   if (ffmpeg.status !== 0) {
@@ -109,14 +98,15 @@ async function main() {
         }),
       });
       const raw = await res.text();
-      if (!res.ok) {
-        throw new Error(`VPS API error ${res.status}: ${raw}`);
+      if (res.ok) {
+        const data = JSON.parse(raw);
+        console.log("mode=vps_proxy");
+        console.log(`synthetic_audio_text="${synthText}"`);
+        console.log(`voxtral_response="${String(data.text || "").trim()}"`);
+        return;
       }
-      const data = JSON.parse(raw);
-      console.log("mode=vps_proxy");
-      console.log(`synthetic_audio_text="${synthText}"`);
-      console.log(`voxtral_response="${String(data.text || "").trim()}"`);
-      return;
+
+      throw new Error(`VPS API error ${res.status}: ${raw}`);
     }
 
     const mistralKey =

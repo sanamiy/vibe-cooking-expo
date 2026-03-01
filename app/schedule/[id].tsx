@@ -116,6 +116,16 @@ export default function ScheduleScreen() {
       <View style={styles.header}>
         <BackButton label="買い出し" onPress={() => router.back()} />
         <Text style={styles.title}>スケジュール</Text>
+        <Pressable
+          style={({ pressed }) => [
+            styles.settingsBtn,
+            pressed && { opacity: 0.8 },
+          ]}
+          onPress={() => router.push("/settings")}
+          hitSlop={12}
+        >
+          <Text style={styles.settingsText}>⚙️</Text>
+        </Pressable>
       </View>
 
       <ScrollView
@@ -148,17 +158,19 @@ export default function ScheduleScreen() {
           <>
             {/* サマリー */}
             <View style={styles.summaryCard}>
-              <Text style={styles.summaryTitle}>調理プラン</Text>
               <View style={styles.summaryRow}>
                 <View style={styles.summaryItem}>
+                  <Text style={styles.summaryEmoji}>⏱️</Text>
                   <Text style={styles.summaryValue}>{schedule.total_time}</Text>
                   <Text style={styles.summaryLabel}>合計（分）</Text>
                 </View>
                 <View style={styles.summaryItem}>
+                  <Text style={styles.summaryEmoji}>📖</Text>
                   <Text style={styles.summaryValue}>{recipes.length}</Text>
-                  <Text style={styles.summaryLabel}>レシピ数</Text>
+                  <Text style={styles.summaryLabel}>メニュー数</Text>
                 </View>
                 <View style={styles.summaryItem}>
+                  <Text style={styles.summaryEmoji}>🔥</Text>
                   <Text style={styles.summaryValue}>
                     {settings.stoveBurners}
                   </Text>
@@ -266,6 +278,9 @@ function GanttChart({
 
           return (
             <View key={idx} style={ganttStyles.row}>
+              <Text style={ganttStyles.label} numberOfLines={1}>
+                {isWash ? "🧼" : ""} {task.step_description}
+              </Text>
               <View style={ganttStyles.track}>
                 <View
                   style={[
@@ -281,9 +296,6 @@ function GanttChart({
                   ]}
                 />
               </View>
-              <Text style={ganttStyles.label} numberOfLines={1}>
-                {isWash ? "🧼" : ""} {task.step_description}
-              </Text>
             </View>
           );
         })}
@@ -353,6 +365,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  settingsBtn: {
+    position: "absolute",
+    right: 16,
+    top: 0,
+    bottom: 0,
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  settingsText: { fontSize: 24 },
   backBtn: {
     position: "absolute",
     left: 20,
@@ -428,18 +450,22 @@ const styles = StyleSheet.create({
   },
   summaryItem: {
     alignItems: "center",
-    gap: 4,
+    gap: 2,
   },
   summaryValue: {
     fontSize: 32,
     fontWeight: "800",
-    color: theme.colors.primary,
+    color: theme.colors.subText,
     fontFamily: "Quicksand",
   },
   summaryLabel: {
     fontSize: 13,
     color: theme.colors.subText,
     fontWeight: "600",
+  },
+  summaryEmoji: {
+    fontSize: 36,
+    marginBottom: 2,
   },
 
   // Legend
@@ -544,7 +570,7 @@ const ganttStyles = StyleSheet.create({
   label: {
     fontSize: 11,
     color: theme.colors.subText,
-    marginTop: 2,
+    marginBottom: 2,
   },
 });
 

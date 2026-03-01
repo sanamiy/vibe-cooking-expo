@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 
-type ApiMode = "vps_proxy" | "direct_client";
+type ApiMode = "vps_proxy" | "direct_client" | "cloudflare";
 
 const config = require("@/config.json") as {
   apiMode?: ApiMode;
@@ -8,8 +8,10 @@ const config = require("@/config.json") as {
 
 function requireApiMode(): ApiMode {
   const mode = config?.apiMode;
-  if (mode !== "vps_proxy" && mode !== "direct_client") {
-    throw new Error("Missing or invalid config.json apiMode (expected vps_proxy or direct_client)");
+  if (mode !== "vps_proxy" && mode !== "direct_client" && mode !== "cloudflare") {
+    throw new Error(
+      "Missing or invalid config.json apiMode (expected vps_proxy, direct_client, or cloudflare)",
+    );
   }
   return mode;
 }
@@ -26,16 +28,36 @@ export function requireVpsBaseUrl(): string {
 
 export function getVpsBaseUrlOptional(): string | null {
   const raw =
-    (Constants.expoConfig?.extra as any)?.VPS_API_BASE_URL ??
-    process.env.EXPO_PUBLIC_VPS_API_BASE_URL;
+    process.env.EXPO_PUBLIC_VPS_API_BASE_URL ??
+    (Constants.expoConfig?.extra as any)?.VPS_API_BASE_URL;
   if (raw === "") return "";
   if (!raw) return null;
   return raw.replace(/\/$/, "");
 }
 
+export function getCloudflareBaseUrlOptional(): string | null {
+  const raw =
+    (Constants.expoConfig?.extra as any)?.CLOUDFLARE_PROXY_BASE_URL ??
+    process.env.EXPO_PUBLIC_CLOUDFLARE_PROXY_BASE_URL;
+  if (raw === "") return "";
+  if (!raw) return null;
+  return raw.replace(/\/$/, "");
+}
+
+export function requireProxyBaseUrl(): string {
+  const mode = requireApiMode();
+  if (mode === "cloudflare") {
+    const url = getCloudflareBaseUrlOptional();
+    if (url === null) throw new Error("Missing Cloudflare proxy base URL");
+    return url;
+  }
+  return requireVpsBaseUrl();
+}
+
 export function requireMistralApiKey(): string {
-  if (requireApiMode() === "vps_proxy") {
-    throw new Error("Mistral API key should not be used on client in vps_proxy mode");
+  const mode = requireApiMode();
+  if (mode === "vps_proxy" || mode === "cloudflare") {
+    throw new Error(`Mistral API key should not be used on client in ${mode} mode`);
   }
 
   const key =
@@ -49,8 +71,9 @@ export function requireMistralApiKey(): string {
 }
 
 export function requireClaudeApiKey(): string {
-  if (requireApiMode() === "vps_proxy") {
-    throw new Error("Claude API key should not be used on client in vps_proxy mode");
+  const mode = requireApiMode();
+  if (mode === "vps_proxy" || mode === "cloudflare") {
+    throw new Error(`Claude API key should not be used on client in ${mode} mode`);
   }
 
   const key =
@@ -63,8 +86,9 @@ export function requireClaudeApiKey(): string {
 }
 
 export function requireElevenLabsApiKey(): string {
-  if (requireApiMode() === "vps_proxy") {
-    throw new Error("ElevenLabs API key should not be used on client in vps_proxy mode");
+  const mode = requireApiMode();
+  if (mode === "vps_proxy" || mode === "cloudflare") {
+    throw new Error(`ElevenLabs API key should not be used on client in ${mode} mode`);
   }
 
   const key =

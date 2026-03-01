@@ -4,6 +4,13 @@ const path = require("node:path");
 const { randomUUID } = require("node:crypto");
 const { URL } = require("node:url");
 
+const DEFAULT_ANTHROPIC_MODEL =
+  process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
+const EVALUATOR_ANTHROPIC_MODEL =
+  process.env.CLAUDE_EVALUATOR_MODEL || "claude-sonnet-4-6";
+const EVALUATOR_ANTHROPIC_FALLBACK_MODEL =
+  process.env.CLAUDE_EVALUATOR_MODEL_FALLBACK || "claude-sonnet-4-5-20250929";
+
 // Scheduler module (compiled from TypeScript)
 let scheduler = null;
 try {
@@ -163,6 +170,7 @@ async function callAnthropic({
   tools,
   toolChoice,
   temperature,
+  model,
 }) {
   const key = requireEnv("CLAUDE_API_KEY");
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -173,7 +181,7 @@ async function callAnthropic({
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
+      model: String(model || DEFAULT_ANTHROPIC_MODEL),
       max_tokens: maxTokens,
       ...(temperature != null ? { temperature } : {}),
       ...(system ? { system } : {}),
@@ -221,6 +229,57 @@ async function callElevenLabs({ text }) {
   for (let i = 0; i < bytes.length; i++)
     binary += String.fromCharCode(bytes[i]);
   return Buffer.from(binary, "binary").toString("base64");
+}
+
+function normalizeIntentText(text) {
+  return String(text ?? "")
+    .toLowerCase()
+    .replace(/[\s\u3000]/g, "")
+    .replace(/[。、，,.!！?？「」『』（）()［］[\]{}]/g, "")
+    .trim();
+}
+
+function classifyIntentHeuristic({ userText, nextStep }) {
+  // TODO: Remove this heuristic fallback after intent classification is fully stable with LLM-only routing.
+  const raw = String(userText ?? "").trim();
+  const text = normalizeIntentText(raw);
+  if (!text) return null;
+
+  const hasQuestionMark = /[?？]/.test(raw);
+  if (
+    hasQuestionMark ||
+    /コツ|どう|なぜ|なんで|どれくらい|何分|教えて|方法|ポイント|大丈夫/.test(
+      text,
+    )
+  ) {
+    return "question";
+  }
+
+  if (/タイマー|残り|あと\d+|何分/.test(text)) {
+    return "timer_status";
+  }
+
+  if (/前|戻|もど/.test(text)) {
+    return "previous_step";
+  }
+
+  if (
+    /終わりました|終わった|できました|完了|done|finished|作業完了|おわりました/.test(
+      text,
+    )
+  ) {
+    return nextStep ? "next_step" : "end_session";
+  }
+
+  if (/次|つぎ|進む|すすめ|next/.test(text)) {
+    return "next_step";
+  }
+
+  if (/終了|おしまい|終わりにする|やめる|stop/.test(text)) {
+    return "end_session";
+  }
+
+  return null;
 }
 
 const FALLBACK_RECIPE_COLORS = [
@@ -281,6 +340,86 @@ function normalizeTaskType(rawTaskType, usesStove, requiresAttention) {
   if (VALID_TASK_TYPES.has(taskType)) return taskType;
   if (usesStove) return requiresAttention ? "cook_active" : "cook_passive";
   return "prep";
+}
+
+function classifyCuttingBoardIngredient(description) {
+  const text = String(description ?? "");
+  if (
+    /(鶏|牛|豚|ひき肉|挽き肉|ミンチ|レバー|ホルモン|手羽|もも肉|バラ肉|ロース|肉)/.test(
+      text,
+    )
+  ) {
+    return "raw_meat";
+  }
+  if (/(魚|サーモン|マグロ|刺身|えび|エビ|イカ|貝|ホタテ|たこ|タコ)/.test(text)) {
+    return "raw_fish";
+  }
+  if (
+    /(野菜|玉ねぎ|たまねぎ|にんじん|人参|じゃがいも|キャベツ|トマト|きゅうり|ピーマン|なす|白菜|ほうれん草|きのこ|大根|レタス|パセリ|みつば|ネギ|ねぎ)/.test(
+      text,
+    )
+  ) {
+    return "vegetables";
+  }
+  return "none";
+}
+
+function analyzeCuttingBoardFlow(tasks) {
+  const sorted = [...tasks].sort(
+    (a, b) => a.start_time - b.start_time || a.end_time - b.end_time,
+  );
+  const boardPrepTasks = sorted.filter(
+    (t) => t.uses_cutting_board && t.task_type !== "wash",
+  );
+  const washTasks = sorted.filter(
+    (t) =>
+      t.task_type === "wash" ||
+      /(まな板.*洗|洗浄|board.*wash)/i.test(String(t.description ?? "")),
+  );
+
+  const tagged = boardPrepTasks.map((task) => ({
+    ...task,
+    contamination: classifyCuttingBoardIngredient(task.description),
+  }));
+  const vegetableTasks = tagged.filter((t) => t.contamination === "vegetables");
+  const meatTasks = tagged.filter((t) => t.contamination === "raw_meat");
+  const fishTasks = tagged.filter((t) => t.contamination === "raw_fish");
+
+  const latestVegetableEnd =
+    vegetableTasks.length > 0
+      ? Math.max(...vegetableTasks.map((t) => t.end_time))
+      : null;
+  const earliestRawStartCandidates = [...meatTasks, ...fishTasks].map(
+    (t) => t.start_time,
+  );
+  const earliestRawStart =
+    earliestRawStartCandidates.length > 0
+      ? Math.min(...earliestRawStartCandidates)
+      : null;
+  const vegetablesBeforeRaw =
+    latestVegetableEnd == null ||
+    earliestRawStart == null ||
+    latestVegetableEnd <= earliestRawStart;
+
+  let rawToVegetableTransitions = 0;
+  for (let i = 1; i < tagged.length; i++) {
+    const prev = tagged[i - 1].contamination;
+    const curr = tagged[i].contamination;
+    const prevIsRaw = prev === "raw_meat" || prev === "raw_fish";
+    if (prevIsRaw && curr === "vegetables") rawToVegetableTransitions++;
+  }
+
+  return {
+    board_task_count: boardPrepTasks.length,
+    wash_task_count: washTasks.length,
+    vegetable_task_count: vegetableTasks.length,
+    raw_meat_task_count: meatTasks.length,
+    raw_fish_task_count: fishTasks.length,
+    vegetables_before_raw: vegetablesBeforeRaw,
+    latest_vegetable_end: latestVegetableEnd,
+    earliest_raw_start: earliestRawStart,
+    raw_to_vegetable_transitions: rawToVegetableTransitions,
+  };
 }
 
 function countParallelWindows(tasks) {
@@ -980,6 +1119,652 @@ function applyTaskUpdates(existingTasks, updates) {
   return { tasks, warnings };
 }
 
+function normalizeEvaluationCriteria(rawCriteria) {
+  const criteria = {
+    must_respect_kitchen_limits: true,
+    prefer_vegetables_before_meat: true,
+    minimize_cutting_board_washes: true,
+    max_cutting_board_washes: null,
+    max_total_time: null,
+    max_sync_variance: null,
+    min_parallel_windows: null,
+    custom_rules: [],
+  };
+
+  if (typeof rawCriteria === "string") {
+    const text = rawCriteria.trim();
+    if (text) criteria.custom_rules.push(text);
+    return criteria;
+  }
+
+  if (Array.isArray(rawCriteria)) {
+    criteria.custom_rules = rawCriteria
+      .map((v) => String(v ?? "").trim())
+      .filter(Boolean);
+    return criteria;
+  }
+
+  if (!rawCriteria || typeof rawCriteria !== "object") {
+    return criteria;
+  }
+
+  if ("must_respect_kitchen_limits" in rawCriteria) {
+    criteria.must_respect_kitchen_limits = toBool(
+      rawCriteria.must_respect_kitchen_limits,
+      true,
+    );
+  }
+
+  if ("max_total_time" in rawCriteria) {
+    const n = Number(rawCriteria.max_total_time);
+    criteria.max_total_time = Number.isFinite(n)
+      ? Math.max(0, Math.trunc(n))
+      : null;
+  }
+
+  if ("max_sync_variance" in rawCriteria) {
+    const n = Number(rawCriteria.max_sync_variance);
+    criteria.max_sync_variance = Number.isFinite(n)
+      ? Math.max(0, Math.trunc(n))
+      : null;
+  }
+
+  if ("min_parallel_windows" in rawCriteria) {
+    const n = Number(rawCriteria.min_parallel_windows);
+    criteria.min_parallel_windows = Number.isFinite(n)
+      ? Math.max(0, Math.trunc(n))
+      : null;
+  }
+
+  if ("prefer_vegetables_before_meat" in rawCriteria) {
+    criteria.prefer_vegetables_before_meat = toBool(
+      rawCriteria.prefer_vegetables_before_meat,
+      true,
+    );
+  }
+
+  if ("minimize_cutting_board_washes" in rawCriteria) {
+    criteria.minimize_cutting_board_washes = toBool(
+      rawCriteria.minimize_cutting_board_washes,
+      true,
+    );
+  }
+
+  if ("max_cutting_board_washes" in rawCriteria) {
+    const n = Number(rawCriteria.max_cutting_board_washes);
+    criteria.max_cutting_board_washes = Number.isFinite(n)
+      ? Math.max(0, Math.trunc(n))
+      : null;
+  }
+
+  const ruleTexts = [];
+  const pushRule = (value) => {
+    const text = String(value ?? "").trim();
+    if (text) ruleTexts.push(text);
+  };
+
+  if (typeof rawCriteria.criteria_text === "string") {
+    pushRule(rawCriteria.criteria_text);
+  }
+
+  if (Array.isArray(rawCriteria.criteria_rules)) {
+    for (const rule of rawCriteria.criteria_rules) pushRule(rule);
+  }
+
+  if (Array.isArray(rawCriteria.custom_rules)) {
+    for (const rule of rawCriteria.custom_rules) pushRule(rule);
+  }
+
+  if (Array.isArray(rawCriteria.rules)) {
+    for (const rule of rawCriteria.rules) {
+      if (typeof rule === "string") {
+        pushRule(rule);
+      } else if (rule && typeof rule === "object") {
+        pushRule(rule.criterion ?? rule.text ?? rule.rule);
+      }
+    }
+  }
+
+  criteria.custom_rules = [...new Set(ruleTexts)];
+  return criteria;
+}
+
+function findResourceViolations(tasks, kitchen) {
+  const stoveLimit = toInt(kitchen?.stove_burners, 1, { min: 0, max: 100 });
+  const boardLimit = toInt(kitchen?.cutting_boards, 1, { min: 0, max: 100 });
+  const cooksLimit = toInt(kitchen?.cooks, 1, { min: 0, max: 100 });
+  const totalTime = tasks.length > 0 ? Math.max(...tasks.map((t) => t.end_time), 0) : 0;
+
+  const violations = [];
+  for (let minute = 0; minute < totalTime; minute++) {
+    let stoveUsed = 0;
+    let boardUsed = 0;
+    let attentionUsed = 0;
+
+    for (const task of tasks) {
+      if (!(task.start_time < minute + 1 && task.end_time > minute)) continue;
+      if (task.uses_stove) stoveUsed++;
+      if (task.uses_cutting_board) boardUsed++;
+      if (task.requires_attention) attentionUsed++;
+    }
+
+    if (stoveUsed > stoveLimit) {
+      violations.push({
+        type: "stove_burners",
+        minute,
+        used: stoveUsed,
+        limit: stoveLimit,
+      });
+    }
+    if (boardUsed > boardLimit) {
+      violations.push({
+        type: "cutting_boards",
+        minute,
+        used: boardUsed,
+        limit: boardLimit,
+      });
+    }
+    if (attentionUsed > cooksLimit) {
+      violations.push({
+        type: "cooks_attention",
+        minute,
+        used: attentionUsed,
+        limit: cooksLimit,
+      });
+    }
+  }
+
+  return violations;
+}
+
+function findStepOrderViolations(tasks) {
+  const violations = [];
+  const byRecipe = new Map();
+  for (const task of tasks) {
+    if (task.step_index < 0) continue;
+    if (!byRecipe.has(task.recipe_id)) byRecipe.set(task.recipe_id, []);
+    byRecipe.get(task.recipe_id).push(task);
+  }
+
+  for (const [recipeId, recipeTasks] of byRecipe.entries()) {
+    const sorted = [...recipeTasks].sort((a, b) => {
+      if (a.step_index !== b.step_index) return a.step_index - b.step_index;
+      if (a.start_time !== b.start_time) return a.start_time - b.start_time;
+      return a.end_time - b.end_time;
+    });
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = sorted[i - 1];
+      const curr = sorted[i];
+      if (curr.step_index > prev.step_index && curr.start_time < prev.end_time) {
+        violations.push({
+          recipe_id: recipeId,
+          previous_task_id: prev.task_id,
+          current_task_id: curr.task_id,
+          previous_range: `${prev.start_time}-${prev.end_time}`,
+          current_range: `${curr.start_time}-${curr.end_time}`,
+        });
+      }
+    }
+  }
+
+  return violations;
+}
+
+function buildCriteriaResultsFromDeterministicChecks({
+  criteria,
+  stats,
+  scheduleTasks,
+  kitchen,
+}) {
+  const results = [];
+  const blockers = [];
+  const boardFlow = analyzeCuttingBoardFlow(scheduleTasks);
+
+  const resourceViolations = criteria.must_respect_kitchen_limits
+    ? findResourceViolations(scheduleTasks, kitchen)
+    : [];
+  const resourcePass = resourceViolations.length === 0;
+  results.push({
+    criterion: "キッチン制約を超えない",
+    passed: resourcePass,
+    reason: resourcePass
+      ? "コンロ・まな板・注意タスク人数の上限を超えていません。"
+      : `制約超過が ${resourceViolations.length} 箇所あります。`,
+    source: "deterministic",
+  });
+  if (!resourcePass) {
+    blockers.push(
+      `キッチン制約違反: ${resourceViolations
+        .slice(0, 3)
+        .map((v) => `${v.type}@${v.minute}分(使用${v.used}/上限${v.limit})`)
+        .join(", ")}`,
+    );
+  }
+
+  const stepOrderViolations = findStepOrderViolations(scheduleTasks);
+  const stepOrderPass = stepOrderViolations.length === 0;
+  results.push({
+    criterion: "同一レシピの工程順序を守る",
+    passed: stepOrderPass,
+    reason: stepOrderPass
+      ? "工程順序違反は検出されませんでした。"
+      : `工程順序違反が ${stepOrderViolations.length} 箇所あります。`,
+    source: "deterministic",
+  });
+  if (!stepOrderPass) {
+    blockers.push(
+      `工程順序違反: ${stepOrderViolations
+        .slice(0, 3)
+        .map((v) => `${v.recipe_id} ${v.previous_range} -> ${v.current_range}`)
+        .join(", ")}`,
+    );
+  }
+
+  if (criteria.prefer_vegetables_before_meat) {
+    const pass = boardFlow.vegetables_before_raw;
+    results.push({
+      criterion: "まな板作業で野菜を先、肉/魚を後にする",
+      passed: pass,
+      reason: pass
+        ? "野菜タスクが肉/魚タスクより先に配置されています。"
+        : "野菜より前に肉/魚のまな板タスクがあります。",
+      source: "deterministic",
+    });
+    if (!pass) {
+      blockers.push(
+        "まな板順序違反: 野菜の先切り（全野菜→肉/魚）になっていません。",
+      );
+    }
+  }
+
+  if (criteria.minimize_cutting_board_washes) {
+    const hasRaw =
+      boardFlow.raw_meat_task_count > 0 || boardFlow.raw_fish_task_count > 0;
+    const hasVegetables = boardFlow.vegetable_task_count > 0;
+    const estimatedBestWashCount = hasRaw && hasVegetables ? 1 : 0;
+    const improvementPossible =
+      !boardFlow.vegetables_before_raw ||
+      boardFlow.raw_to_vegetable_transitions > 0 ||
+      boardFlow.wash_task_count > estimatedBestWashCount;
+    const pass = !improvementPossible;
+    results.push({
+      criterion: "まな板洗浄回数を最小化（改善余地がない）",
+      passed: pass,
+      reason: pass
+        ? `実測 ${boardFlow.wash_task_count} 回（改善余地なし）`
+        : `実測 ${boardFlow.wash_task_count} 回（理想目安 ${estimatedBestWashCount} 回、並び替え改善余地あり）`,
+      source: "deterministic",
+    });
+    if (!pass) {
+      blockers.push(
+        `まな板洗浄最小化未達: 実測 ${boardFlow.wash_task_count} 回、野菜先切り/遷移削減で改善余地あり`,
+      );
+    }
+  }
+
+  if (criteria.max_cutting_board_washes != null) {
+    const washLimit = criteria.max_cutting_board_washes;
+    const pass = boardFlow.wash_task_count <= washLimit;
+    results.push({
+      criterion: `まな板洗浄回数 <= ${washLimit}（ハード制約）`,
+      passed: pass,
+      reason: `実測 ${boardFlow.wash_task_count} 回`,
+      source: "deterministic",
+    });
+    if (!pass) {
+      blockers.push(
+        `まな板洗浄回数ハード制約超過: ${boardFlow.wash_task_count} 回 > ${washLimit} 回`,
+      );
+    }
+  }
+
+  if (criteria.max_total_time != null) {
+    const pass = stats.totalTime <= criteria.max_total_time;
+    results.push({
+      criterion: `総時間 <= ${criteria.max_total_time}分`,
+      passed: pass,
+      reason: `実測 ${stats.totalTime}分`,
+      source: "deterministic",
+    });
+    if (!pass) blockers.push(`総時間超過: ${stats.totalTime}分`);
+  }
+
+  if (criteria.max_sync_variance != null) {
+    const pass = stats.syncVariance <= criteria.max_sync_variance;
+    results.push({
+      criterion: `同時完成ばらつき <= ${criteria.max_sync_variance}分`,
+      passed: pass,
+      reason: `実測 ${stats.syncVariance}分`,
+      source: "deterministic",
+    });
+    if (!pass) blockers.push(`同時完成ばらつき超過: ${stats.syncVariance}分`);
+  }
+
+  if (criteria.min_parallel_windows != null) {
+    const pass = stats.parallelWindows >= criteria.min_parallel_windows;
+    results.push({
+      criterion: `並列ウィンドウ >= ${criteria.min_parallel_windows}`,
+      passed: pass,
+      reason: `実測 ${stats.parallelWindows}`,
+      source: "deterministic",
+    });
+    if (!pass) blockers.push(`並列ウィンドウ不足: ${stats.parallelWindows}`);
+  }
+
+  return {
+    results,
+    blockers,
+    resourceViolations,
+    stepOrderViolations,
+    boardFlow,
+  };
+}
+
+function normalizeCriteriaResults(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      const criterion = String(
+        item?.criterion ?? item?.name ?? item?.rule ?? "",
+      ).trim();
+      if (!criterion) return null;
+      return {
+        criterion,
+        passed: toBool(item?.passed, false),
+        reason: String(item?.reason ?? item?.comment ?? ""),
+        source: "llm",
+      };
+    })
+    .filter(Boolean);
+}
+
+function buildRuleBasedFeedbackFromEvaluation(evaluation) {
+  if (!evaluation || typeof evaluation !== "object") return [];
+
+  const diagnostics = evaluation?.diagnostics ?? {};
+  const resourceViolations = Array.isArray(diagnostics?.resource_violations)
+    ? diagnostics.resource_violations
+    : [];
+  const stepOrderViolations = Array.isArray(diagnostics?.step_order_violations)
+    ? diagnostics.step_order_violations
+    : [];
+
+  const feedback = [];
+
+  const attentionViolations = resourceViolations
+    .filter((v) => String(v?.type ?? "") === "cooks_attention")
+    .slice(0, 8);
+  if (attentionViolations.length > 0) {
+    const windows = attentionViolations.map((v) => {
+      const minute = toInt(v?.minute, 0, { min: 0, max: 24 * 60 });
+      const used = toInt(v?.used, 0, { min: 0, max: 100 });
+      const limit = toInt(v?.limit, 0, { min: 0, max: 100 });
+      return `${minute}分(注意${used}/上限${limit})`;
+    });
+    feedback.push(`人数制約違反(cooks_attention): ${windows.join(", ")}`);
+    feedback.push(
+      "修正方針: requires_attention=true のタスク重なりを解消し、同時実行数を cooks 以下にする。必要なら後ろへシフトして直列化する。",
+    );
+  }
+
+  const otherResourceViolations = resourceViolations
+    .filter((v) => String(v?.type ?? "") !== "cooks_attention")
+    .slice(0, 4);
+  if (otherResourceViolations.length > 0) {
+    feedback.push(
+      `その他リソース違反: ${otherResourceViolations
+        .map((v) => {
+          const type = String(v?.type ?? "unknown");
+          const minute = toInt(v?.minute, 0, { min: 0, max: 24 * 60 });
+          const used = toInt(v?.used, 0, { min: 0, max: 100 });
+          const limit = toInt(v?.limit, 0, { min: 0, max: 100 });
+          return `${type}@${minute}分(使用${used}/上限${limit})`;
+        })
+        .join(", ")}`,
+    );
+  }
+
+  if (stepOrderViolations.length > 0) {
+    feedback.push(
+      `工程順序違反: ${stepOrderViolations
+        .slice(0, 4)
+        .map((v) => {
+          const recipeId = String(v?.recipe_id ?? "unknown");
+          const prev = String(v?.previous_range ?? "?-?");
+          const curr = String(v?.current_range ?? "?-?");
+          return `${recipeId} ${prev} -> ${curr}`;
+        })
+        .join(", ")}`,
+    );
+    feedback.push(
+      "修正方針: 同一 recipe_id では step_index の小さい工程が完了してから次工程を開始する。",
+    );
+  }
+
+  return feedback;
+}
+
+async function runScheduleEvaluationOneCall(args) {
+  const scheduleId = String(args?.schedule_id ?? "");
+  const providedSchedule = args?.schedule;
+  const providedKitchen = args?.kitchen;
+  const criteriaInput =
+    args?.criteria ?? args?.criteria_text ?? args?.criteria_rules ?? {};
+  const criteria = normalizeEvaluationCriteria(criteriaInput);
+  const taskLimit = toInt(args?.task_limit_for_llm, 120, { min: 20, max: 500 });
+
+  let resolvedSchedule = providedSchedule;
+  let resolvedKitchen = providedKitchen;
+  let resolvedScheduleId = scheduleId || null;
+
+  if (scheduleId) {
+    const store = readAgenticStore();
+    const record = store.schedules[scheduleId];
+    if (!record) throw new Error(`schedule not found: ${scheduleId}`);
+    resolvedSchedule = record?.result?.schedule;
+    resolvedKitchen = resolvedKitchen ?? record?.request?.kitchen;
+  }
+
+  if (!resolvedSchedule) {
+    throw new Error("evaluate_schedule requires schedule_id or schedule");
+  }
+
+  const rawTasks = Array.isArray(resolvedSchedule?.tasks)
+    ? resolvedSchedule.tasks
+    : Array.isArray(resolvedSchedule?.schedule?.tasks)
+      ? resolvedSchedule.schedule.tasks
+      : [];
+  if (rawTasks.length === 0) {
+    throw new Error("schedule.tasks is empty");
+  }
+
+  const normalizedTasks = rawTasks.map((t, i) =>
+    normalizeScheduleTask(t, `eval-${i + 1}`),
+  );
+  const stats = computeScheduleStats(normalizedTasks);
+  const algorithmUsed = String(
+    resolvedSchedule?.algorithm_used ??
+      resolvedSchedule?.schedule?.algorithm_used ??
+      "unknown",
+  );
+
+  const {
+    results: deterministicResults,
+    blockers: deterministicBlockers,
+    resourceViolations,
+    stepOrderViolations,
+    boardFlow,
+  } = buildCriteriaResultsFromDeterministicChecks({
+    criteria,
+    stats,
+    scheduleTasks: stats.tasks,
+    kitchen: resolvedKitchen ?? {},
+  });
+
+  let llmPayload = null;
+  let llmError = null;
+  if (criteria.custom_rules.length > 0) {
+    const scheduleForLlm = stats.tasks.slice(0, taskLimit).map((t) => ({
+      task_id: t.task_id,
+      recipe_id: t.recipe_id,
+      recipe_name: t.recipe_name,
+      step_index: t.step_index,
+      time: `${t.start_time}-${t.end_time}`,
+      task_type: t.task_type,
+      requires_attention: t.requires_attention,
+      uses_stove: t.uses_stove,
+      uses_cutting_board: t.uses_cutting_board,
+      description: t.description,
+    }));
+
+    const system = `あなたはスケジュール評価エージェントです。
+出力はJSONオブジェクトのみ。コードブロック禁止。
+厳密に次の形式:
+{
+  "pass": true/false,
+  "score": 0-100の整数,
+  "summary": "全体評価",
+  "criteria_results": [
+    { "criterion": "基準文", "passed": true/false, "reason": "根拠" }
+  ],
+  "blockers": ["未達の重要項目"],
+  "suggestions": ["改善案"]
+}`;
+
+    const prompt = {
+      criteria: criteria.custom_rules,
+      schedule_meta: {
+        schedule_id: resolvedScheduleId,
+        algorithm_used: algorithmUsed,
+        total_time: stats.totalTime,
+        task_count: stats.tasks.length,
+        sync_variance: stats.syncVariance,
+        parallel_windows: stats.parallelWindows,
+      },
+      kitchen: resolvedKitchen ?? null,
+      deterministic_findings: {
+        blockers: deterministicBlockers,
+        resource_violations: resourceViolations.slice(0, 10),
+        step_order_violations: stepOrderViolations.slice(0, 10),
+      },
+      tasks: scheduleForLlm,
+      tasks_truncated: stats.tasks.length > taskLimit,
+    };
+
+    try {
+      const data = await callAnthropic({
+        system,
+        maxTokens: 1200,
+        temperature: 0,
+        model: EVALUATOR_ANTHROPIC_MODEL,
+        messages: [{ role: "user", content: JSON.stringify(prompt, null, 2) }],
+      });
+      const text = (Array.isArray(data?.content) ? data.content : [])
+        .filter((c) => c?.type === "text")
+        .map((c) => String(c?.text ?? ""))
+        .join("\n")
+        .trim();
+      llmPayload = extractJsonObject(text);
+    } catch (e) {
+      const firstError = e instanceof Error ? e.message : String(e);
+      try {
+        const shouldRetryWithFallback =
+          EVALUATOR_ANTHROPIC_FALLBACK_MODEL &&
+          EVALUATOR_ANTHROPIC_FALLBACK_MODEL !== EVALUATOR_ANTHROPIC_MODEL &&
+          /model|not.?found|invalid/i.test(firstError);
+        if (!shouldRetryWithFallback) throw e;
+
+        const data = await callAnthropic({
+          system,
+          maxTokens: 1200,
+          temperature: 0,
+          model: EVALUATOR_ANTHROPIC_FALLBACK_MODEL,
+          messages: [
+            { role: "user", content: JSON.stringify(prompt, null, 2) },
+          ],
+        });
+        const text = (Array.isArray(data?.content) ? data.content : [])
+          .filter((c) => c?.type === "text")
+          .map((c) => String(c?.text ?? ""))
+          .join("\n")
+          .trim();
+        llmPayload = extractJsonObject(text);
+      } catch (retryErr) {
+        llmError =
+          retryErr instanceof Error ? retryErr.message : String(retryErr);
+      }
+    }
+  }
+
+  const llmCriteriaResults = normalizeCriteriaResults(llmPayload?.criteria_results);
+  const llmBlockers = Array.isArray(llmPayload?.blockers)
+    ? llmPayload.blockers.map((v) => String(v))
+    : [];
+  const llmSuggestions = Array.isArray(llmPayload?.suggestions)
+    ? llmPayload.suggestions.map((v) => String(v))
+    : [];
+  const deterministicPass = deterministicResults.every((r) => r.passed);
+  const llmPass = llmPayload
+    ? toBool(llmPayload?.pass, false)
+    : criteria.custom_rules.length > 0
+      ? false
+      : true;
+  const pass = deterministicPass && llmPass;
+  const score = llmPayload
+    ? toInt(llmPayload?.score, pass ? 100 : 0, { min: 0, max: 100 })
+    : toInt(
+        Math.round(
+          (deterministicResults.filter((r) => r.passed).length /
+            Math.max(1, deterministicResults.length)) *
+            100,
+        ),
+        pass ? 100 : 0,
+        { min: 0, max: 100 },
+      );
+
+  const summary = llmPayload?.summary
+    ? String(llmPayload.summary)
+    : pass
+      ? "評価基準を満たしています。"
+      : "評価基準を満たしていません。";
+
+  const blockers = [...deterministicBlockers, ...llmBlockers];
+  if (llmError) blockers.push(`LLM評価失敗: ${llmError}`);
+  const suggestions = llmSuggestions;
+  if (!pass && suggestions.length === 0) {
+    suggestions.push("未達基準を満たすように schedule を update して再評価してください。");
+  }
+
+  return {
+    schedule_id: resolvedScheduleId,
+    pass,
+    score,
+    summary,
+    criteria_used: criteria,
+    criteria_results: [...deterministicResults, ...llmCriteriaResults],
+    blockers,
+    suggestions,
+    schedule_stats: {
+      total_time: stats.totalTime,
+      task_count: stats.tasks.length,
+      algorithm_used: algorithmUsed,
+      sync_variance: stats.syncVariance,
+      parallel_windows: stats.parallelWindows,
+    },
+    diagnostics: {
+      llm_called: criteria.custom_rules.length > 0,
+      llm_error: llmError,
+      llm_model_primary: EVALUATOR_ANTHROPIC_MODEL,
+      llm_model_fallback: EVALUATOR_ANTHROPIC_FALLBACK_MODEL,
+      resource_violations_count: resourceViolations.length,
+      resource_violations: resourceViolations.slice(0, 40),
+      step_order_violations_count: stepOrderViolations.length,
+      step_order_violations: stepOrderViolations.slice(0, 40),
+      cutting_board: boardFlow,
+    },
+  };
+}
+
 const SCHEDULER_AGENT_TOOLS = [
   {
     name: "optimize_schedule",
@@ -1048,6 +1833,46 @@ const SCHEDULER_AGENT_TOOLS = [
         },
       },
       required: ["schedule_id", "updates"],
+    },
+  },
+  {
+    name: "evaluate_schedule",
+    description:
+      "与えられた基準でスケジュールを評価し、pass/failと改善提案を返す（1回評価）。",
+    input_schema: {
+      type: "object",
+      properties: {
+        schedule_id: {
+          type: "string",
+          description: "保存済みスケジュールID（指定時はstoreから取得）",
+        },
+        schedule: {
+          type: "object",
+          description: "直接評価したいスケジュール（tasks配列を含む）",
+        },
+        kitchen: {
+          type: "object",
+          description: "キッチン制約（schedule直渡し時に推奨）",
+        },
+        criteria: {
+          type: "object",
+          description:
+            "評価基準。max_total_time/max_sync_variance/min_parallel_windows/custom_rules など。",
+        },
+        criteria_text: {
+          type: "string",
+          description: "自然言語の評価基準（任意）",
+        },
+        criteria_rules: {
+          type: "array",
+          items: { type: "string" },
+          description: "自然言語の評価基準一覧（任意）",
+        },
+        task_limit_for_llm: {
+          type: "integer",
+          description: "LLM評価へ渡す最大タスク数（20-500）",
+        },
+      },
     },
   },
 ];
@@ -1205,10 +2030,15 @@ async function agentToolUpdateSchedule(args) {
   };
 }
 
+async function agentToolEvaluateSchedule(args) {
+  return await runScheduleEvaluationOneCall(args ?? {});
+}
+
 const SCHEDULER_AGENT_HANDLERS = {
   optimize_schedule: agentToolOptimizeSchedule,
   get_schedule: agentToolGetSchedule,
   update_schedule: agentToolUpdateSchedule,
+  evaluate_schedule: agentToolEvaluateSchedule,
 };
 
 async function runSchedulerAgent({
@@ -1220,6 +2050,9 @@ async function runSchedulerAgent({
   algorithmCandidates,
   options,
   maxSteps,
+  evaluationCriteria,
+  evaluationEnabled,
+  evaluationMaxRounds,
 }) {
   const requestText = String(userRequest ?? "").trim();
   if (!requestText) {
@@ -1227,6 +2060,14 @@ async function runSchedulerAgent({
   }
 
   const stepsLimit = toInt(maxSteps, 8, { min: 1, max: 12 });
+  const autoEvaluationEnabled = toBool(evaluationEnabled, true);
+  const maxEvaluationRounds = toInt(evaluationMaxRounds, 5, {
+    min: 1,
+    max: 8,
+  });
+  const normalizedEvaluationCriteria = normalizeEvaluationCriteria(
+    evaluationCriteria ?? {},
+  );
   const context = {
     recipes: Array.isArray(recipes) ? recipes : undefined,
     kitchen: kitchen ?? undefined,
@@ -1236,6 +2077,11 @@ async function runSchedulerAgent({
       ? algorithmCandidates
       : undefined,
     options: options ?? undefined,
+    evaluation: {
+      enabled: autoEvaluationEnabled,
+      max_rounds: maxEvaluationRounds,
+      criteria: normalizedEvaluationCriteria,
+    },
   };
 
   const system = `あなたはスケジューリング最適化エージェントです。
@@ -1244,11 +2090,16 @@ async function runSchedulerAgent({
 - optimize_schedule: スケジュール最適化と保存
 - get_schedule: 保存済みスケジュール取得
 - update_schedule: 保存済みスケジュールの手動調整
+- evaluate_schedule: 評価基準に対する pass/fail 判定
 
 ルール:
 - 新規作成が必要なら optimize_schedule を呼ぶ
 - 既存 schedule_id がある場合、内容確認には get_schedule を呼ぶ
 - 手動調整依頼がある場合は update_schedule を呼ぶ
+- 合否判定依頼がある場合は evaluate_schedule を呼ぶ
+- まな板作業は「野菜を先にすべて切る -> 肉/魚はあとで切る」を優先する
+- まな板洗浄回数は最小化し、改善余地がない状態を目指す（1回以下は目安であり固定制約ではない）
+- evaluate_schedule で pass=true なら作業完了として最終回答する
 - 最後は日本語で簡潔に結果を要約し、schedule_id と次アクションを示す`;
 
   const messages = [
@@ -1259,79 +2110,191 @@ async function runSchedulerAgent({
   ];
 
   const trace = [];
+  const evaluations = [];
+  const accumulatedRuleBasedFeedback = [];
   let finalText = "";
+  for (let round = 1; round <= maxEvaluationRounds; round++) {
+    let roundEndedWithoutTool = false;
 
-  for (let step = 1; step <= stepsLimit; step++) {
-    const response = await callAnthropic({
-      system,
-      maxTokens: 1400,
-      tools: SCHEDULER_AGENT_TOOLS,
-      toolChoice: { type: "auto" },
-      messages,
-    });
+    for (let step = 1; step <= stepsLimit; step++) {
+      const response = await callAnthropic({
+        system,
+        maxTokens: 1400,
+        tools: SCHEDULER_AGENT_TOOLS,
+        toolChoice: { type: "auto" },
+        messages,
+      });
 
-    const content = Array.isArray(response?.content) ? response.content : [];
-    const toolUses = content.filter((c) => c?.type === "tool_use");
-    const text = content
-      .filter((c) => c?.type === "text")
-      .map((c) => String(c.text ?? ""))
-      .join("\n")
-      .trim();
+      const content = Array.isArray(response?.content) ? response.content : [];
+      const toolUses = content.filter((c) => c?.type === "tool_use");
+      const text = content
+        .filter((c) => c?.type === "text")
+        .map((c) => String(c.text ?? ""))
+        .join("\n")
+        .trim();
 
-    messages.push({ role: "assistant", content });
+      messages.push({ role: "assistant", content });
 
-    if (toolUses.length === 0) {
-      finalText = text;
+      if (toolUses.length === 0) {
+        finalText = text;
+        roundEndedWithoutTool = true;
+        break;
+      }
+
+      const resultBlocks = [];
+      for (const toolUse of toolUses) {
+        const toolName = String(toolUse.name ?? "");
+        const handler = SCHEDULER_AGENT_HANDLERS[toolName];
+        let payload;
+        if (!handler) {
+          payload = { ok: false, error: `unknown tool: ${toolName}` };
+        } else {
+          try {
+            const result = await handler(toolUse.input ?? {});
+            payload = { ok: true, result };
+          } catch (e) {
+            payload = {
+              ok: false,
+              error: e instanceof Error ? e.message : String(e),
+            };
+          }
+        }
+
+        trace.push({
+          round,
+          step,
+          tool: toolName,
+          ok: !!payload.ok,
+          schedule_id:
+            payload?.result?.schedule_id ?? toolUse?.input?.schedule_id ?? null,
+          error: payload.ok ? null : payload.error,
+        });
+
+        resultBlocks.push({
+          type: "tool_result",
+          tool_use_id: toolUse.id,
+          content: JSON.stringify(payload),
+        });
+      }
+
+      messages.push({
+        role: "user",
+        content: resultBlocks,
+      });
+    }
+
+    const touchedScheduleIdsInOrder = trace
+      .map((t) => t.schedule_id)
+      .filter(Boolean);
+    const latestScheduleId =
+      touchedScheduleIdsInOrder.length > 0
+        ? touchedScheduleIdsInOrder[touchedScheduleIdsInOrder.length - 1]
+        : scheduleId
+          ? String(scheduleId)
+          : null;
+
+    if (!autoEvaluationEnabled || !latestScheduleId) {
       break;
     }
 
-    const resultBlocks = [];
-    for (const toolUse of toolUses) {
-      const toolName = String(toolUse.name ?? "");
-      const handler = SCHEDULER_AGENT_HANDLERS[toolName];
-      let payload;
-      if (!handler) {
-        payload = { ok: false, error: `unknown tool: ${toolName}` };
-      } else {
-        try {
-          const result = await handler(toolUse.input ?? {});
-          payload = { ok: true, result };
-        } catch (e) {
-          payload = {
-            ok: false,
-            error: e instanceof Error ? e.message : String(e),
-          };
-        }
-      }
-
-      trace.push({
-        step,
-        tool: toolName,
-        ok: !!payload.ok,
-        schedule_id:
-          payload?.result?.schedule_id ?? toolUse?.input?.schedule_id ?? null,
-        error: payload.ok ? null : payload.error,
+    let evaluation;
+    let evaluationError = null;
+    try {
+      evaluation = await runScheduleEvaluationOneCall({
+        schedule_id: latestScheduleId,
+        kitchen,
+        criteria: normalizedEvaluationCriteria,
       });
-
-      resultBlocks.push({
-        type: "tool_result",
-        tool_use_id: toolUse.id,
-        content: JSON.stringify(payload),
+      evaluations.push(evaluation);
+      trace.push({
+        round,
+        step: stepsLimit + 1,
+        tool: "evaluate_schedule(auto)",
+        ok: true,
+        schedule_id: latestScheduleId,
+        error: null,
+        pass: evaluation.pass,
+        score: evaluation.score,
+      });
+    } catch (e) {
+      evaluationError = e instanceof Error ? e.message : String(e);
+      trace.push({
+        round,
+        step: stepsLimit + 1,
+        tool: "evaluate_schedule(auto)",
+        ok: false,
+        schedule_id: latestScheduleId,
+        error: evaluationError,
       });
     }
 
+    if (evaluation?.pass) {
+      if (!finalText) {
+        finalText =
+          "評価基準を満たすスケジュールを作成できました。作業を完了します。";
+      }
+      break;
+    }
+
+    const ruleFeedback = buildRuleBasedFeedbackFromEvaluation(evaluation);
+    for (const line of ruleFeedback) {
+      if (!line || accumulatedRuleBasedFeedback.includes(line)) continue;
+      accumulatedRuleBasedFeedback.push(line);
+    }
+
+    if (round >= maxEvaluationRounds) {
+      if (!finalText) {
+        finalText = "評価基準を満たせなかったため、現状結果で終了します。";
+      }
+      break;
+    }
+
+    const blockers =
+      evaluation?.blockers?.slice(0, 6)?.join(" / ") ??
+      `評価失敗: ${evaluationError ?? "unknown"}`;
+    const scoreText = evaluation ? `${evaluation.score}` : "N/A";
+    const accumulatedRuleFeedbackText =
+      accumulatedRuleBasedFeedback.length > 0
+        ? accumulatedRuleBasedFeedback
+            .map((line, idx) => `${idx + 1}. ${line}`)
+            .join("\n")
+        : "なし";
     messages.push({
       role: "user",
-      content: resultBlocks,
+      content: `評価フィードバック（round ${round}）:
+pass: false
+score: ${scoreText}
+blockers: ${blockers}
+
+ルールベース検出フィードバック（累積）:
+${accumulatedRuleFeedbackText}
+
+これまでの履歴は保持したまま、このフィードバックを反映して次の作業を行ってください。
+必須改善:
+1) cooks_attention（1人なのに注意タスク並列）の違反をゼロにする
+2) まな板作業は「全野菜を先に切る -> 肉/魚を後で切る」順序にする
+3) まな板洗浄回数を最小化し、改善余地がない状態にする（1回以下は目安）
+4) update_schedule または optimize_schedule を使って改善する
+5) 最後に evaluate_schedule を呼んで再判定する`,
     });
+
+    if (roundEndedWithoutTool) {
+      continue;
+    }
   }
 
-  const touchedScheduleIds = [
+const touchedScheduleIds = [
     ...new Set(trace.map((t) => t.schedule_id).filter(Boolean)),
   ];
   return {
     final_text: finalText || "処理を完了しました。",
     trace,
+    evaluations,
+    evaluation_config: {
+      enabled: autoEvaluationEnabled,
+      max_rounds: maxEvaluationRounds,
+      criteria: normalizedEvaluationCriteria,
+    },
     schedule_ids: touchedScheduleIds,
   };
 }
@@ -1410,6 +2373,12 @@ const server = http.createServer(async (req, res) => {
 
     if (path === "/vps/ai/classify-intent") {
       const { userText, currentStep, prevStep, nextStep, recipeName } = body;
+      const heuristicIntent = classifyIntentHeuristic({ userText, nextStep });
+      if (heuristicIntent) {
+        json(res, 200, { intent: heuristicIntent });
+        return;
+      }
+
       const system = `あなたは調理アシスタントの意図分類器です。
 ユーザーの発話を以下のラベルのいずれかに分類してください。
 ラベル: next_step, previous_step, question, timer_status, end_session
@@ -1418,6 +2387,12 @@ ${recipeName ? `料理名: ${recipeName}` : ""}
 現在の工程: ${currentStep}
 ${prevStep ? `前の工程: ${prevStep}` : "（最初の工程です）"}
 ${nextStep ? `次の工程: ${nextStep}` : "（最後の工程です）"}
+
+重要ルール:
+- 「終わりました」「終わった」「できました」「完了」などの完了報告は、質問ではありません。
+- 次の工程が存在する場合、完了報告は必ず next_step に分類してください。
+- 次の工程が存在しない（最後の工程）場合、完了報告は end_session に分類してください。
+- 疑問文・質問内容がある場合のみ question を返してください。
 
 JSON形式で返してください: {"intent": "ラベル"}`;
 
@@ -1615,6 +2590,38 @@ ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
       return;
     }
 
+    if (path === "/vps/scheduler/agent/evaluate") {
+      const {
+        schedule_id,
+        schedule,
+        kitchen,
+        criteria,
+        criteria_text,
+        criteria_rules,
+        task_limit_for_llm,
+      } = body;
+
+      const result = await runScheduleEvaluationOneCall({
+        schedule_id,
+        schedule,
+        kitchen,
+        criteria:
+          criteria ??
+          (criteria_text || Array.isArray(criteria_rules)
+            ? {
+                criteria_text,
+                criteria_rules,
+              }
+            : undefined),
+        task_limit_for_llm,
+      });
+      json(res, 200, {
+        mode: "one_call_evaluator",
+        result,
+      });
+      return;
+    }
+
     if (path === "/vps/scheduler/agent/run") {
       const {
         user_request,
@@ -1625,6 +2632,9 @@ ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
         algorithm_candidates,
         options,
         max_steps,
+        evaluation_enabled,
+        evaluation_max_rounds,
+        evaluation_criteria,
       } = body;
 
       if (!String(user_request ?? "").trim()) {
@@ -1641,6 +2651,9 @@ ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
         algorithmCandidates: algorithm_candidates,
         options,
         maxSteps: max_steps,
+        evaluationEnabled: evaluation_enabled,
+        evaluationMaxRounds: evaluation_max_rounds,
+        evaluationCriteria: evaluation_criteria,
       });
       json(res, 200, {
         mode: "tool_calling_agent",

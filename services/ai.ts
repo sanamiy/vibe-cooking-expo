@@ -4,7 +4,7 @@ import {
   requireElevenLabsApiKey,
   requireMistralApiKey,
 } from "@/services/apiConfig";
-import { postJsonVps, shouldUseVpsProxy } from "@/services/vpsClient";
+import { postJsonVps, shouldUseServerProxy } from "@/services/vpsClient";
 
 async function callMistralChat(
   messages: any[],
@@ -33,24 +33,21 @@ async function callElevenLabsTts(text: string): Promise<string> {
   const apiKey = requireElevenLabsApiKey();
   const voiceId = getElevenLabsVoiceId();
   const modelId = getElevenLabsModelId();
-  const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "xi-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        text,
-        model_id: modelId,
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-        },
-      }),
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "xi-api-key": apiKey,
     },
-  );
+    body: JSON.stringify({
+      text,
+      model_id: modelId,
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.75,
+      },
+    }),
+  });
   if (!res.ok) {
     const err = await res.text();
     throw new Error(`ElevenLabs API error ${res.status}: ${err}`);
@@ -58,23 +55,71 @@ async function callElevenLabsTts(text: string): Promise<string> {
   const arrayBuffer = await res.arrayBuffer();
   const bytes = new Uint8Array(arrayBuffer);
   let binary = "";
-  for (let i = 0; i < bytes.length; i++)
-    binary += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
   return btoa(binary);
 }
 
 // ---------- Types ----------
 
-export type Intent =
-  | "next_step"
-  | "previous_step"
-  | "question"
-  | "timer_status"
-  | "end_session";
+export type Intent = "next_step" | "previous_step" | "question" | "timer_status" | "end_session";
 
 interface ConversationEntry {
   role: "user" | "assistant";
   content: string;
+}
+
+function normalizeIntentText(text: string): string {
+  return String(text ?? "")
+    .toLowerCase()
+    .replace(/[\s\u3000]/g, "")
+    .replace(/[。、，,.!！?？「」『』（）()［］[\]{}]/g, "")
+    .trim();
+}
+
+function classifyIntentHeuristic(
+  userText: string,
+  nextStep: string | null,
+): Intent | null {
+  // TODO: Remove this heuristic fallback after intent classification is fully stable with LLM-only routing.
+  const raw = String(userText ?? "").trim();
+  const text = normalizeIntentText(raw);
+  if (!text) return null;
+
+  const hasQuestionMark = /[?？]/.test(raw);
+  if (
+    hasQuestionMark ||
+    /コツ|どう|なぜ|なんで|どれくらい|何分|教えて|方法|ポイント|大丈夫/.test(
+      text,
+    )
+  ) {
+    return "question";
+  }
+
+  if (/タイマー|残り|あと\d+|何分/.test(text)) {
+    return "timer_status";
+  }
+
+  if (/前|戻|もど/.test(text)) {
+    return "previous_step";
+  }
+
+  if (
+    /終わりました|終わった|できました|完了|done|finished|作業完了|おわりました/.test(
+      text,
+    )
+  ) {
+    return nextStep ? "next_step" : "end_session";
+  }
+
+  if (/次|つぎ|進む|すすめ|next/.test(text)) {
+    return "next_step";
+  }
+
+  if (/終了|おしまい|終わりにする|やめる|stop/.test(text)) {
+    return "end_session";
+  }
+
+  return null;
 }
 
 // ---------- Mistral: Intent classification ----------
@@ -86,18 +131,18 @@ export async function classifyIntent(
   nextStep: string | null,
   recipeName?: string,
 ): Promise<Intent> {
-  if (shouldUseVpsProxy()) {
+  const heuristic = classifyIntentHeuristic(userText, nextStep);
+  if (heuristic) return heuristic;
+
+  if (shouldUseServerProxy()) {
     try {
-      const data = await postJsonVps<{ intent: Intent }>(
-        "/vps/ai/classify-intent",
-        {
-          userText,
-          currentStep,
-          prevStep,
-          nextStep,
-          recipeName,
-        },
-      );
+      const data = await postJsonVps<{ intent: Intent }>("/vps/ai/classify-intent", {
+        userText,
+        currentStep,
+        prevStep,
+        nextStep,
+        recipeName,
+      });
       const valid: Intent[] = [
         "next_step",
         "previous_step",
@@ -148,13 +193,7 @@ JSON形式で返してください: {"intent": "ラベル"}`;
   );
   const text = data.choices?.[0]?.message?.content ?? "{}";
   const parsed = JSON.parse(text);
-  const valid: Intent[] = [
-    "next_step",
-    "previous_step",
-    "question",
-    "timer_status",
-    "end_session",
-  ];
+  const valid: Intent[] = ["next_step", "previous_step", "question", "timer_status", "end_session"];
   return valid.includes(parsed.intent) ? parsed.intent : "question";
 }
 
@@ -175,27 +214,21 @@ export async function answerQuestion(
   recipeContext?: RecipeContext,
   currentStepTip?: string | null,
 ): Promise<string> {
-  if (shouldUseVpsProxy()) {
+  if (shouldUseServerProxy()) {
     try {
-      const data = await postJsonVps<{ answer: string }>(
-        "/vps/ai/answer-question",
-        {
-          userText,
-          currentStep,
-          stepProgress,
-          history,
-          recipeContext,
-          currentStepTip,
-        },
-      );
+      const data = await postJsonVps<{ answer: string }>("/vps/ai/answer-question", {
+        userText,
+        currentStep,
+        stepProgress,
+        history,
+        recipeContext,
+        currentStepTip,
+      });
       return data.answer;
     } catch (e) {
       if (__DEV__) {
         // eslint-disable-next-line no-console
-        console.warn(
-          "[ai] VPS answer-question failed, fallback to direct:",
-          e,
-        );
+        console.warn("[ai] VPS answer-question failed, fallback to direct:", e);
       }
     }
   }
@@ -254,7 +287,7 @@ export async function handleBargeIn(
   history: ConversationEntry[],
   recipeContext?: RecipeContext,
 ): Promise<BargeInResult> {
-  if (shouldUseVpsProxy()) {
+  if (shouldUseServerProxy()) {
     try {
       const data = await postJsonVps<BargeInResult>("/vps/ai/barge-in", {
         userText,
@@ -322,24 +355,25 @@ export async function generateStepGuidance(
   recipeContext?: RecipeContext,
 ): Promise<string> {
   const tipForStep = recipeContext?.stepTips?.[stepIndex] ?? "";
-  const normalizedStep = String(stepText ?? "").replace(/\s+/g, " ").trim();
+  const normalizedStep = String(stepText ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
   return [
-    `工程${stepIndex + 1}/${totalSteps}は「${normalizedStep}」です。`,
-    tipForStep ? `コツは${tipForStep}です。` : "焦らず順番どおりに進めましょう。",
+    `ステップ${stepIndex + 1}は「${normalizedStep}」です。`,
+    tipForStep
+      ? `コツは${tipForStep}です。`
+      : "焦らず順番どおりに進めましょう。",
   ].join("");
 }
 
 // ---------- ElevenLabs: TTS ----------
 
 export async function synthesizeSpeech(text: string): Promise<string> {
-  if (shouldUseVpsProxy()) {
+  if (shouldUseServerProxy()) {
     try {
-      const data = await postJsonVps<{ audioBase64: string }>(
-        "/vps/tts/synthesize",
-        {
-          text,
-        },
-      );
+      const data = await postJsonVps<{ audioBase64: string }>("/vps/tts/synthesize", {
+        text,
+      });
       return data.audioBase64;
     } catch (e) {
       if (__DEV__) {

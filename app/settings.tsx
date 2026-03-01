@@ -72,10 +72,6 @@ export default function SettingsScreen() {
           { paddingBottom: 40 + insets.bottom },
         ]}
       >
-        <Text style={styles.description}>
-          キッチンの環境や、作る量に合わせて設定を調整してください。
-        </Text>
-
         <View style={styles.settingCard}>
           <View style={styles.cardHeader}>
             <Text style={styles.icon}>🔥</Text>
