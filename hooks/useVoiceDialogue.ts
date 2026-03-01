@@ -8,7 +8,6 @@ import {
   answerQuestion,
   generateStepGuidance,
   synthesizeSpeech,
-  handleBargeIn,
   type RecipeContext,
 } from "@/services/ai";
 import { stripHtml } from "@/utils/recipe";
@@ -29,6 +28,13 @@ export type DialogueState =
 interface ConversationEntry {
   role: "user" | "assistant";
   content: string;
+}
+
+interface VoxtralDialogueResult {
+  assistantReply: string;
+  intent?: string;
+  userText?: string;
+  raw?: string;
 }
 
 interface UseVoiceDialogueProps {
@@ -68,13 +74,53 @@ export function useVoiceDialogue({
   const listeningResumeRef = useRef<(() => void) | null>(null);
 
   const startBgmSoundRef = useRef<Audio.Sound | null>(null);
+  const currentIndexRef = useRef<number>(currentIndex);
+  const stepsRef = useRef<Array<{ text: string }>>(steps);
+  const tasksRef = useRef<GanttTask[]>(tasks);
+  const listeningTurnInFlightRef = useRef(false);
 
   // Track what AI was saying when interrupted
   const currentSpeechTextRef = useRef<string>("");
+  const lastSpeechEndedAtRef = useRef<number>(0);
+  const lastAssistantUtteranceRef = useRef<string>("");
+
+  const normalizeSpeechText = useCallback((text: string): string => {
+    return String(text ?? "")
+      .toLowerCase()
+      .replace(/[\s\u3000]/g, "")
+      .replace(/[。、，,.!！?？「」『』（）()［］[\]{}]/g, "")
+      .trim();
+  }, []);
+
+  const hasSubstantialOverlap = useCallback(
+    (a: string, b: string): boolean => {
+      const na = normalizeSpeechText(a);
+      const nb = normalizeSpeechText(b);
+      if (!na || !nb) return false;
+      const shorter = na.length <= nb.length ? na : nb;
+      const longer = na.length > nb.length ? na : nb;
+      // Japanese command phrases are often short ("次の工程です" etc.)
+      if (shorter.length < 4) return false;
+      return longer.includes(shorter);
+    },
+    [normalizeSpeechText],
+  );
 
   const setListeningResume = useCallback((fn: () => void) => {
     listeningResumeRef.current = fn;
   }, []);
+
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
+
+  useEffect(() => {
+    stepsRef.current = steps;
+  }, [steps]);
+
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
 
   const speakWithExpoSpeech = useCallback((text: string) => {
     if (Platform.OS === "web") return Promise.resolve();
@@ -256,11 +302,14 @@ export function useVoiceDialogue({
 
   const speakText = useCallback(
     async (text: string) => {
+      currentSpeechTextRef.current = text;
+      lastAssistantUtteranceRef.current = text;
       setDialogueState("speaking");
       if (config?.tts === "offline_expospeech") {
         try {
           await speakWithExpoSpeech(text);
         } finally {
+          lastSpeechEndedAtRef.current = Date.now();
           currentSpeechTextRef.current = "";
           setDialogueState((prev) =>
             prev === "speaking" ? "listening" : prev,
@@ -285,6 +334,7 @@ export function useVoiceDialogue({
         await speakWithExpoSpeech(text);
       } finally {
         // Only transition to listening if we weren't interrupted
+        lastSpeechEndedAtRef.current = Date.now();
         currentSpeechTextRef.current = "";
         setDialogueState((prev) => (prev === "speaking" ? "listening" : prev));
         listeningResumeRef.current?.();
@@ -302,13 +352,21 @@ export function useVoiceDialogue({
       setDialogueState("processing");
       await playStartBgmForMs(5000);
       const stepText = stripHtml(steps[0].text);
-      const guidance = await generateStepGuidance(
-        stepText,
-        0,
-        steps.length,
-        recipeName,
-        recipeContext,
-      );
+      let guidance = stepText;
+      try {
+        guidance = await generateStepGuidance(
+          stepText,
+          0,
+          steps.length,
+          recipeName,
+          recipeContext,
+        );
+      } catch (e) {
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn("[voice] generateStepGuidance failed:", e);
+        }
+      }
       const greeting = `${recipeName}の調理を始めましょう。${guidance}`;
       setLastResponse(greeting);
       setConversationHistory([{ role: "assistant", content: greeting }]);
@@ -348,13 +406,50 @@ export function useVoiceDialogue({
 
   const processUserInput = useCallback(
     async (transcript: string) => {
-      const prevState = dialogueState;
+      const prevStateSnapshot = dialogueState;
+      const needsListeningLock = prevStateSnapshot === "listening";
+      if (needsListeningLock && listeningTurnInFlightRef.current) {
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn("[voice] dropped overlapping transcript:", transcript);
+        }
+        return;
+      }
+      if (needsListeningLock) {
+        listeningTurnInFlightRef.current = true;
+      }
 
-      // If we were interrupted, handle barge-in logic
-      if (prevState === "interrupted" || prevState === "speaking") {
-        const interruptedText = currentSpeechTextRef.current;
-        currentSpeechTextRef.current = "";
-        await stopSpeaking();
+      try {
+        const prevState = prevStateSnapshot;
+        const now = Date.now();
+        const withinEchoWindow = now - lastSpeechEndedAtRef.current < 2500;
+        const looksLikeEcho =
+          withinEchoWindow &&
+          hasSubstantialOverlap(
+            transcript,
+            lastAssistantUtteranceRef.current || lastResponse,
+          );
+
+        if (looksLikeEcho) {
+          if (__DEV__) {
+            // eslint-disable-next-line no-console
+            console.warn("[voice] ignored likely echo transcript:", transcript);
+          }
+          setDialogueState((prev) =>
+            prev === "processing" || prev === "interrupted" ? "listening" : prev,
+          );
+          return;
+        }
+
+        // speaking/interrupted中の発話も通常intent処理に統一する
+        // （説明だけ進んで工程が進まない競合を防ぐ）
+        if (prevState === "interrupted" || prevState === "speaking") {
+          currentSpeechTextRef.current = "";
+          await stopSpeaking();
+        } else if (prevState !== "listening") {
+          return;
+        }
+
         setDialogueState("processing");
 
         setConversationHistory((prev) => [
@@ -362,58 +457,99 @@ export function useVoiceDialogue({
           { role: "user", content: transcript },
         ]);
 
-        const currentStep = stripHtml(steps[currentIndex]?.text ?? "");
-        const stepProgress = `工程${currentIndex + 1}/${steps.length}`;
+        const idx = currentIndexRef.current;
+        const localSteps = stepsRef.current;
+        const localTasks = tasksRef.current;
+        const currentStep = stripHtml(localSteps[idx]?.text ?? "");
+        const prevStep =
+          idx > 0 ? stripHtml(localSteps[idx - 1].text) : null;
+        const nextStep =
+          idx < localSteps.length - 1
+            ? stripHtml(localSteps[idx + 1].text)
+            : null;
 
-        const result = await handleBargeIn(
+        const intent = await classifyIntent(
           transcript,
-          interruptedText,
           currentStep,
-          stepProgress,
-          conversationHistory,
-          recipeContext,
+          prevStep,
+          nextStep,
+          recipeName,
         );
 
-        setLastResponse(result.response);
-        setConversationHistory((prev) => [
-          ...prev,
-          { role: "assistant", content: result.response },
-        ]);
-        await speakText(result.response);
-        return;
-      }
+        let response = "";
 
-      if (prevState !== "listening") return;
+        switch (intent) {
+          case "next_step": {
+            if (idx >= localSteps.length - 1) {
+              response = "すべての工程が完了しました。お疲れさまでした！";
+              setLastResponse(response);
+              setConversationHistory((prev) => [
+                ...prev,
+                { role: "assistant", content: response },
+              ]);
+              await speakText(response);
+              onSessionEnd();
+              return;
+            }
+            const nextIdx = idx + 1;
+            currentIndexRef.current = nextIdx;
+            onChangeIndex(nextIdx);
+            const guidance = await generateStepGuidance(
+              stripHtml(localSteps[nextIdx].text),
+              nextIdx,
+              localSteps.length,
+              recipeName,
+              recipeContext,
+            );
+            response = `次の工程です。${guidance}`;
+            break;
+          }
 
-      setDialogueState("processing");
+          case "previous_step": {
+            if (idx <= 0) {
+              response = "最初の工程です。" + currentStep;
+            } else {
+              const prevIdx = idx - 1;
+              currentIndexRef.current = prevIdx;
+              onChangeIndex(prevIdx);
+              const guidance = await generateStepGuidance(
+                stripHtml(localSteps[prevIdx].text),
+                prevIdx,
+                localSteps.length,
+                recipeName,
+                recipeContext,
+              );
+              response = `前の工程に戻ります。${guidance}`;
+            }
+            break;
+          }
 
-      setConversationHistory((prev) => [
-        ...prev,
-        { role: "user", content: transcript },
-      ]);
+          case "question": {
+            const stepProgress = `工程${idx + 1}/${localSteps.length}`;
+            const currentStepTip = recipeContext?.stepTips?.[idx] ?? null;
+            response = await answerQuestion(
+              transcript,
+              currentStep,
+              stepProgress,
+              conversationHistory,
+              recipeContext,
+              currentStepTip,
+            );
+            break;
+          }
 
-      const currentStep = stripHtml(steps[currentIndex]?.text ?? "");
-      const prevStep =
-        currentIndex > 0 ? stripHtml(steps[currentIndex - 1].text) : null;
-      const nextStep =
-        currentIndex < steps.length - 1
-          ? stripHtml(steps[currentIndex + 1].text)
-          : null;
+          case "timer_status": {
+            const task = localTasks[idx];
+            if (task?.requires_timer && task.timer_minutes) {
+              response = `この工程のタイマーは${task.timer_minutes}分です。`;
+            } else {
+              response = "この工程にはタイマーは設定されていません。";
+            }
+            break;
+          }
 
-      const intent = await classifyIntent(
-        transcript,
-        currentStep,
-        prevStep,
-        nextStep,
-        recipeName,
-      );
-
-      let response = "";
-
-      switch (intent) {
-        case "next_step": {
-          if (currentIndex >= steps.length - 1) {
-            response = "すべての工程が完了しました。お疲れさまでした！";
+          case "end_session": {
+            response = "調理ナビを終了します。お疲れさまでした。";
             setLastResponse(response);
             setConversationHistory((prev) => [
               ...prev,
@@ -423,78 +559,38 @@ export function useVoiceDialogue({
             onSessionEnd();
             return;
           }
-          const nextIdx = currentIndex + 1;
-          onChangeIndex(nextIdx);
-          const guidance = await generateStepGuidance(
-            stripHtml(steps[nextIdx].text),
-            nextIdx,
-            steps.length,
-            recipeName,
-            recipeContext,
+        }
+
+        setLastResponse(response);
+        setConversationHistory((prev) => [
+          ...prev,
+          { role: "assistant", content: response },
+        ]);
+        await speakText(response);
+      } catch (e) {
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn("[voice] processUserInput failed:", e);
+        }
+        const fallbackResponse =
+          "通信エラーが発生しました。もう一度ゆっくり話してください。";
+        setLastResponse(fallbackResponse);
+        setConversationHistory((prev) => [
+          ...prev,
+          { role: "assistant", content: fallbackResponse },
+        ]);
+        try {
+          await speakText(fallbackResponse);
+        } catch {
+          setDialogueState((prev) =>
+            prev === "processing" || prev === "interrupted" ? "listening" : prev,
           );
-          response = `次の工程です。${guidance}`;
-          break;
         }
-
-        case "previous_step": {
-          if (currentIndex <= 0) {
-            response = "最初の工程です。" + currentStep;
-          } else {
-            const prevIdx = currentIndex - 1;
-            onChangeIndex(prevIdx);
-            const guidance = await generateStepGuidance(
-              stripHtml(steps[prevIdx].text),
-              prevIdx,
-              steps.length,
-              recipeName,
-              recipeContext,
-            );
-            response = `前の工程に戻ります。${guidance}`;
-          }
-          break;
-        }
-
-        case "question": {
-          const stepProgress = `工程${currentIndex + 1}/${steps.length}`;
-          response = await answerQuestion(
-            transcript,
-            currentStep,
-            stepProgress,
-            conversationHistory,
-            recipeContext,
-          );
-          break;
-        }
-
-        case "timer_status": {
-          const task = tasks[currentIndex];
-          if (task?.requires_timer && task.timer_minutes) {
-            response = `この工程のタイマーは${task.timer_minutes}分です。`;
-          } else {
-            response = "この工程にはタイマーは設定されていません。";
-          }
-          break;
-        }
-
-        case "end_session": {
-          response = "調理ナビを終了します。お疲れさまでした。";
-          setLastResponse(response);
-          setConversationHistory((prev) => [
-            ...prev,
-            { role: "assistant", content: response },
-          ]);
-          await speakText(response);
-          onSessionEnd();
-          return;
+      } finally {
+        if (needsListeningLock) {
+          listeningTurnInFlightRef.current = false;
         }
       }
-
-      setLastResponse(response);
-      setConversationHistory((prev) => [
-        ...prev,
-        { role: "assistant", content: response },
-      ]);
-      await speakText(response);
     },
     [
       dialogueState,
@@ -508,6 +604,72 @@ export function useVoiceDialogue({
       speakText,
       stopSpeaking,
       recipeContext,
+      hasSubstantialOverlap,
+      lastResponse,
+    ],
+  );
+
+  const processVoxtralDialogueResult = useCallback(
+    async (result: VoxtralDialogueResult) => {
+      const response = String(result.assistantReply ?? "").trim();
+      if (!response) return;
+
+      const userText = String(result.userText ?? "").trim();
+      const echoProbe = userText || String(result.raw ?? "").trim();
+      const withinEchoWindow = Date.now() - lastSpeechEndedAtRef.current < 2500;
+      const looksLikeEcho =
+        withinEchoWindow &&
+        hasSubstantialOverlap(
+          echoProbe,
+          lastAssistantUtteranceRef.current || lastResponse,
+        );
+      if (looksLikeEcho) {
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn("[voice] ignored likely dialogue echo:", echoProbe);
+        }
+        setDialogueState((prev) =>
+          prev === "processing" || prev === "interrupted" ? "listening" : prev,
+        );
+        return;
+      }
+
+      const intent = String(result.intent ?? "").trim();
+      await stopSpeaking();
+      setDialogueState("processing");
+
+      const idx = currentIndexRef.current;
+      const localSteps = stepsRef.current;
+      if (intent === "next_step" && idx < localSteps.length - 1) {
+        const nextIdx = idx + 1;
+        currentIndexRef.current = nextIdx;
+        onChangeIndex(nextIdx);
+      } else if (intent === "previous_step" && idx > 0) {
+        const prevIdx = idx - 1;
+        currentIndexRef.current = prevIdx;
+        onChangeIndex(prevIdx);
+      }
+
+      setConversationHistory((prev) => {
+        const next = [...prev];
+        if (userText) next.push({ role: "user", content: userText });
+        next.push({ role: "assistant", content: response });
+        return next;
+      });
+      setLastResponse(response);
+      await speakText(response);
+
+      if (intent === "end_session") {
+        onSessionEnd();
+      }
+    },
+    [
+      hasSubstantialOverlap,
+      lastResponse,
+      onChangeIndex,
+      onSessionEnd,
+      speakText,
+      stopSpeaking,
     ],
   );
 
@@ -516,6 +678,7 @@ export function useVoiceDialogue({
     conversationHistory,
     lastResponse,
     processUserInput,
+    processVoxtralDialogueResult,
     interrupt,
     stopSpeaking,
     setListeningResume,
