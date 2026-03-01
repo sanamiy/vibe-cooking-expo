@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import { transcribeStream } from "@/services/voxtralAsr";
+import { understandAudioWithVoxtral } from "@/services/voxtralSpeechUnderstanding";
 
 interface UseVoiceCommandsProps {
   onTranscript: (text: string) => void;
@@ -11,6 +12,11 @@ interface UseVoiceCommandsProps {
   inputDeviceId?: string;
   isSpeaking?: boolean;
 }
+
+const config = require("@/config.json") as {
+  voiceInputMode?: "asr_then_llm" | "voxtral_speech_understanding";
+  voxtralSpeechPrompt?: string;
+};
 
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -164,23 +170,52 @@ export function useVoiceCommands({
 
           let gotTranscript = false;
 
-          // Use streaming transcription
-          await transcribeStream(
-            [pcm16],
-            (interim) => {
-              console.log("Interim:", interim);
-              onInterimTranscriptRef.current?.(interim);
-            },
-            (final) => {
-              console.log("Final:", final);
-              gotTranscript = true;
-              onTranscriptRef.current(final);
-            },
-            (err) => {
-              console.error("Transcription error:", err);
+          const recordedChunks =
+            audioChunksRef.current.length > 0 ? audioChunksRef.current : [pcm16];
+          const useSpeechUnderstandingMode =
+            config?.voiceInputMode === "voxtral_speech_understanding";
+
+          if (useSpeechUnderstandingMode) {
+            try {
+              const understoodText = await understandAudioWithVoxtral(
+                recordedChunks,
+                {
+                  prompt: config?.voxtralSpeechPrompt,
+                },
+              );
+              if (understoodText.trim()) {
+                gotTranscript = true;
+                onInterimTranscriptRef.current?.(understoodText);
+                onTranscriptRef.current(understoodText);
+                console.log("Voxtral speech understanding:", understoodText);
+              }
+            } catch (e) {
+              const err =
+                e instanceof Error
+                  ? e.message
+                  : "Speech understanding failed";
+              console.error("Speech understanding error:", err);
               setError(err);
-            },
-          );
+            }
+          } else {
+            // Use streaming transcription
+            await transcribeStream(
+              recordedChunks,
+              (interim) => {
+                console.log("Interim:", interim);
+                onInterimTranscriptRef.current?.(interim);
+              },
+              (final) => {
+                console.log("Final:", final);
+                gotTranscript = true;
+                onTranscriptRef.current(final);
+              },
+              (err) => {
+                console.error("Transcription error:", err);
+                setError(err);
+              },
+            );
+          }
 
           // If no transcript was produced (noise/echo), notify with empty to reset state
           if (!gotTranscript) {

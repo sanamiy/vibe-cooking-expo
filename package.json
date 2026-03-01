@@ -21,6 +21,7 @@
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit",
+    "test:voxtral-speech": "node scripts/test-voxtral-speech-understanding.js",
     "scrape:recipes": "python3 scripts/scraping-ajinomoto.py",
     "validate:recipes": "python3 scripts/validate_recipe_json.py"
   },
