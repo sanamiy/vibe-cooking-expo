@@ -78,6 +78,7 @@ export function useVoiceDialogue({
   const currentIndexRef = useRef<number>(currentIndex);
   const stepsRef = useRef<Array<{ text: string }>>(steps);
   const tasksRef = useRef<GanttTask[]>(tasks);
+  const listeningTurnInFlightRef = useRef(false);
 
   // Track what AI was saying when interrupted
   const currentSpeechTextRef = useRef<string>("");
@@ -406,8 +407,21 @@ export function useVoiceDialogue({
 
   const processUserInput = useCallback(
     async (transcript: string) => {
+      const prevStateSnapshot = dialogueState;
+      const needsListeningLock = prevStateSnapshot === "listening";
+      if (needsListeningLock && listeningTurnInFlightRef.current) {
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn("[voice] dropped overlapping transcript:", transcript);
+        }
+        return;
+      }
+      if (needsListeningLock) {
+        listeningTurnInFlightRef.current = true;
+      }
+
       try {
-        const prevState = dialogueState;
+        const prevState = prevStateSnapshot;
         const now = Date.now();
         const withinEchoWindow = now - lastSpeechEndedAtRef.current < 2500;
         const looksLikeEcho =
@@ -598,6 +612,10 @@ export function useVoiceDialogue({
           setDialogueState((prev) =>
             prev === "processing" || prev === "interrupted" ? "listening" : prev,
           );
+        }
+      } finally {
+        if (needsListeningLock) {
+          listeningTurnInFlightRef.current = false;
         }
       }
     },
