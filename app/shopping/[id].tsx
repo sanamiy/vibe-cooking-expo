@@ -71,7 +71,12 @@ export default function ShoppingScreen() {
                   </View>
                 )}
                 <Text style={styles.recipe}>{group.name}</Text>
-                <View style={styles.divider} />
+                <View
+                  style={[
+                    styles.divider,
+                    isMulti && { backgroundColor: color },
+                  ]}
+                />
               </View>
 
               <View style={styles.card}>
