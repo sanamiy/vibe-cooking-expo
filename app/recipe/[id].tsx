@@ -52,6 +52,16 @@ export default function RecipeDetailScreen() {
       <View style={styles.header}>
         <BackButton label="トップ" onPress={() => router.back()} />
         <Text style={styles.title}>Vibe Cooking 🍳</Text>
+        <Pressable
+          style={({ pressed }) => [
+            styles.settingsBtn,
+            pressed && { opacity: 0.8 },
+          ]}
+          onPress={() => router.push("/settings")}
+          hitSlop={12}
+        >
+          <Text style={styles.settingsText}>⚙️</Text>
+        </Pressable>
       </View>
 
       <ScrollView
@@ -205,6 +215,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  settingsBtn: {
+    position: "absolute",
+    right: 16,
+    top: 0,
+    bottom: 0,
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  settingsText: { fontSize: 24 },
   backBtn: {
     position: "absolute",
     left: 20,

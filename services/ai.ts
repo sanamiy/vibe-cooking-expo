@@ -359,8 +359,10 @@ export async function generateStepGuidance(
     .replace(/\s+/g, " ")
     .trim();
   return [
-    `工程${stepIndex + 1}/${totalSteps}は「${normalizedStep}」です。`,
-    tipForStep ? `コツは${tipForStep}です。` : "焦らず順番どおりに進めましょう。",
+    `ステップ${stepIndex + 1}は「${normalizedStep}」です。`,
+    tipForStep
+      ? `コツは${tipForStep}です。`
+      : "焦らず順番どおりに進めましょう。",
   ].join("");
 }
 

@@ -49,6 +49,16 @@ export default function ShoppingScreen() {
       <View style={styles.header}>
         <BackButton label="レシピ" onPress={() => router.back()} />
         <Text style={styles.title}>買い出しリスト</Text>
+        <Pressable
+          style={({ pressed }) => [
+            styles.settingsBtn,
+            pressed && { opacity: 0.8 },
+          ]}
+          onPress={() => router.push("/settings")}
+          hitSlop={12}
+        >
+          <Text style={styles.settingsText}>⚙️</Text>
+        </Pressable>
       </View>
 
       <ScrollView
@@ -140,6 +150,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  settingsBtn: {
+    position: "absolute",
+    right: 16,
+    top: 0,
+    bottom: 0,
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  settingsText: { fontSize: 24 },
   backBtn: {
     position: "absolute",
     left: 20,

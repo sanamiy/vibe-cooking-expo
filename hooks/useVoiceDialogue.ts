@@ -200,7 +200,18 @@ export function useVoiceDialogue({
             webAudioRef.current = null;
             resolve();
           };
-          audio.play();
+          try {
+            const playResult = audio.play();
+            if (playResult && typeof (playResult as any).catch === "function") {
+              (playResult as any).catch(() => {
+                webAudioRef.current = null;
+                resolve();
+              });
+            }
+          } catch {
+            webAudioRef.current = null;
+            resolve();
+          }
         });
       }
 
@@ -465,7 +476,9 @@ export function useVoiceDialogue({
             console.warn("[voice] ignored likely echo transcript:", transcript);
           }
           setDialogueState((prev) =>
-            prev === "processing" || prev === "interrupted" ? "listening" : prev,
+            prev === "processing" || prev === "interrupted"
+              ? "listening"
+              : prev,
           );
           return;
         }
@@ -490,8 +503,7 @@ export function useVoiceDialogue({
         const localSteps = stepsRef.current;
         const localTasks = tasksRef.current;
         const currentStep = stripHtml(localSteps[idx]?.text ?? "");
-        const prevStep =
-          idx > 0 ? stripHtml(localSteps[idx - 1].text) : null;
+        const prevStep = idx > 0 ? stripHtml(localSteps[idx - 1].text) : null;
         const nextStep =
           idx < localSteps.length - 1
             ? stripHtml(localSteps[idx + 1].text)
@@ -510,7 +522,7 @@ export function useVoiceDialogue({
         switch (intent) {
           case "next_step": {
             if (idx >= localSteps.length - 1) {
-              response = "すべての工程が完了しました。お疲れさまでした！";
+              response = "すべてのステップが完了しました。お疲れさまでした！";
               setLastResponse(response);
               setConversationHistory((prev) => [
                 ...prev,
@@ -530,13 +542,13 @@ export function useVoiceDialogue({
               recipeName,
               recipeContext,
             );
-            response = `次の工程です。${guidance}`;
+            response = `次のステップです。${guidance}`;
             break;
           }
 
           case "previous_step": {
             if (idx <= 0) {
-              response = "最初の工程です。" + currentStep;
+              response = "最初のステップです。" + currentStep;
             } else {
               const prevIdx = idx - 1;
               currentIndexRef.current = prevIdx;
@@ -548,13 +560,13 @@ export function useVoiceDialogue({
                 recipeName,
                 recipeContext,
               );
-              response = `前の工程に戻ります。${guidance}`;
+              response = `前のステップに戻ります。${guidance}`;
             }
             break;
           }
 
           case "question": {
-            const stepProgress = `工程${idx + 1}/${localSteps.length}`;
+            const stepProgress = `ステップ${idx + 1}/${localSteps.length}`;
             const currentStepTip = recipeContext?.stepTips?.[idx] ?? null;
             response = await answerQuestion(
               transcript,
@@ -570,9 +582,9 @@ export function useVoiceDialogue({
           case "timer_status": {
             const task = localTasks[idx];
             if (task?.requires_timer && task.timer_minutes) {
-              response = `この工程のタイマーは${task.timer_minutes}分です。`;
+              response = `このステップのタイマーは${task.timer_minutes}分です。`;
             } else {
-              response = "この工程にはタイマーは設定されていません。";
+              response = "このステップにはタイマーは設定されていません。";
             }
             break;
           }
@@ -612,7 +624,9 @@ export function useVoiceDialogue({
           await speakText(fallbackResponse);
         } catch {
           setDialogueState((prev) =>
-            prev === "processing" || prev === "interrupted" ? "listening" : prev,
+            prev === "processing" || prev === "interrupted"
+              ? "listening"
+              : prev,
           );
         }
       } finally {

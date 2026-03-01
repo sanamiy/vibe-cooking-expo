@@ -27,6 +27,7 @@ interface VoiceDialoguePanelProps {
   selectedOutputId: string;
   onSelectInput: (id: string) => void;
   onSelectOutput: (id: string) => void;
+  showDeviceSelectors?: boolean;
   showVoiceAlgorithmSelector?: boolean;
   selectedVoiceInputMode?: VoiceInputMode;
   onSelectVoiceInputMode?: (mode: VoiceInputMode) => void;
@@ -97,6 +98,41 @@ function DevicePicker({
   );
 }
 
+export function VoiceDeviceSelectors({
+  inputDevices,
+  outputDevices,
+  selectedInputId,
+  selectedOutputId,
+  onSelectInput,
+  onSelectOutput,
+}: {
+  inputDevices: AudioDevice[];
+  outputDevices: AudioDevice[];
+  selectedInputId: string;
+  selectedOutputId: string;
+  onSelectInput: (id: string) => void;
+  onSelectOutput: (id: string) => void;
+}) {
+  return (
+    <View style={styles.deviceRow}>
+      <DevicePicker
+        label="入力"
+        icon="🎙️"
+        devices={inputDevices}
+        selectedId={selectedInputId}
+        onSelect={onSelectInput}
+      />
+      <DevicePicker
+        label="出力"
+        icon="🔈"
+        devices={outputDevices}
+        selectedId={selectedOutputId}
+        onSelect={onSelectOutput}
+      />
+    </View>
+  );
+}
+
 export function VoiceDialoguePanel({
   dialogueState,
   conversationHistory,
@@ -107,6 +143,7 @@ export function VoiceDialoguePanel({
   selectedOutputId,
   onSelectInput,
   onSelectOutput,
+  showDeviceSelectors = true,
   showVoiceAlgorithmSelector = false,
   selectedVoiceInputMode = "asr_then_llm",
   onSelectVoiceInputMode,
@@ -115,23 +152,16 @@ export function VoiceDialoguePanel({
 
   return (
     <View style={styles.container}>
-      {/* Device selectors */}
-      <View style={styles.deviceRow}>
-        <DevicePicker
-          label="入力"
-          icon="🎙️"
-          devices={inputDevices}
-          selectedId={selectedInputId}
-          onSelect={onSelectInput}
+      {showDeviceSelectors ? (
+        <VoiceDeviceSelectors
+          inputDevices={inputDevices}
+          outputDevices={outputDevices}
+          selectedInputId={selectedInputId}
+          selectedOutputId={selectedOutputId}
+          onSelectInput={onSelectInput}
+          onSelectOutput={onSelectOutput}
         />
-        <DevicePicker
-          label="出力"
-          icon="🔈"
-          devices={outputDevices}
-          selectedId={selectedOutputId}
-          onSelect={onSelectOutput}
-        />
-      </View>
+      ) : null}
 
       {showVoiceAlgorithmSelector ? (
         <View style={styles.modeSelectorCard}>

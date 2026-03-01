@@ -52,8 +52,12 @@ export default function HomeScreen() {
           気になる料理を選んで、今日のメニューを決めよう
         </Text>
         <Pressable
-          style={styles.settingsBtn}
+          style={({ pressed }) => [
+            styles.settingsBtn,
+            pressed && { opacity: 0.8 },
+          ]}
           onPress={() => router.push("/settings")}
+          hitSlop={12}
         >
           <Text style={styles.settingsText}>⚙️</Text>
         </Pressable>
@@ -124,7 +128,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  settingsBtn: { position: "absolute", right: 16, top: 20, padding: 8 },
+  settingsBtn: {
+    position: "absolute",
+    right: 16,
+    top: 0,
+    bottom: 0,
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   settingsText: { fontSize: 24 },
   content: {
     padding: 20,
