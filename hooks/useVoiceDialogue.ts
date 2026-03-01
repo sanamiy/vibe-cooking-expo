@@ -77,6 +77,28 @@ export function useVoiceDialogue({
 
   // Track what AI was saying when interrupted
   const currentSpeechTextRef = useRef<string>("");
+  const lastSpeechEndedAtRef = useRef<number>(0);
+  const lastAssistantUtteranceRef = useRef<string>("");
+
+  const normalizeSpeechText = useCallback((text: string): string => {
+    return String(text ?? "")
+      .toLowerCase()
+      .replace(/[\s\u3000]/g, "")
+      .replace(/[。、，,.!！?？「」『』（）()［］[\]{}]/g, "")
+      .trim();
+  }, []);
+
+  const hasSubstantialOverlap = useCallback(
+    (a: string, b: string): boolean => {
+      const na = normalizeSpeechText(a);
+      const nb = normalizeSpeechText(b);
+      if (!na || !nb) return false;
+      const shorter = na.length <= nb.length ? na : nb;
+      if (shorter.length < 8) return false;
+      return na.includes(shorter) || nb.includes(shorter);
+    },
+    [normalizeSpeechText],
+  );
 
   const setListeningResume = useCallback((fn: () => void) => {
     listeningResumeRef.current = fn;
@@ -262,11 +284,14 @@ export function useVoiceDialogue({
 
   const speakText = useCallback(
     async (text: string) => {
+      currentSpeechTextRef.current = text;
+      lastAssistantUtteranceRef.current = text;
       setDialogueState("speaking");
       if (config?.tts === "offline_expospeech") {
         try {
           await speakWithExpoSpeech(text);
         } finally {
+          lastSpeechEndedAtRef.current = Date.now();
           currentSpeechTextRef.current = "";
           setDialogueState((prev) =>
             prev === "speaking" ? "listening" : prev,
@@ -291,6 +316,7 @@ export function useVoiceDialogue({
         await speakWithExpoSpeech(text);
       } finally {
         // Only transition to listening if we weren't interrupted
+        lastSpeechEndedAtRef.current = Date.now();
         currentSpeechTextRef.current = "";
         setDialogueState((prev) => (prev === "speaking" ? "listening" : prev));
         listeningResumeRef.current?.();
@@ -363,6 +389,25 @@ export function useVoiceDialogue({
   const processUserInput = useCallback(
     async (transcript: string) => {
       const prevState = dialogueState;
+      const now = Date.now();
+      const withinEchoWindow = now - lastSpeechEndedAtRef.current < 2500;
+      const looksLikeEcho =
+        withinEchoWindow &&
+        hasSubstantialOverlap(
+          transcript,
+          lastAssistantUtteranceRef.current || lastResponse,
+        );
+
+      if (looksLikeEcho) {
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn("[voice] ignored likely echo transcript:", transcript);
+        }
+        setDialogueState((prev) =>
+          prev === "processing" || prev === "interrupted" ? "listening" : prev,
+        );
+        return;
+      }
 
       // If we were interrupted, handle barge-in logic
       if (prevState === "interrupted" || prevState === "speaking") {
@@ -522,6 +567,8 @@ export function useVoiceDialogue({
       speakText,
       stopSpeaking,
       recipeContext,
+      hasSubstantialOverlap,
+      lastResponse,
     ],
   );
 
