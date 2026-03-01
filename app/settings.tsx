@@ -1,6 +1,10 @@
 import { AppButton } from "@/components/AppButton";
+import { BackButton } from "@/components/BackButton";
 import { theme } from "@/constants/theme";
-import { useAppSettings, type SchedulerAlgorithm } from "@/contexts/AppSettingsContext";
+import {
+  useAppSettings,
+  type SchedulerAlgorithm,
+} from "@/contexts/AppSettingsContext";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -8,7 +12,11 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 // Feature flag: アルゴリズム選択UIを表示するか
 const SHOW_ALGORITHM_SELECTOR = __DEV__;
 
-const ALGORITHM_OPTIONS: { value: SchedulerAlgorithm; label: string; desc: string }[] = [
+const ALGORITHM_OPTIONS: {
+  value: SchedulerAlgorithm;
+  label: string;
+  desc: string;
+}[] = [
   { value: "auto", label: "自動", desc: "レシピ数に応じて最適化" },
   { value: "greedy", label: "貪欲法", desc: "シンプルで高速" },
   { value: "genetic", label: "遺伝的", desc: "同時完成を最適化" },
@@ -53,9 +61,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.back}>← 戻る</Text>
-        </Pressable>
+        <BackButton label="ホーム" onPress={() => router.back()} />
         <Text style={styles.title}>キッチン設定</Text>
       </View>
 
@@ -184,14 +190,16 @@ export default function SettingsScreen() {
                   key={opt.value}
                   style={[
                     styles.algorithmOption,
-                    schedulerAlgorithm === opt.value && styles.algorithmOptionSelected,
+                    schedulerAlgorithm === opt.value &&
+                      styles.algorithmOptionSelected,
                   ]}
                   onPress={() => setSchedulerAlgorithm(opt.value)}
                 >
                   <Text
                     style={[
                       styles.algorithmLabel,
-                      schedulerAlgorithm === opt.value && styles.algorithmLabelSelected,
+                      schedulerAlgorithm === opt.value &&
+                        styles.algorithmLabelSelected,
                     ]}
                   >
                     {opt.label}

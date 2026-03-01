@@ -28,20 +28,29 @@ automatic progression keep the experience hands-free.
 
 ## Architecture
 
-Frontend: Expo (React Native for Web) deployed to Cloudflare Workers via
-GitHub Actions on push to main.
+Frontend and backend (API proxy) are deployed together as a single Cloudflare
+Worker. The API proxy runs at /vps/\* paths on the same origin (the "/vps"
+prefix is a legacy naming convention). In production, EXPO_PUBLIC_VPS_API_BASE_URL
+is set to "" (empty string), so API calls use relative paths to the same Worker.
 
-Backend: API proxy running on a VPS at temp.synome.jp. Forwards requests to
-Mistral, Claude, and ElevenLabs APIs so that API keys stay server-side.
+The API proxy forwards requests to Mistral, Claude, and ElevenLabs APIs so that
+API keys stay server-side (stored as Cloudflare Workers secrets).
 
-config.json controls the API routing mode:
+8 API endpoints:
 
-- `direct_client` - the app calls AI APIs directly from the client (API keys
-  required in .env)
-- `vps_proxy` - the app routes all AI calls through the VPS proxy (no client
-  API keys needed)
+- health
+- asr/transcribe
+- ai/classify-intent
+- ai/answer-question
+- ai/barge-in
+- ai/generate-step-guidance
+- tts/synthesize
+- scheduler/analyze-recipe
 
-TTS engine is also configured in config.json:
+The VPS at temp.synome.jp still exists as legacy, but Cloudflare Workers is
+the primary deployment.
+
+TTS engine is configured in config.json:
 
 - `online_elevenlabs` - uses ElevenLabs API
 - `offline_expospeech` - uses expo-speech (device TTS)
@@ -50,11 +59,24 @@ TTS engine is also configured in config.json:
 
 ```bash
 npm install
-cp .env.sample .env
+cp .env.example .env
 ```
 
-Edit .env as needed, then set config.json to the desired apiMode and tts
-engine.
+Edit .env as needed, then set config.json to the desired tts engine.
+
+For Workers local development:
+
+```bash
+cp .dev.vars.example .dev.vars
+```
+
+Fill in API keys in .dev.vars, then run:
+
+```bash
+npx wrangler dev
+```
+
+To start the Expo frontend:
 
 ```bash
 npm run start
@@ -66,11 +88,12 @@ npm run web
 
 | Script           | Description                          |
 | ---------------- | ------------------------------------ |
+| dev              | Start frontend + backend dev servers |
 | start            | Launch Expo with auto port selection |
 | ios              | Launch on iOS simulator              |
 | android          | Launch on Android emulator           |
 | web              | Launch in browser                    |
-| deploy:vps       | Deploy API proxy to VPS              |
+| deploy:vps       | Deploy API proxy to VPS (legacy)     |
 | api:vps          | Set apiMode to vps_proxy             |
 | api:direct       | Set apiMode to direct_client         |
 | format           | Run Prettier                         |
@@ -88,7 +111,7 @@ npm run web
 
 ## Environment Variables
 
-Defined in .env (see .env.sample).
+Defined in .env (see .env.example).
 
 | Variable                        | Required | Description           |
 | ------------------------------- | -------- | --------------------- |
@@ -102,28 +125,46 @@ Defined in .env (see .env.sample).
 
 (\*) Required only when apiMode is direct_client.
 
+### Workers Environment Variables
+
+| Variable            | Required | Description                         |
+| ------------------- | -------- | ----------------------------------- |
+| MISTRAL_API_KEY     | Yes      | Mistral API key (Workers secret)    |
+| CLAUDE_API_KEY      | Yes      | Claude API key (Workers secret)     |
+| ELEVENLABS_API_KEY  | Yes      | ElevenLabs API key (Workers secret) |
+| ELEVENLABS_VOICE_ID | No       | ElevenLabs voice ID                 |
+| ELEVENLABS_MODEL    | No       | ElevenLabs model ID                 |
+
+Defined in .dev.vars for local development (see .dev.vars.example). Set via
+`wrangler secret put` for production.
+
 ## Main Files
 
-| Path                            | Role                                |
-| ------------------------------- | ----------------------------------- |
-| app/index.tsx                   | Home (recipe selection)             |
-| app/recipe/[id].tsx             | Recipe detail                       |
-| app/shopping/[id].tsx           | Shopping list                       |
-| app/schedule/[id].tsx           | Multi-recipe scheduling             |
-| app/cook-interactive/[id].tsx   | Cooking navigation                  |
-| app/settings.tsx                | Settings                            |
-| contexts/AppSettingsContext.tsx | Shared settings + persistence       |
-| hooks/useVoiceDialogue.ts       | Voice dialogue state machine        |
-| hooks/useVoiceCommands.ts       | Speech-to-text via Voxtral ASR      |
-| services/ai.ts                  | AI orchestration (intent, Q&A, TTS) |
-| services/apiConfig.ts           | API mode and key management         |
-| services/vpsClient.ts           | VPS proxy HTTP client               |
-| services/voxtralAsr.ts          | Voxtral ASR streaming client        |
-| services/anthropicClient.ts     | Claude API client                   |
-| utils/gantt.ts                  | Gantt chart generation              |
-| utils/recipe.ts                 | Ingredient scaling utilities        |
-| utils/scheduler.ts              | Multi-recipe greedy scheduler       |
-| utils/scheduleStore.ts          | In-memory store for schedule data   |
+| Path                            | Role                                                  |
+| ------------------------------- | ----------------------------------------------------- |
+| app/index.tsx                   | Home (recipe selection)                               |
+| app/recipe/[id].tsx             | Recipe detail                                         |
+| app/shopping/[id].tsx           | Shopping list                                         |
+| app/schedule/[id].tsx           | Multi-recipe scheduling                               |
+| app/cook-interactive/[id].tsx   | Cooking navigation                                    |
+| app/settings.tsx                | Settings                                              |
+| contexts/AppSettingsContext.tsx | Shared settings + persistence                         |
+| hooks/useVoiceDialogue.ts       | Voice dialogue state machine                          |
+| hooks/useVoiceCommands.ts       | Speech-to-text via Voxtral ASR                        |
+| services/ai.ts                  | AI orchestration (intent, Q&A, TTS)                   |
+| services/apiConfig.ts           | API mode and key management                           |
+| services/vpsClient.ts           | VPS proxy HTTP client                                 |
+| services/voxtralAsr.ts          | Voxtral ASR streaming client                          |
+| services/anthropicClient.ts     | Claude API client                                     |
+| utils/gantt.ts                  | Gantt chart generation                                |
+| utils/recipe.ts                 | Ingredient scaling utilities                          |
+| utils/scheduler.ts              | Multi-recipe greedy scheduler                         |
+| utils/scheduleStore.ts          | In-memory store for schedule data                     |
+| src/worker.ts                   | Cloudflare Workers entry point (API proxy)            |
+| src/routes/\*.ts                | API route handlers (8 endpoints)                      |
+| src/lib/\*.ts                   | API client libraries (Mistral, Anthropic, ElevenLabs) |
+| wrangler.toml                   | Cloudflare Workers configuration                      |
+| .dev.vars.example               | Workers local dev env template                        |
 
 ## Data Assets
 
@@ -188,20 +229,29 @@ Expo + React Native で構築した料理ナビゲーションアプリ。vibe-c
 
 ## アーキテクチャ
 
-フロントエンド: Expo (React Native for Web) を Cloudflare Workers にデプロイ。
-main ブランチへの push 時に GitHub Actions で自動デプロイ。
+フロントエンドとバックエンド (API プロキシ) を単一の Cloudflare Worker として
+デプロイ。API プロキシは同一オリジンの /vps/\* パスで動作する ("/vps" プレフィックス
+はレガシーな命名規則)。本番では EXPO_PUBLIC_VPS_API_BASE_URL を "" (空文字列) に
+設定し、API 呼び出しは同一 Worker への相対パスで行う。
 
-バックエンド: temp.synome.jp の VPS で API プロキシを稼働。Mistral, Claude,
-ElevenLabs API へのリクエストを中継し、API キーをサーバー側に保持する。
+API プロキシは Mistral, Claude, ElevenLabs API へのリクエストを中継し、API キーを
+サーバー側に保持する (Cloudflare Workers secrets として保管)。
 
-config.json で API ルーティングモードを切り替える:
+8 つの API エンドポイント:
 
-- `direct_client` - クライアントから AI API を直接呼び出す (.env に API キーが
-  必要)
-- `vps_proxy` - 全 AI 呼び出しを VPS プロキシ経由にする (クライアント側の API
-  キー不要)
+- health
+- asr/transcribe
+- ai/classify-intent
+- ai/answer-question
+- ai/barge-in
+- ai/generate-step-guidance
+- tts/synthesize
+- scheduler/analyze-recipe
 
-TTS エンジンも config.json で設定:
+temp.synome.jp の VPS はレガシーとして残存するが、Cloudflare Workers が主要な
+デプロイ先。
+
+TTS エンジンは config.json で設定:
 
 - `online_elevenlabs` - ElevenLabs API を使用
 - `offline_expospeech` - expo-speech (デバイス内蔵 TTS) を使用
@@ -210,10 +260,24 @@ TTS エンジンも config.json で設定:
 
 ```bash
 npm install
-cp .env.sample .env
+cp .env.example .env
 ```
 
-.env を編集し、config.json で apiMode と TTS エンジンを設定する。
+.env を編集し、config.json で TTS エンジンを設定する。
+
+Workers ローカル開発の場合:
+
+```bash
+cp .dev.vars.example .dev.vars
+```
+
+.dev.vars に API キーを記入し、以下を実行:
+
+```bash
+npx wrangler dev
+```
+
+Expo フロントエンドの起動:
 
 ```bash
 npm run start
@@ -223,31 +287,32 @@ npm run web
 
 ## スクリプト
 
-| スクリプト       | 説明                                    |
-| ---------------- | --------------------------------------- |
-| start            | 自動ポート選択で Expo を起動            |
-| ios              | iOS シミュレータで起動                  |
-| android          | Android エミュレータで起動              |
-| web              | ブラウザで起動                          |
-| deploy:vps       | API プロキシを VPS にデプロイ           |
-| api:vps          | apiMode を vps_proxy に設定             |
-| api:direct       | apiMode を direct_client に設定         |
-| format           | Prettier 実行                           |
-| format:check     | Prettier フォーマットチェック           |
-| build:web        | Expo で Web ビルドをエクスポート        |
-| e2e:server       | E2E テストサーバーをポート 19006 で起動 |
-| e2e:offline      | オフライン TTS で E2E テスト実行        |
-| e2e:online       | オンライン TTS で E2E テスト実行        |
-| e2e:both         | 両方の TTS エンジンで E2E テスト実行    |
-| e2e              | Playwright テスト実行                   |
-| e2e:ui           | Playwright テスト (UI モード)           |
-| typecheck        | TypeScript 型チェック                   |
-| scrape:recipes   | 味の素からレシピデータをスクレイピング  |
-| validate:recipes | レシピ JSON スキーマ検証                |
+| スクリプト       | 説明                                          |
+| ---------------- | --------------------------------------------- |
+| dev              | フロントエンド + バックエンド開発サーバー起動 |
+| start            | 自動ポート選択で Expo を起動                  |
+| ios              | iOS シミュレータで起動                        |
+| android          | Android エミュレータで起動                    |
+| web              | ブラウザで起動                                |
+| deploy:vps       | API プロキシを VPS にデプロイ (レガシー)      |
+| api:vps          | apiMode を vps_proxy に設定                   |
+| api:direct       | apiMode を direct_client に設定               |
+| format           | Prettier 実行                                 |
+| format:check     | Prettier フォーマットチェック                 |
+| build:web        | Expo で Web ビルドをエクスポート              |
+| e2e:server       | E2E テストサーバーをポート 19006 で起動       |
+| e2e:offline      | オフライン TTS で E2E テスト実行              |
+| e2e:online       | オンライン TTS で E2E テスト実行              |
+| e2e:both         | 両方の TTS エンジンで E2E テスト実行          |
+| e2e              | Playwright テスト実行                         |
+| e2e:ui           | Playwright テスト (UI モード)                 |
+| typecheck        | TypeScript 型チェック                         |
+| scrape:recipes   | 味の素からレシピデータをスクレイピング        |
+| validate:recipes | レシピ JSON スキーマ検証                      |
 
 ## 環境変数
 
-.env で定義 (.env.sample を参照)。
+.env で定義 (.env.example を参照)。
 
 | 変数                            | 必須 | 説明                 |
 | ------------------------------- | ---- | -------------------- |
@@ -261,28 +326,46 @@ npm run web
 
 (\*) apiMode が direct_client の場合のみ必要。
 
+### Workers 環境変数
+
+| 変数                | 必須 | 説明                                 |
+| ------------------- | ---- | ------------------------------------ |
+| MISTRAL_API_KEY     | Yes  | Mistral API キー (Workers secret)    |
+| CLAUDE_API_KEY      | Yes  | Claude API キー (Workers secret)     |
+| ELEVENLABS_API_KEY  | Yes  | ElevenLabs API キー (Workers secret) |
+| ELEVENLABS_VOICE_ID | No   | ElevenLabs 音声 ID                   |
+| ELEVENLABS_MODEL    | No   | ElevenLabs モデル ID                 |
+
+.dev.vars で定義 (ローカル開発用、.dev.vars.example を参照)。本番は
+`wrangler secret put` で設定。
+
 ## 主要ファイル
 
-| パス                            | 役割                               |
-| ------------------------------- | ---------------------------------- |
-| app/index.tsx                   | ホーム (レシピ選択)                |
-| app/recipe/[id].tsx             | レシピ詳細                         |
-| app/shopping/[id].tsx           | 買い出しリスト                     |
-| app/schedule/[id].tsx           | 複数レシピスケジューリング         |
-| app/cook-interactive/[id].tsx   | 調理ナビ                           |
-| app/settings.tsx                | 設定                               |
-| contexts/AppSettingsContext.tsx | 共有設定 + 永続化                  |
-| hooks/useVoiceDialogue.ts       | 音声対話ステートマシン             |
-| hooks/useVoiceCommands.ts       | Voxtral ASR による音声認識         |
-| services/ai.ts                  | AI オーケストレーション            |
-| services/apiConfig.ts           | API モード / キー管理              |
-| services/vpsClient.ts           | VPS プロキシ HTTP クライアント     |
-| services/voxtralAsr.ts          | Voxtral ASR ストリーミング         |
-| services/anthropicClient.ts     | Claude API クライアント            |
-| utils/gantt.ts                  | ガントチャート生成                 |
-| utils/recipe.ts                 | 分量スケールユーティリティ         |
-| utils/scheduler.ts              | 複数レシピ貪欲法スケジューラ       |
-| utils/scheduleStore.ts          | スケジュールデータのメモリ内ストア |
+| パス                            | 役割                                              |
+| ------------------------------- | ------------------------------------------------- |
+| app/index.tsx                   | ホーム (レシピ選択)                               |
+| app/recipe/[id].tsx             | レシピ詳細                                        |
+| app/shopping/[id].tsx           | 買い出しリスト                                    |
+| app/schedule/[id].tsx           | 複数レシピスケジューリング                        |
+| app/cook-interactive/[id].tsx   | 調理ナビ                                          |
+| app/settings.tsx                | 設定                                              |
+| contexts/AppSettingsContext.tsx | 共有設定 + 永続化                                 |
+| hooks/useVoiceDialogue.ts       | 音声対話ステートマシン                            |
+| hooks/useVoiceCommands.ts       | Voxtral ASR による音声認識                        |
+| services/ai.ts                  | AI オーケストレーション                           |
+| services/apiConfig.ts           | API モード / キー管理                             |
+| services/vpsClient.ts           | VPS プロキシ HTTP クライアント                    |
+| services/voxtralAsr.ts          | Voxtral ASR ストリーミング                        |
+| services/anthropicClient.ts     | Claude API クライアント                           |
+| utils/gantt.ts                  | ガントチャート生成                                |
+| utils/recipe.ts                 | 分量スケールユーティリティ                        |
+| utils/scheduler.ts              | 複数レシピ貪欲法スケジューラ                      |
+| utils/scheduleStore.ts          | スケジュールデータのメモリ内ストア                |
+| src/worker.ts                   | Cloudflare Workers エントリポイント (API proxy)   |
+| src/routes/\*.ts                | API ルートハンドラ (8 エンドポイント)             |
+| src/lib/\*.ts                   | API クライアント (Mistral, Anthropic, ElevenLabs) |
+| wrangler.toml                   | Cloudflare Workers 設定                           |
+| .dev.vars.example               | Workers ローカル開発用環境変数テンプレート        |
 
 ## データ資産
 
