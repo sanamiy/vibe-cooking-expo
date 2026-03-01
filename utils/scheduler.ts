@@ -13,7 +13,7 @@
 import { stripHtmlInline } from "@/utils/recipe";
 import type { Recipe } from "@/types/recipe";
 import { buildRecipeGantt, type GanttTask } from "@/utils/gantt";
-import { postJsonVps, shouldUseVpsProxy } from "@/services/vpsClient";
+import { postJsonVps, shouldUseServerProxy } from "@/services/vpsClient";
 import { callAnthropicMessages } from "@/services/anthropicClient";
 
 // ─── Types ──────────────────────────────────────────
@@ -116,7 +116,7 @@ async function analyzeRecipeWithLLM(
   ingredients: string[],
   steps: Array<{ text: string }>,
 ): Promise<StepResource[]> {
-  const useVps = shouldUseVpsProxy();
+  const useVps = shouldUseServerProxy();
 
   const stepsText = steps
     .map((s, i) => `${i + 1}. ${stripHtmlInline(s.text)}`)
@@ -604,7 +604,7 @@ export async function scheduleMultipleRecipes(
 ): Promise<MultiRecipeSchedule> {
   const effectiveAlgorithm: SchedulerAlgorithmType =
     algorithm === "auto" && recipes.length === 3 ? "greedy" : algorithm;
-  const useVps = shouldUseVpsProxy();
+  const useVps = shouldUseServerProxy();
   let useLLMInLocalFallback = useVps && effectiveAlgorithm !== "claude_e2e";
 
   // VPS API経由でスケジューリング（高度なアルゴリズムを使用）

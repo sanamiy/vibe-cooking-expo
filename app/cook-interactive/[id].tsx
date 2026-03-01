@@ -246,7 +246,6 @@ export default function CookInteractiveScreen() {
     lastResponse,
     processUserInput,
     processVoxtralDialogueResult,
-    interrupt,
     stopSpeaking,
     setListeningResume,
     resetFromInterrupted,
@@ -262,15 +261,15 @@ export default function CookInteractiveScreen() {
     recipeContext,
   });
 
-  // Voice recognition – always active (even during speaking for barge-in)
+  // Voice recognition: accept transcripts only in listening state.
   const handleTranscript = useCallback(
     (text: string) => {
-      if (dialogueState === "speaking") {
-        interrupt();
+      if (dialogueState !== "listening") {
+        return;
       }
       processUserInput(text);
     },
-    [processUserInput, dialogueState, interrupt],
+    [processUserInput, dialogueState],
   );
 
   const voxtralDialoguePrompt = useMemo(() => {
@@ -312,12 +311,12 @@ ${historyText || "なし"}
 
   const { isListening, startListening } = useVoiceCommands({
     onTranscript: handleTranscript,
-    onSpeechStart: interrupt,
     onSpeechEnd: resetFromInterrupted,
     onVoxtralDialogueResult: processVoxtralDialogueResult,
     active: dialogueState !== "processing",
     inputDeviceId: selectedInputId,
     isSpeaking: dialogueState === "speaking",
+    allowBargeIn: false,
     voiceInputMode,
     voxtralSpeechPrompt:
       voiceInputMode === "voxtral_dialogue"

@@ -483,12 +483,8 @@ export function useVoiceDialogue({
           return;
         }
 
-        // speaking/interrupted中の発話も通常intent処理に統一する
-        // （説明だけ進んで工程が進まない競合を防ぐ）
-        if (prevState === "interrupted" || prevState === "speaking") {
-          currentSpeechTextRef.current = "";
-          await stopSpeaking();
-        } else if (prevState !== "listening") {
+        // 受け付けは listening 状態のみ（話し終わるまで入力を無効化）
+        if (prevState !== "listening") {
           return;
         }
 
@@ -655,6 +651,9 @@ export function useVoiceDialogue({
 
   const processVoxtralDialogueResult = useCallback(
     async (result: VoxtralDialogueResult) => {
+      if (dialogueState !== "listening") {
+        return;
+      }
       const response = String(result.assistantReply ?? "").trim();
       if (!response) return;
 
@@ -679,7 +678,6 @@ export function useVoiceDialogue({
       }
 
       const intent = String(result.intent ?? "").trim();
-      await stopSpeaking();
       setDialogueState("processing");
 
       const idx = currentIndexRef.current;
@@ -710,10 +708,10 @@ export function useVoiceDialogue({
     [
       hasSubstantialOverlap,
       lastResponse,
+      dialogueState,
       onChangeIndex,
       onSessionEnd,
       speakText,
-      stopSpeaking,
     ],
   );
 
