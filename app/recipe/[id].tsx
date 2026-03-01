@@ -325,9 +325,9 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   stepNumberBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: theme.colors.accent,
     alignItems: "center",
     justifyContent: "center",
@@ -336,15 +336,15 @@ const styles = StyleSheet.create({
   stepNumber: {
     color: theme.colors.text,
     fontWeight: "800",
-    fontSize: 14,
+    fontSize: 16,
   },
   stepContent: {
     flex: 1,
   },
   step: {
     color: theme.colors.text,
-    lineHeight: 24,
-    fontSize: 16,
+    lineHeight: 28,
+    fontSize: 18,
     marginBottom: 8,
   },
   stepImage: {

@@ -5,6 +5,10 @@ export function shouldUseServerProxy(): boolean {
   return mode === "vps_proxy" || mode === "cloudflare";
 }
 
+export function shouldUseVpsProxy(): boolean {
+  return shouldUseServerProxy();
+}
+
 export async function postJsonVps<T>(path: string, body: any): Promise<T> {
   const base = requireProxyBaseUrl();
   const res = await fetch(`${base}${path}`, {
