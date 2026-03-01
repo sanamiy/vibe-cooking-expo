@@ -6,6 +6,8 @@ expo-env.d.ts
 # @end expo-cli
 node_modules
 dist
+.wrangler
+.dev.vars
 data/recipe-img
 .env
 data/*.mp3
