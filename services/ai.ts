@@ -88,24 +88,31 @@ export async function classifyIntent(
   recipeName?: string,
 ): Promise<Intent> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<{ intent: Intent }>(
-      "/vps/ai/classify-intent",
-      {
-        userText,
-        currentStep,
-        prevStep,
-        nextStep,
-        recipeName,
-      },
-    );
-    const valid: Intent[] = [
-      "next_step",
-      "previous_step",
-      "question",
-      "timer_status",
-      "end_session",
-    ];
-    return valid.includes(data.intent) ? data.intent : "question";
+    try {
+      const data = await postJsonVps<{ intent: Intent }>(
+        "/vps/ai/classify-intent",
+        {
+          userText,
+          currentStep,
+          prevStep,
+          nextStep,
+          recipeName,
+        },
+      );
+      const valid: Intent[] = [
+        "next_step",
+        "previous_step",
+        "question",
+        "timer_status",
+        "end_session",
+      ];
+      return valid.includes(data.intent) ? data.intent : "question";
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn("[ai] VPS classify-intent failed, fallback to direct:", e);
+      }
+    }
   }
 
   const system = `あなたは調理アシスタントの意図分類器です。
@@ -155,17 +162,27 @@ export async function answerQuestion(
   recipeContext?: RecipeContext,
 ): Promise<string> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<{ answer: string }>(
-      "/vps/ai/answer-question",
-      {
-        userText,
-        currentStep,
-        stepProgress,
-        history,
-        recipeContext,
-      },
-    );
-    return data.answer;
+    try {
+      const data = await postJsonVps<{ answer: string }>(
+        "/vps/ai/answer-question",
+        {
+          userText,
+          currentStep,
+          stepProgress,
+          history,
+          recipeContext,
+        },
+      );
+      return data.answer;
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "[ai] VPS answer-question failed, fallback to direct:",
+          e,
+        );
+      }
+    }
   }
 
   const recipeInfo = recipeContext
@@ -220,18 +237,25 @@ export async function handleBargeIn(
   recipeContext?: RecipeContext,
 ): Promise<BargeInResult> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<BargeInResult>("/vps/ai/barge-in", {
-      userText,
-      interruptedSpeech,
-      currentStep,
-      stepProgress,
-      history,
-      recipeContext,
-    });
-    return {
-      action: data.action === "continue" ? "continue" : "new_response",
-      response: data.response,
-    };
+    try {
+      const data = await postJsonVps<BargeInResult>("/vps/ai/barge-in", {
+        userText,
+        interruptedSpeech,
+        currentStep,
+        stepProgress,
+        history,
+        recipeContext,
+      });
+      return {
+        action: data.action === "continue" ? "continue" : "new_response",
+        response: data.response,
+      };
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn("[ai] VPS barge-in failed, fallback to direct:", e);
+      }
+    }
   }
 
   const recipeInfo = recipeContext
@@ -280,17 +304,27 @@ export async function generateStepGuidance(
   recipeContext?: RecipeContext,
 ): Promise<string> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<{ guidance: string }>(
-      "/vps/ai/generate-step-guidance",
-      {
-        stepText,
-        stepIndex,
-        totalSteps,
-        recipeName,
-        recipeContext,
-      },
-    );
-    return data.guidance;
+    try {
+      const data = await postJsonVps<{ guidance: string }>(
+        "/vps/ai/generate-step-guidance",
+        {
+          stepText,
+          stepIndex,
+          totalSteps,
+          recipeName,
+          recipeContext,
+        },
+      );
+      return data.guidance;
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "[ai] VPS generate-step-guidance failed, fallback to direct:",
+          e,
+        );
+      }
+    }
   }
 
   const tipForStep = recipeContext?.stepTips?.[stepIndex] ?? "";
@@ -324,13 +358,20 @@ ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
 
 export async function synthesizeSpeech(text: string): Promise<string> {
   if (shouldUseVpsProxy()) {
-    const data = await postJsonVps<{ audioBase64: string }>(
-      "/vps/tts/synthesize",
-      {
-        text,
-      },
-    );
-    return data.audioBase64;
+    try {
+      const data = await postJsonVps<{ audioBase64: string }>(
+        "/vps/tts/synthesize",
+        {
+          text,
+        },
+      );
+      return data.audioBase64;
+    } catch (e) {
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn("[ai] VPS tts failed, fallback to direct:", e);
+      }
+    }
   }
 
   return await callElevenLabsTts(text);
