@@ -43,7 +43,8 @@ export type AlgorithmType =
   | "genetic"
   | "backward"
   | "astar"
-  | "auto";
+  | "auto"
+  | "claude_e2e";
 
 export interface ScheduleRequest {
   recipes: RecipeInput[];
@@ -132,14 +133,31 @@ export const RECIPE_COLORS = [
 
 export const CONTAMINATION_KEYWORDS: Record<string, string[]> = {
   raw_meat: [
-    "肉", "牛肉", "豚肉", "鶏肉", "ひき肉", "合いびき",
-    "バラ肉", "ロース", "もも肉",
+    "肉",
+    "牛肉",
+    "豚肉",
+    "鶏肉",
+    "ひき肉",
+    "合いびき",
+    "バラ肉",
+    "ロース",
+    "もも肉",
   ],
   raw_fish: ["魚", "刺身", "サーモン", "マグロ", "エビ", "イカ", "貝"],
   vegetables: [
-    "野菜", "じゃがいも", "にんじん", "玉ねぎ", "キャベツ",
-    "レタス", "トマト", "きゅうり", "ピーマン", "ネギ",
-    "長ネギ", "ほうれん草", "人参",
+    "野菜",
+    "じゃがいも",
+    "にんじん",
+    "玉ねぎ",
+    "キャベツ",
+    "レタス",
+    "トマト",
+    "きゅうり",
+    "ピーマン",
+    "ネギ",
+    "長ネギ",
+    "ほうれん草",
+    "人参",
   ],
 };
 

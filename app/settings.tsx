@@ -18,6 +18,7 @@ const ALGORITHM_OPTIONS: {
   desc: string;
 }[] = [
   { value: "auto", label: "自動", desc: "レシピ数に応じて最適化" },
+  { value: "claude_e2e", label: "Claude E2E", desc: "Claude 1回で全体生成" },
   { value: "greedy", label: "貪欲法", desc: "シンプルで高速" },
   { value: "genetic", label: "遺伝的", desc: "同時完成を最適化" },
   { value: "critical_path", label: "クリティカルパス", desc: "最長レシピ優先" },
