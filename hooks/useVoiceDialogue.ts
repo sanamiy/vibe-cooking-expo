@@ -31,6 +31,12 @@ interface ConversationEntry {
   content: string;
 }
 
+interface VoxtralDialogueResult {
+  assistantReply: string;
+  intent?: string;
+  userText?: string;
+}
+
 interface UseVoiceDialogueProps {
   steps: Array<{ text: string }>;
   tasks: GanttTask[];
@@ -511,11 +517,43 @@ export function useVoiceDialogue({
     ],
   );
 
+  const processVoxtralDialogueResult = useCallback(
+    async (result: VoxtralDialogueResult) => {
+      const response = String(result.assistantReply ?? "").trim();
+      if (!response) return;
+
+      await stopSpeaking();
+      setDialogueState("processing");
+
+      if (result.intent === "next_step" && currentIndex < steps.length - 1) {
+        onChangeIndex(currentIndex + 1);
+      } else if (result.intent === "previous_step" && currentIndex > 0) {
+        onChangeIndex(currentIndex - 1);
+      }
+
+      const userText = String(result.userText ?? "").trim();
+      setConversationHistory((prev) => {
+        const next = [...prev];
+        if (userText) next.push({ role: "user", content: userText });
+        next.push({ role: "assistant", content: response });
+        return next;
+      });
+      setLastResponse(response);
+      await speakText(response);
+
+      if (result.intent === "end_session") {
+        onSessionEnd();
+      }
+    },
+    [currentIndex, onChangeIndex, onSessionEnd, speakText, steps.length, stopSpeaking],
+  );
+
   return {
     dialogueState,
     conversationHistory,
     lastResponse,
     processUserInput,
+    processVoxtralDialogueResult,
     interrupt,
     stopSpeaking,
     setListeningResume,

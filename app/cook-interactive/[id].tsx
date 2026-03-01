@@ -27,6 +27,7 @@ import type { SchedulerTask } from "@/utils/scheduler";
 const config = require("@/config.json") as {
   voiceInputMode?: VoiceInputMode;
   voxtralSpeechPrompt?: string;
+  voxtralDialoguePrompt?: string;
   enableVoiceAlgorithmSelector?: boolean;
 };
 
@@ -89,6 +90,14 @@ export default function CookInteractiveScreen() {
   const recipes = useMemo(
     () => ids.map((rid) => getRecipeById(rid)).filter(Boolean),
     [ids, getRecipeById],
+  );
+  const combinedRecipeName = useMemo(
+    () =>
+      recipes
+        .map((r) => r?.name)
+        .filter(Boolean)
+        .join("、"),
+    [recipes],
   );
 
   // Combine all scheduled tasks from all recipes, sorted by start_time
@@ -228,6 +237,7 @@ export default function CookInteractiveScreen() {
     conversationHistory,
     lastResponse,
     processUserInput,
+    processVoxtralDialogueResult,
     interrupt,
     stopSpeaking,
     setListeningResume,
@@ -235,10 +245,7 @@ export default function CookInteractiveScreen() {
   } = useVoiceDialogue({
     steps,
     tasks: gantt.tasks,
-    recipeName: recipes
-      .map((r) => r?.name)
-      .filter(Boolean)
-      .join("、"),
+    recipeName: combinedRecipeName,
     currentIndex,
     outputDeviceId: selectedOutputId,
     startBgmUri: process.env.EXPO_PUBLIC_MUSIC_LINK,
@@ -258,15 +265,53 @@ export default function CookInteractiveScreen() {
     [processUserInput, dialogueState, interrupt],
   );
 
+  const voxtralDialoguePrompt = useMemo(() => {
+    const currentStepText = stripHtml(steps[currentIndex]?.text ?? "");
+    const prevStepText =
+      currentIndex > 0 ? stripHtml(steps[currentIndex - 1]?.text ?? "") : "";
+    const nextStepText =
+      currentIndex < steps.length - 1
+        ? stripHtml(steps[currentIndex + 1]?.text ?? "")
+        : "";
+    const historyText = conversationHistory
+      .slice(-6)
+      .map((h) => `${h.role === "user" ? "ユーザー" : "アシスタント"}: ${h.content}`)
+      .join("\n");
+
+    const customPrompt = String(config?.voxtralDialoguePrompt ?? "").trim();
+    if (customPrompt) return customPrompt;
+
+    return `あなたは料理中ユーザー向けの音声アシスタントです。入力音声の意図を理解し、日本語で短く実用的に返答してください。
+料理名: ${recipeContext?.recipeName ?? combinedRecipeName}
+現在工程(${currentIndex + 1}/${steps.length}): ${currentStepText}
+前工程: ${prevStepText || "なし"}
+次工程: ${nextStepText || "なし"}
+会話履歴:
+${historyText || "なし"}
+
+以下のJSONのみを返してください（コードフェンス禁止）:
+{"intent":"next_step|previous_step|question|timer_status|end_session|stay","assistant_reply":"ユーザーに話す短い日本語応答","user_text":"認識したユーザー発話の要約"}`
+  }, [
+    conversationHistory,
+    currentIndex,
+    recipeContext?.recipeName,
+    combinedRecipeName,
+    steps,
+  ]);
+
   const { isListening, startListening } = useVoiceCommands({
     onTranscript: handleTranscript,
     onSpeechStart: interrupt,
     onSpeechEnd: resetFromInterrupted,
+    onVoxtralDialogueResult: processVoxtralDialogueResult,
     active: dialogueState !== "processing",
     inputDeviceId: selectedInputId,
     isSpeaking: dialogueState === "speaking",
     voiceInputMode,
-    voxtralSpeechPrompt: config?.voxtralSpeechPrompt,
+    voxtralSpeechPrompt:
+      voiceInputMode === "voxtral_dialogue"
+        ? voxtralDialoguePrompt
+        : config?.voxtralSpeechPrompt,
   });
 
   useEffect(() => {
