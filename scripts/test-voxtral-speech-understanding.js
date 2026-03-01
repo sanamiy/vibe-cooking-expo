@@ -25,18 +25,7 @@ function synthesizeSpeechToWav(targetPath, text) {
   const filter = `flite=text='${safeText}':voice=slt`;
   const ffmpeg = spawnSync(
     "ffmpeg",
-    [
-      "-y",
-      "-f",
-      "lavfi",
-      "-i",
-      filter,
-      "-ar",
-      "16000",
-      "-ac",
-      "1",
-      targetPath,
-    ],
+    ["-y", "-f", "lavfi", "-i", filter, "-ar", "16000", "-ac", "1", targetPath],
     { encoding: "utf8" },
   );
   if (ffmpeg.status !== 0) {
@@ -65,33 +54,6 @@ function extractAssistantText(response) {
     .filter(Boolean)
     .join("\n")
     .trim();
-}
-
-async function transcribeViaVpsAsr(vpsBase, wavPath) {
-  const formData = new FormData();
-  formData.append("model", "voxtral-mini-2602");
-  formData.append("language", "en");
-  formData.append("stream", "false");
-  formData.append(
-    "file",
-    new Blob([fs.readFileSync(wavPath)], { type: "audio/wav" }),
-    "audio.wav",
-  );
-
-  const res = await fetch(`${vpsBase}/vps/asr/transcribe`, {
-    method: "POST",
-    body: formData,
-  });
-  const raw = await res.text();
-  if (!res.ok) {
-    throw new Error(`VPS ASR API error ${res.status}: ${raw}`);
-  }
-  try {
-    const data = JSON.parse(raw);
-    return String(data.text || "").trim();
-  } catch {
-    return String(raw || "").trim();
-  }
 }
 
 async function main() {
@@ -141,15 +103,6 @@ async function main() {
         console.log("mode=vps_proxy");
         console.log(`synthetic_audio_text="${synthText}"`);
         console.log(`voxtral_response="${String(data.text || "").trim()}"`);
-        return;
-      }
-
-      // Some deployments only expose ASR proxy and do not provide /vps/audio/understand.
-      if (res.status === 404) {
-        const text = await transcribeViaVpsAsr(vpsBase, wavPath);
-        console.log("mode=vps_proxy(asr-fallback)");
-        console.log(`synthetic_audio_text="${synthText}"`);
-        console.log(`voxtral_response="${text}"`);
         return;
       }
 

@@ -28,8 +28,8 @@ export function requireVpsBaseUrl(): string {
 
 export function getVpsBaseUrlOptional(): string | null {
   const raw =
-    (Constants.expoConfig?.extra as any)?.VPS_API_BASE_URL ??
-    process.env.EXPO_PUBLIC_VPS_API_BASE_URL;
+    process.env.EXPO_PUBLIC_VPS_API_BASE_URL ??
+    (Constants.expoConfig?.extra as any)?.VPS_API_BASE_URL;
   if (raw === "") return "";
   if (!raw) return null;
   return raw.replace(/\/$/, "");
