@@ -5,7 +5,14 @@ import { buildRecipeGantt, RecipeGanttData, GanttTask } from "@/utils/gantt";
 import { stripHtml } from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
@@ -24,21 +31,31 @@ const formatCountdownLabel = (countdown: number | null) => {
 
 const getTaskTypeLabel = (taskType: string) => {
   switch (taskType) {
-    case "prep": return "下準備";
-    case "cook_active": return "加熱中";
-    case "cook_passive": return "待機";
-    case "wash": return "洗い物";
-    default: return taskType;
+    case "prep":
+      return "下準備";
+    case "cook_active":
+      return "加熱中";
+    case "cook_passive":
+      return "待機";
+    case "wash":
+      return "洗い物";
+    default:
+      return taskType;
   }
 };
 
 const getTaskTypeColor = (taskType: string) => {
   switch (taskType) {
-    case "prep": return "#4ECDC4";
-    case "cook_active": return "#FF6B6B";
-    case "cook_passive": return "#FFE66D";
-    case "wash": return "#95E1D3";
-    default: return theme.colors.subText;
+    case "prep":
+      return "#4ECDC4";
+    case "cook_active":
+      return "#FF6B6B";
+    case "cook_passive":
+      return "#FFE66D";
+    case "wash":
+      return "#95E1D3";
+    default:
+      return theme.colors.subText;
   }
 };
 
@@ -50,9 +67,7 @@ interface CombinedStep {
   color: string;
 }
 
-const RECIPE_COLORS = [
-  "#FF6B6B", "#4ECDC4", "#FFE66D", "#95E1D3", "#F38181",
-];
+const RECIPE_COLORS = ["#FF6B6B", "#4ECDC4", "#FFE66D", "#95E1D3", "#F38181"];
 
 export default function CookInteractiveScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -61,7 +76,7 @@ export default function CookInteractiveScreen() {
   const ids = useMemo(() => String(id).split(","), [id]);
   const recipes = useMemo(
     () => ids.map((rid) => getRecipeById(rid)).filter(Boolean),
-    [ids, getRecipeById]
+    [ids, getRecipeById],
   );
 
   // Combine all scheduled tasks from all recipes, sorted by start_time
@@ -84,7 +99,9 @@ export default function CookInteractiveScreen() {
         recipeName: t.recipe_name,
         text: t.step_description,
         schedulerTask: t,
-        color: t.color || RECIPE_COLORS[ids.indexOf(t.recipe_id) % RECIPE_COLORS.length],
+        color:
+          t.color ||
+          RECIPE_COLORS[ids.indexOf(t.recipe_id) % RECIPE_COLORS.length],
       }));
     }
     // Fallback: interleave original recipe steps
@@ -94,7 +111,7 @@ export default function CookInteractiveScreen() {
       if (!recipe) continue;
       const recipeSteps = recipe.instruction_steps?.length
         ? recipe.instruction_steps.map((s) => s.text)
-        : recipe.instructions ?? [];
+        : (recipe.instructions ?? []);
       for (const text of recipeSteps) {
         steps.push({
           recipeId: recipe.id,
@@ -110,14 +127,16 @@ export default function CookInteractiveScreen() {
   // For voice dialogue, use simple steps array
   const steps = useMemo(
     () => combinedSteps.map((s) => ({ text: s.text })),
-    [combinedSteps]
+    [combinedSteps],
   );
 
   // Build combined gantt chart
   const gantt = useMemo<RecipeGanttData>(() => {
     if (allScheduledTasks.length > 0) {
       // Note: scheduler duration and start_time are already in MINUTES
-      const totalTime = Math.max(...allScheduledTasks.map((t) => t.start_time + t.duration));
+      const totalTime = Math.max(
+        ...allScheduledTasks.map((t) => t.start_time + t.duration),
+      );
       return {
         version: 1 as const,
         recipe_id: ids.join(","),
@@ -133,7 +152,9 @@ export default function CookInteractiveScreen() {
           return {
             task_id: `${t.recipe_id}-${idx}`,
             step_index: idx + 1,
-            label: t.step_description.slice(0, 25) + (t.step_description.length > 25 ? "…" : ""),
+            label:
+              t.step_description.slice(0, 25) +
+              (t.step_description.length > 25 ? "…" : ""),
             source_text: t.step_description,
             duration_min: durationMin,
             start_min: startMin,
@@ -164,7 +185,10 @@ export default function CookInteractiveScreen() {
       if (tips.length > 0) allTips.push(...tips);
     }
     return {
-      recipeName: recipes.map((r) => r?.name).filter(Boolean).join("、"),
+      recipeName: recipes
+        .map((r) => r?.name)
+        .filter(Boolean)
+        .join("、"),
       ingredients: allIngredients,
       allSteps: combinedSteps.map((s) => stripHtml(s.text)),
       ...(allTips.length > 0 ? { stepTips: allTips } : {}),
@@ -196,7 +220,10 @@ export default function CookInteractiveScreen() {
   } = useVoiceDialogue({
     steps,
     tasks: gantt.tasks,
-    recipeName: recipes.map((r) => r?.name).filter(Boolean).join("、"),
+    recipeName: recipes
+      .map((r) => r?.name)
+      .filter(Boolean)
+      .join("、"),
     currentIndex,
     outputDeviceId: selectedOutputId,
     startBgmUri: process.env.EXPO_PUBLIC_MUSIC_LINK,
@@ -233,16 +260,20 @@ export default function CookInteractiveScreen() {
 
   // Debug: keyboard navigation (dev only)
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight" || e.key === "n") {
+    if (Platform.OS !== "web") return;
+    const w = globalThis as any;
+    if (!w || typeof w.addEventListener !== "function") {
+      return;
+    }
+    const handleKeyDown = (e: any) => {
+      if (e?.key === "ArrowRight" || e?.key === "n") {
         setCurrentIndex((prev) => Math.min(prev + 1, combinedSteps.length - 1));
-      } else if (e.key === "ArrowLeft" || e.key === "p") {
+      } else if (e?.key === "ArrowLeft" || e?.key === "p") {
         setCurrentIndex((prev) => Math.max(prev - 1, 0));
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    w.addEventListener("keydown", handleKeyDown);
+    return () => w.removeEventListener("keydown", handleKeyDown);
   }, [combinedSteps.length]);
 
   // Timer countdown
@@ -271,17 +302,26 @@ export default function CookInteractiveScreen() {
   const countdownLabel = formatCountdownLabel(countdown);
 
   // Calculate progress percentage
-  const progressPercent = combinedSteps.length > 0
-    ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100)
-    : 0;
+  const progressPercent =
+    combinedSteps.length > 0
+      ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100)
+      : 0;
 
   // Calculate per-recipe progress
   const recipeProgress = useMemo(() => {
-    const progress: Record<string, { done: number; total: number; name: string; color: string }> = {};
+    const progress: Record<
+      string,
+      { done: number; total: number; name: string; color: string }
+    > = {};
     for (let i = 0; i < combinedSteps.length; i++) {
       const step = combinedSteps[i];
       if (!progress[step.recipeId]) {
-        progress[step.recipeId] = { done: 0, total: 0, name: step.recipeName, color: step.color };
+        progress[step.recipeId] = {
+          done: 0,
+          total: 0,
+          name: step.recipeName,
+          color: step.color,
+        };
       }
       progress[step.recipeId].total += 1;
       if (i < currentIndex) {
@@ -316,14 +356,20 @@ export default function CookInteractiveScreen() {
           <Text style={styles.topProgressPercent}>{progressPercent}%</Text>
         </View>
         <View style={styles.topProgressBar}>
-          <View style={[styles.topProgressFill, { width: `${progressPercent}%` }]} />
+          <View
+            style={[styles.topProgressFill, { width: `${progressPercent}%` }]}
+          />
         </View>
         {recipeProgress.length > 1 && (
           <View style={styles.topRecipeProgress}>
             {recipeProgress.map((rp) => (
               <View key={rp.recipeId} style={styles.topRecipeItem}>
-                <View style={[styles.topRecipeDot, { backgroundColor: rp.color }]} />
-                <Text style={styles.topRecipeName} numberOfLines={1}>{rp.name}</Text>
+                <View
+                  style={[styles.topRecipeDot, { backgroundColor: rp.color }]}
+                />
+                <Text style={styles.topRecipeName} numberOfLines={1}>
+                  {rp.name}
+                </Text>
                 <Text style={styles.topRecipePercent}>{rp.percent}%</Text>
               </View>
             ))}
@@ -332,9 +378,13 @@ export default function CookInteractiveScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-
         {/* Current step card */}
-        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: currentStep?.color }]}>
+        <View
+          style={[
+            styles.card,
+            { borderLeftWidth: 4, borderLeftColor: currentStep?.color },
+          ]}
+        >
           <View style={styles.stepHeader}>
             <View style={styles.stepBadge}>
               <Text style={styles.stepBadgeText}>
@@ -342,7 +392,16 @@ export default function CookInteractiveScreen() {
               </Text>
             </View>
             {currentStep?.schedulerTask?.task_type && (
-              <View style={[styles.typeBadge, { backgroundColor: getTaskTypeColor(currentStep.schedulerTask.task_type) }]}>
+              <View
+                style={[
+                  styles.typeBadge,
+                  {
+                    backgroundColor: getTaskTypeColor(
+                      currentStep.schedulerTask.task_type,
+                    ),
+                  },
+                ]}
+              >
                 <Text style={styles.typeBadgeText}>
                   {getTaskTypeLabel(currentStep.schedulerTask.task_type)}
                 </Text>
@@ -356,7 +415,9 @@ export default function CookInteractiveScreen() {
           {currentStep?.schedulerTask?.tips && (
             <View style={styles.tipsContainer}>
               <Text style={styles.tipsLabel}>💡 コツ</Text>
-              <Text style={styles.tipsText}>{currentStep.schedulerTask.tips}</Text>
+              <Text style={styles.tipsText}>
+                {currentStep.schedulerTask.tips}
+              </Text>
             </View>
           )}
         </View>
@@ -395,7 +456,12 @@ export default function CookInteractiveScreen() {
             return (
               <View key={task.task_id} style={styles.ganttRow}>
                 <View style={styles.ganttLabelRow}>
-                  <View style={[styles.ganttColorDot, { backgroundColor: stepColor }]} />
+                  <View
+                    style={[
+                      styles.ganttColorDot,
+                      { backgroundColor: stepColor },
+                    ]}
+                  />
                   <Text
                     style={[
                       styles.ganttLabel,
@@ -411,7 +477,15 @@ export default function CookInteractiveScreen() {
                   <View
                     style={[
                       styles.bar,
-                      { left: left as any, width: width as any, backgroundColor: isDone ? theme.colors.success : isActive ? stepColor : theme.colors.border },
+                      {
+                        left: left as any,
+                        width: width as any,
+                        backgroundColor: isDone
+                          ? theme.colors.success
+                          : isActive
+                            ? stepColor
+                            : theme.colors.border,
+                      },
                     ]}
                   />
                 </View>
@@ -688,7 +762,12 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  ganttLabel: { fontSize: 12, color: theme.colors.subText, fontWeight: "600", flex: 1 },
+  ganttLabel: {
+    fontSize: 12,
+    color: theme.colors.subText,
+    fontWeight: "600",
+    flex: 1,
+  },
   activeLabel: { color: theme.colors.primary, fontWeight: "800" },
   doneLabel: { color: theme.colors.success },
   track: {
