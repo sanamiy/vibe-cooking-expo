@@ -129,6 +129,14 @@ ${nextStep ? `次の工程: ${nextStep}` : "（最後の工程です）"}
 - 次の工程が存在しない（最後の工程）場合、完了報告は end_session に分類してください。
 - 疑問文・質問内容がある場合のみ question を返してください。
 
+分類例:
+- 発話: 「終わりました」 -> next_step（次工程がある場合）
+- 発話: 「終わりました」 -> end_session（次工程がない場合）
+- 発話: 「次お願いします」 -> next_step
+- 発話: 「前に戻って」 -> previous_step
+- 発話: 「タイマーあと何分？」 -> timer_status
+- 発話: 「この工程のコツは？」 -> question
+
 JSON形式で返してください: {"intent": "ラベル"}`;
 
   const data = await callMistralChat(
@@ -165,6 +173,7 @@ export async function answerQuestion(
   stepProgress: string,
   history: ConversationEntry[],
   recipeContext?: RecipeContext,
+  currentStepTip?: string | null,
 ): Promise<string> {
   if (shouldUseVpsProxy()) {
     try {
@@ -176,6 +185,7 @@ export async function answerQuestion(
           stepProgress,
           history,
           recipeContext,
+          currentStepTip,
         },
       );
       return data.answer;
@@ -195,31 +205,30 @@ export async function answerQuestion(
 料理名: ${recipeContext.recipeName}
 
 【材料】
-${(recipeContext.ingredients || []).map((ing) => `- ${ing}`).join("\n")}
-
-【全工程】
-${(recipeContext.allSteps || []).map((s, i) => `${i + 1}. ${s}`).join("\n")}
-${
-  recipeContext.stepTips?.length
-    ? `\n【各工程の注意点・コツ】\n${recipeContext.stepTips.map((t, i) => `${i + 1}. ${t}`).join("\n")}`
-    : ""
-}`
+${(recipeContext.ingredients || [])
+  .slice(0, 30)
+  .map((ing) => `- ${ing}`)
+  .join("\n")}
+`
     : "";
+  const currentTip = String(currentStepTip ?? "").trim();
 
   const messages = [
     {
       role: "system",
       content: `あなたは料理中のユーザーを助ける調理アシスタントです。
-手が塞がっているので、簡潔に（1-2文で）答えてください。
+手が塞がっているので、簡潔に（最大2文で）答えてください。
 ${recipeInfo}
 
 現在の工程: ${currentStep}
 進捗: ${stepProgress}
+${currentTip ? `この工程のコツ: ${currentTip}` : ""}
 
 厳守:
 - 現在工程の内容だけに基づいて答えること。
 - 次工程・前工程の具体的な手順を説明しないこと。
-- 工程移動を促す質問が来ても、具体手順は話さず、短く案内だけ返すこと。`,
+- 「次に何をするか」を聞かれても、工程移動はせず現在工程の範囲で案内すること。
+- 関係ない工程の説明をしないこと。`,
     },
     ...((history || []).slice(-10).map((h) => ({
       role: h.role,
@@ -227,10 +236,9 @@ ${recipeInfo}
     })) || []),
     { role: "user", content: String(userText ?? "") },
   ];
-  const data = await callMistralChat(messages, { temperature: 0.7 });
-  return data.choices?.[0]?.message?.content ?? "";
+  const data = await callMistralChat(messages, { temperature: 0.2 });
+  return String(data.choices?.[0]?.message?.content ?? "").trim();
 }
-
 // ---------- Mistral: Barge-in (interruption) handling ----------
 
 export interface BargeInResult {
