@@ -10,6 +10,7 @@
     "android": "node scripts/start-expo-auto-port.js -- --android",
     "web": "node scripts/start-expo-auto-port.js -- --web",
     "deploy:vps": "node scripts/deploy-vps.js",
+    "api:cloudflare": "node scripts/set-api-mode.js cloudflare",
     "api:vps": "node scripts/set-api-mode.js vps_proxy",
     "api:direct": "node scripts/set-api-mode.js direct_client",
     "format": "prettier --write .",

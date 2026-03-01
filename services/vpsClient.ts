@@ -1,8 +1,8 @@
-import { getApiMode, requireVpsBaseUrl } from "@/services/apiConfig";
+import { getApiMode, requireProxyBaseUrl } from "@/services/apiConfig";
 
-export function shouldUseVpsProxy(): boolean {
+export function shouldUseServerProxy(): boolean {
   const mode = getApiMode();
-  return mode === "vps_proxy";
+  return mode === "vps_proxy" || mode === "cloudflare";
 }
 
 const DEFAULT_VPS_TIMEOUT_MS = 20_000;
@@ -12,7 +12,7 @@ export async function postJsonVps<T>(
   body: any,
   opts?: { timeoutMs?: number },
 ): Promise<T> {
-  const base = requireVpsBaseUrl();
+  const base = requireProxyBaseUrl();
   const controller = new AbortController();
   const timeoutMs = opts?.timeoutMs ?? DEFAULT_VPS_TIMEOUT_MS;
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -35,7 +35,6 @@ export async function postJsonVps<T>(
   } finally {
     clearTimeout(timeoutId);
   }
-
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`VPS API error ${res.status}: ${text}`);

@@ -42,10 +42,7 @@ function classifyStep(text: string): {
   };
 }
 
-function getTaskType(
-  usesStove: boolean,
-  requiresAttention: boolean
-): TaskType {
+function getTaskType(usesStove: boolean, requiresAttention: boolean): TaskType {
   if (usesStove) {
     return requiresAttention ? "cook_active" : "cook_passive";
   }
@@ -65,7 +62,7 @@ function buildTasksFromRecipe(
     uses_cutting_board: boolean;
     requires_attention: boolean;
     tips?: string;
-  }>
+  }>,
 ): SchedulerTask[] {
   if (analyzedSteps && analyzedSteps.length > 0) {
     // Use LLM-analyzed steps
@@ -167,7 +164,7 @@ export interface AnalyzedRecipe {
 
 export async function createSchedule(
   request: ScheduleRequest,
-  analyzedRecipes?: AnalyzedRecipe[]
+  analyzedRecipes?: AnalyzedRecipe[],
 ): Promise<ScheduleResponse> {
   const startTime = Date.now();
 
@@ -207,7 +204,12 @@ export async function createSchedule(
       algorithmUsed = "critical_path";
       break;
     case "genetic":
-      scheduled = geneticSchedule(allTasks, kitchen, sync_tolerance, sync_weight);
+      scheduled = geneticSchedule(
+        allTasks,
+        kitchen,
+        sync_tolerance,
+        sync_weight,
+      );
       algorithmUsed = "genetic";
       break;
     case "backward":
@@ -217,6 +219,11 @@ export async function createSchedule(
     case "astar":
       scheduled = astarSchedule(allTasks, kitchen);
       algorithmUsed = "astar";
+      break;
+    case "claude_e2e":
+      // claude_e2e mode is handled at API layer; keep deterministic fallback here.
+      scheduled = greedySchedule(allTasks, kitchen);
+      algorithmUsed = "claude_e2e+greedy_fallback";
       break;
     case "greedy":
     default:
@@ -237,7 +244,7 @@ export async function createSchedule(
     const end = t.start_time + t.duration;
     recipeEndTimes[t.recipe_id] = Math.max(
       recipeEndTimes[t.recipe_id] ?? 0,
-      end
+      end,
     );
   }
 

@@ -1,4 +1,7 @@
 const http = require("node:http");
+const fs = require("node:fs");
+const path = require("node:path");
+const { randomUUID } = require("node:crypto");
 const { URL } = require("node:url");
 
 // Scheduler module (compiled from TypeScript)
@@ -153,7 +156,14 @@ async function callMistralAudioChat({
   return JSON.parse(text);
 }
 
-async function callAnthropic({ system, messages, maxTokens }) {
+async function callAnthropic({
+  system,
+  messages,
+  maxTokens,
+  tools,
+  toolChoice,
+  temperature,
+}) {
   const key = requireEnv("CLAUDE_API_KEY");
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -165,7 +175,10 @@ async function callAnthropic({ system, messages, maxTokens }) {
     body: JSON.stringify({
       model: "claude-haiku-4-5-20251001",
       max_tokens: maxTokens,
+      ...(temperature != null ? { temperature } : {}),
       ...(system ? { system } : {}),
+      ...(tools ? { tools } : {}),
+      ...(toolChoice ? { tool_choice: toolChoice } : {}),
       messages,
     }),
   });
@@ -258,6 +271,1110 @@ function classifyIntentHeuristic({ userText, nextStep }) {
   }
 
   return null;
+}
+
+const FALLBACK_RECIPE_COLORS = [
+  "#FF6B6B",
+  "#4ECDC4",
+  "#FFE66D",
+  "#95E1D3",
+  "#F38181",
+  "#AA96DA",
+];
+
+const VALID_TASK_TYPES = new Set([
+  "prep",
+  "cook_active",
+  "cook_passive",
+  "wash",
+]);
+
+function stripHtmlInline(text) {
+  return String(text ?? "")
+    .replace(/<[^>]*>/g, "")
+    .trim();
+}
+
+function extractJsonObject(text) {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error("No JSON object in response");
+  }
+  return JSON.parse(text.slice(start, end + 1));
+}
+
+function toInt(
+  value,
+  fallback,
+  { min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER } = {},
+) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  const i = Math.trunc(n);
+  return Math.min(max, Math.max(min, i));
+}
+
+function toBool(value, fallback = false) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  if (typeof value === "string") {
+    const v = value.trim().toLowerCase();
+    if (v === "true") return true;
+    if (v === "false") return false;
+  }
+  return fallback;
+}
+
+function normalizeTaskType(rawTaskType, usesStove, requiresAttention) {
+  const taskType = String(rawTaskType ?? "").trim();
+  if (VALID_TASK_TYPES.has(taskType)) return taskType;
+  if (usesStove) return requiresAttention ? "cook_active" : "cook_passive";
+  return "prep";
+}
+
+function countParallelWindows(tasks) {
+  if (tasks.length === 0) return 0;
+  const events = [];
+  for (const t of tasks) {
+    events.push([t.start_time, 1]);
+    events.push([t.end_time, -1]);
+  }
+  events.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+
+  let current = 0;
+  let windows = 0;
+  for (const [, delta] of events) {
+    const prev = current;
+    current += delta;
+    if (current > 1 && prev <= 1) windows++;
+  }
+  return windows;
+}
+
+function buildEatingWindows(recipes) {
+  return recipes.map((r) => ({
+    recipe_id: r.id,
+    recipe_name: r.name,
+    eat_min: 0,
+    eat_max: 30,
+    reason: "E2E Claude schedule (default window)",
+    temperature_type: "warm",
+  }));
+}
+
+function buildRecipeEndTimes(tasks) {
+  const recipeEndTimes = {};
+  for (const t of tasks) {
+    recipeEndTimes[t.recipe_id] = Math.max(
+      recipeEndTimes[t.recipe_id] ?? 0,
+      t.end_time,
+    );
+  }
+  return recipeEndTimes;
+}
+
+function buildClaudeE2EPrompt(recipes, kitchen) {
+  const recipePayload = recipes.map((recipe) => ({
+    id: recipe.id,
+    name: recipe.name,
+    ingredients: recipe.ingredients ?? [],
+    steps: (recipe.steps ?? []).map((s, idx) => ({
+      step_index: idx,
+      text: stripHtmlInline(s.text),
+      duration_hint: s.duration_hint ?? null,
+    })),
+  }));
+
+  return `複数レシピの同時調理スケジュールを作成してください。
+
+必須制約:
+- 同じrecipe_id内では step_index の順序を守る
+- 同時に使うコンロは ${kitchen.stove_burners} 口以内
+- 同時に使うまな板は ${kitchen.cutting_boards} 枚以内
+- requires_attention=true の同時タスクは ${kitchen.cooks} 人以内
+- start_time/duration は整数分
+- duration は1以上
+- レシピIDは入力に存在する id のみ使用
+- 複合工程は必ず分割する（1タスク=1アクション）
+- 「〜して〜」「〜、〜」「〜してから〜」のような複数動作は2タスク以上に分割する
+- 分割後の同一recipe内タスクは連続時刻で配置してよい（start_timeを詰める）
+- 出力タスクは入力の工程より細かい粒度にすること（粗い要約禁止）
+
+task_typeの定義:
+- prep | cook_active | cook_passive | wash
+
+出力はJSONオブジェクトのみ。コードブロック禁止。
+{
+  "tasks": [
+    {
+      "recipe_id": "入力にあるid",
+      "recipe_name": "レシピ名",
+      "step_index": 0,
+      "description": "工程説明",
+      "start_time": 0,
+      "duration": 5,
+      "uses_stove": false,
+      "uses_cutting_board": true,
+      "requires_attention": true,
+      "task_type": "prep",
+      "tips": "短いコツ"
+    }
+  ],
+  "algorithm_used": "claude_e2e"
+}
+
+入力データ:
+${JSON.stringify({ recipes: recipePayload, kitchen }, null, 2)}`;
+}
+
+function splitDescriptionClauses(description) {
+  const normalized = stripHtmlInline(description).replace(/[。．]+/g, "。");
+  if (!normalized) return [];
+
+  const sentences = normalized
+    .split("。")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const clauses = [];
+  for (const sentence of sentences) {
+    const pieces = sentence
+      .split(/(?:してから|し終えたら|したら|して|し、| then | and )/i)
+      .map((s) => s.trim())
+      .filter((s) => s.length >= 2);
+    if (pieces.length > 0) clauses.push(...pieces);
+  }
+
+  return clauses.length > 0 ? clauses : [normalized];
+}
+
+function splitTaskConsecutively(task) {
+  if (task.task_type === "wash") return [task];
+
+  const clauses = splitDescriptionClauses(task.description);
+  const canSplit = clauses.length >= 2 && task.duration >= 2;
+  if (!canSplit) return [task];
+
+  const partCount = Math.min(clauses.length, Math.min(task.duration, 4));
+  const selected = clauses.slice(0, partCount);
+  const base = Math.floor(task.duration / partCount);
+  const remainder = task.duration % partCount;
+
+  const parts = [];
+  let cursor = task.start_time;
+  for (let i = 0; i < partCount; i++) {
+    const partDuration = base + (i < remainder ? 1 : 0);
+    const duration = Math.max(1, partDuration);
+    parts.push({
+      ...task,
+      description: selected[i],
+      duration,
+      end_time: cursor + duration,
+    });
+    cursor += duration;
+  }
+  return parts;
+}
+
+function applySequentialSplit(tasks) {
+  const expanded = [];
+  for (const task of tasks) {
+    expanded.push(...splitTaskConsecutively(task));
+  }
+
+  expanded.sort(
+    (a, b) => a.start_time - b.start_time || a.step_index - b.step_index,
+  );
+
+  const nextStepByRecipe = new Map();
+  for (const task of expanded) {
+    if (task.task_type === "wash") {
+      task.step_index = -1;
+      continue;
+    }
+    const next = nextStepByRecipe.get(task.recipe_id) ?? 0;
+    task.step_index = next;
+    nextStepByRecipe.set(task.recipe_id, next + 1);
+  }
+
+  for (let i = 0; i < expanded.length; i++) {
+    expanded[i].task_id = `${expanded[i].recipe_id}-${i}`;
+  }
+
+  return expanded;
+}
+
+function parseClaudeE2ESchedule(text, recipes, computationTimeMs) {
+  const parsed = extractJsonObject(text);
+  const rawTasks = Array.isArray(parsed.tasks)
+    ? parsed.tasks
+    : Array.isArray(parsed.schedule?.tasks)
+      ? parsed.schedule.tasks
+      : [];
+  if (rawTasks.length === 0) {
+    throw new Error("No tasks array in Claude E2E response");
+  }
+
+  const recipeById = new Map(recipes.map((r) => [String(r.id), r]));
+  const recipeColorById = new Map(
+    recipes.map((r, idx) => [
+      String(r.id),
+      FALLBACK_RECIPE_COLORS[idx % FALLBACK_RECIPE_COLORS.length],
+    ]),
+  );
+
+  const tasks = [];
+  for (let i = 0; i < rawTasks.length; i++) {
+    const raw = rawTasks[i] ?? {};
+    let recipeId = String(raw.recipe_id ?? raw.recipeId ?? "");
+    if (!recipeById.has(recipeId)) {
+      const byName = recipes.find(
+        (r) => r.name === String(raw.recipe_name ?? raw.recipeName ?? ""),
+      );
+      if (byName) recipeId = byName.id;
+    }
+    if (!recipeById.has(recipeId)) continue;
+
+    const recipeName = String(recipeById.get(recipeId).name);
+    const description = stripHtmlInline(
+      raw.description ?? raw.step_description ?? "",
+    );
+    if (!description) continue;
+
+    const startTime = toInt(raw.start_time ?? raw.startTime, 0, {
+      min: 0,
+      max: 24 * 60,
+    });
+    const duration = toInt(raw.duration, 5, { min: 1, max: 24 * 60 });
+    const stepIndex = toInt(raw.step_index ?? raw.stepIndex, i, {
+      min: -1,
+      max: 10_000,
+    });
+    const usesStove = toBool(raw.uses_stove ?? raw.usesStove, false);
+    const usesCuttingBoard = toBool(
+      raw.uses_cutting_board ?? raw.usesCuttingBoard,
+      false,
+    );
+    const requiresAttention = toBool(
+      raw.requires_attention ?? raw.requiresAttention,
+      true,
+    );
+    const taskType = normalizeTaskType(
+      raw.task_type ?? raw.taskType,
+      usesStove,
+      requiresAttention,
+    );
+    const colorRaw = String(raw.color ?? "").trim();
+    const color = /^#[0-9A-Fa-f]{6}$/.test(colorRaw)
+      ? colorRaw
+      : (recipeColorById.get(recipeId) ?? FALLBACK_RECIPE_COLORS[0]);
+    const tips = String(raw.tips ?? "").trim();
+    const assignedCook = toInt(raw.assigned_cook ?? raw.assignedCook, -1, {
+      min: -1,
+      max: 100,
+    });
+
+    tasks.push({
+      task_id: `${recipeId}-${tasks.length}`,
+      recipe_id: recipeId,
+      recipe_name: recipeName,
+      step_index: stepIndex,
+      description,
+      start_time: startTime,
+      duration,
+      end_time: startTime + duration,
+      uses_stove: usesStove,
+      uses_cutting_board: usesCuttingBoard,
+      requires_attention: requiresAttention,
+      assigned_cook: assignedCook >= 0 ? assignedCook : undefined,
+      task_type: taskType,
+      color,
+      tips: tips || undefined,
+    });
+  }
+
+  if (tasks.length === 0) {
+    throw new Error("Claude E2E response tasks were all invalid");
+  }
+
+  const splitTasks = applySequentialSplit(tasks);
+  splitTasks.sort(
+    (a, b) => a.start_time - b.start_time || a.step_index - b.step_index,
+  );
+
+  const totalTime = Math.max(...splitTasks.map((t) => t.end_time), 0);
+  const recipeEndTimes = buildRecipeEndTimes(splitTasks);
+  const endTimes = Object.values(recipeEndTimes);
+  const syncVariance =
+    endTimes.length > 1 ? Math.max(...endTimes) - Math.min(...endTimes) : 0;
+  const algorithmUsed = String(
+    parsed.algorithm_used ?? parsed.schedule?.algorithm_used ?? "claude_e2e",
+  );
+
+  return {
+    schedule: {
+      tasks: splitTasks,
+      total_time: totalTime,
+      algorithm_used: algorithmUsed,
+    },
+    eating_windows: buildEatingWindows(recipes),
+    metrics: {
+      computation_time_ms: computationTimeMs,
+      sync_variance: syncVariance,
+      parallel_windows: countParallelWindows(splitTasks),
+      recipe_end_times: recipeEndTimes,
+    },
+  };
+}
+
+const AGENTIC_STORE_FILE = path.join(__dirname, "agentic-schedules.json");
+const AGENTIC_ALGORITHMS = [
+  "auto",
+  "greedy",
+  "genetic",
+  "critical_path",
+  "backward",
+  "astar",
+  "claude_e2e",
+];
+
+function ensureSchedulerLoaded() {
+  if (!scheduler) {
+    throw new Error(
+      "Scheduler module not loaded. Run 'npm run build' in vps-api.",
+    );
+  }
+}
+
+function readAgenticStore() {
+  try {
+    const raw = fs.readFileSync(AGENTIC_STORE_FILE, "utf8");
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && parsed.schedules) {
+      return parsed;
+    }
+  } catch {
+    // no-op
+  }
+  return { version: 1, schedules: {} };
+}
+
+function writeAgenticStore(store) {
+  fs.writeFileSync(AGENTIC_STORE_FILE, JSON.stringify(store, null, 2) + "\n");
+}
+
+function buildAnalyzeRecipePrompt(recipe) {
+  const stepsText = recipe.steps
+    .map((s, i) => `${i + 1}. ${String(s.text ?? "").replace(/<[^>]*>/g, "")}`)
+    .join("\n");
+  const ingredientsText = (recipe.ingredients ?? []).join(", ");
+
+  return `レシピの各工程を解析し、必要に応じて細かいサブステップに分割してください。
+
+レシピ名: ${recipe.name}
+材料: ${ingredientsText}
+工程:
+${stepsText}
+
+## 重要：工程の分割ルール
+
+1つの工程に複数の作業が含まれている場合、必ず分割してください：
+
+【分割が必要な例】
+- 「じゃがいもを切って茹でる（15分）」→ 分割：
+  1. じゃがいもを切る（2分、手動、まな板使用）
+  2. 鍋に入れて火にかける（1分、手動、コンロ使用）
+  3. 茹でる（10分、放置、コンロ使用）
+  4. 水を切ってザルにあげる（2分、手動）
+
+## リソース判断基準
+
+- uses_stove: コンロを使うか（炒める、煮る、焼く、沸かす、茹でる等）
+- uses_cutting_board: まな板を使うか（切る、刻む、みじん切り等）
+- requires_attention: 人の手が必要か
+  - true: 切る、炒める、混ぜる、材料を入れる、火にかける、取り出す、盛り付け等
+  - false: 煮込み中、蒸らし中、茹で中（放置して待つだけの時間）
+
+## 出力形式
+
+JSONの配列のみを出力してください。
+
+[
+  {
+    "step_index": 0,
+    "step_description": "工程の説明",
+    "duration": 分数,
+    "uses_stove": true/false,
+    "uses_cutting_board": true/false,
+    "requires_attention": true/false,
+    "tips": "この工程の注意点やコツ"
+  }
+]`;
+}
+
+async function analyzeRecipesWithLLM(recipes) {
+  const analyzedRecipes = [];
+  for (const recipe of recipes) {
+    try {
+      const prompt = buildAnalyzeRecipePrompt(recipe);
+      const data = await callAnthropic({
+        maxTokens: 2048,
+        messages: [{ role: "user", content: prompt }],
+      });
+
+      const text = data.content?.[0]?.text ?? "";
+      const start = text.indexOf("[");
+      const end = text.lastIndexOf("]");
+      if (start !== -1 && end !== -1) {
+        const steps = JSON.parse(text.slice(start, end + 1));
+        analyzedRecipes.push({ recipeId: recipe.id, steps });
+      }
+    } catch (e) {
+      console.warn(`LLM analysis failed for ${recipe.name}:`, e?.message ?? e);
+    }
+  }
+  return analyzedRecipes;
+}
+
+async function runCreateSchedule({ recipes, kitchen, options }) {
+  const startedAt = Date.now();
+
+  if (options?.algorithm === "claude_e2e") {
+    try {
+      const prompt = buildClaudeE2EPrompt(recipes, kitchen);
+      const data = await callAnthropic({
+        maxTokens: 4096,
+        messages: [{ role: "user", content: prompt }],
+      });
+      const text = data.content?.[0]?.text ?? "";
+      return parseClaudeE2ESchedule(text, recipes, Date.now() - startedAt);
+    } catch (e) {
+      console.warn(
+        `Claude E2E scheduling failed, fallback to deterministic scheduler: ${
+          e instanceof Error ? e.message : String(e)
+        }`,
+      );
+      ensureSchedulerLoaded();
+      const fallbackOptions = {
+        ...options,
+        algorithm: "auto",
+        use_llm_analysis: false,
+      };
+      const fallback = await scheduler.createSchedule({
+        recipes,
+        kitchen,
+        options: fallbackOptions,
+      });
+      fallback.schedule.algorithm_used = `${fallback.schedule.algorithm_used}+claude_e2e_fallback`;
+      fallback.metrics.computation_time_ms = Date.now() - startedAt;
+      return fallback;
+    }
+  }
+
+  ensureSchedulerLoaded();
+  const analyzedRecipes =
+    options?.use_llm_analysis === false
+      ? []
+      : await analyzeRecipesWithLLM(recipes);
+
+  return await scheduler.createSchedule(
+    { recipes, kitchen, options },
+    analyzedRecipes.length > 0 ? analyzedRecipes : undefined,
+  );
+}
+
+function chooseAgentAlgorithm({
+  recipes,
+  kitchen,
+  objective,
+  algorithmCandidates,
+  forceAlgorithm,
+}) {
+  const normalizedCandidates =
+    Array.isArray(algorithmCandidates) && algorithmCandidates.length > 0
+      ? algorithmCandidates
+          .map((v) => String(v))
+          .filter((v) => AGENTIC_ALGORITHMS.includes(v))
+      : [...AGENTIC_ALGORITHMS];
+  const candidates =
+    normalizedCandidates.length > 0
+      ? normalizedCandidates
+      : [...AGENTIC_ALGORITHMS];
+
+  const objectiveText = String(objective ?? "").toLowerCase();
+  const forced = String(forceAlgorithm ?? "");
+  if (candidates.includes(forced)) {
+    return {
+      algorithm: forced,
+      reason: "force_algorithm が指定されました",
+      candidates,
+    };
+  }
+
+  const pick = (...preferred) => preferred.find((p) => candidates.includes(p));
+  const recipeCount = Array.isArray(recipes) ? recipes.length : 0;
+  const stoveBurners = Number(kitchen?.stove_burners ?? 1);
+
+  if (objectiveText.match(/speed|fast|quick|短|速/)) {
+    const algorithm = pick("greedy", "critical_path", "auto") ?? candidates[0];
+    return {
+      algorithm,
+      reason: "速度重視のため高速アルゴリズムを選択",
+      candidates,
+    };
+  }
+
+  if (objectiveText.match(/sync|simult|同時|揃|完了タイミング/)) {
+    const algorithm =
+      pick("genetic", "backward", "critical_path", "auto") ?? candidates[0];
+    return {
+      algorithm,
+      reason: "同時完成重視のため同期系アルゴリズムを選択",
+      candidates,
+    };
+  }
+
+  if (recipeCount <= 1) {
+    const algorithm = pick("greedy", "critical_path", "auto") ?? candidates[0];
+    return {
+      algorithm,
+      reason: "単一レシピのためシンプルなアルゴリズムを選択",
+      candidates,
+    };
+  }
+
+  if (recipeCount >= 3) {
+    const algorithm = pick("genetic", "critical_path", "auto") ?? candidates[0];
+    return {
+      algorithm,
+      reason: "複数レシピのため最適化寄りアルゴリズムを選択",
+      candidates,
+    };
+  }
+
+  if (stoveBurners <= 1) {
+    const algorithm = pick("critical_path", "greedy", "auto") ?? candidates[0];
+    return {
+      algorithm,
+      reason: "コンロ制約が強いため競合回避しやすいアルゴリズムを選択",
+      candidates,
+    };
+  }
+
+  const algorithm = pick("auto", "genetic", "greedy") ?? candidates[0];
+  return {
+    algorithm,
+    reason: "デフォルト戦略でアルゴリズムを選択",
+    candidates,
+  };
+}
+
+function computeScheduleStats(tasks) {
+  const normalized = [...tasks].map((task) => {
+    const start = toInt(task.start_time, 0, { min: 0, max: 24 * 60 });
+    const duration = toInt(task.duration, 1, { min: 1, max: 24 * 60 });
+    const end = start + duration;
+    return { ...task, start_time: start, duration, end_time: end };
+  });
+  normalized.sort(
+    (a, b) => a.start_time - b.start_time || a.end_time - b.end_time,
+  );
+
+  const totalTime =
+    normalized.length > 0 ? Math.max(...normalized.map((t) => t.end_time)) : 0;
+  const recipeEndTimes = buildRecipeEndTimes(normalized);
+  const endTimes = Object.values(recipeEndTimes);
+  const syncVariance =
+    endTimes.length > 1 ? Math.max(...endTimes) - Math.min(...endTimes) : 0;
+
+  return {
+    tasks: normalized,
+    totalTime,
+    recipeEndTimes,
+    syncVariance,
+    parallelWindows: countParallelWindows(normalized),
+  };
+}
+
+function normalizeScheduleTask(raw, fallbackTaskId = `manual-${randomUUID()}`) {
+  const start = toInt(raw.start_time ?? raw.startTime, 0, {
+    min: 0,
+    max: 24 * 60,
+  });
+  const duration = toInt(raw.duration, 1, { min: 1, max: 24 * 60 });
+  const usesStove = toBool(raw.uses_stove ?? raw.usesStove, false);
+  const usesCuttingBoard = toBool(
+    raw.uses_cutting_board ?? raw.usesCuttingBoard,
+    false,
+  );
+  const requiresAttention = toBool(
+    raw.requires_attention ?? raw.requiresAttention,
+    true,
+  );
+  const taskType = normalizeTaskType(
+    raw.task_type ?? raw.taskType,
+    usesStove,
+    requiresAttention,
+  );
+  const colorRaw = String(raw.color ?? "").trim();
+  return {
+    task_id: String(raw.task_id ?? raw.taskId ?? fallbackTaskId),
+    recipe_id: String(raw.recipe_id ?? raw.recipeId ?? "manual"),
+    recipe_name: String(raw.recipe_name ?? raw.recipeName ?? "manual"),
+    step_index: toInt(raw.step_index ?? raw.stepIndex, 0, {
+      min: -1,
+      max: 10_000,
+    }),
+    description: stripHtmlInline(raw.description ?? ""),
+    start_time: start,
+    duration,
+    end_time: start + duration,
+    uses_stove: usesStove,
+    uses_cutting_board: usesCuttingBoard,
+    requires_attention: requiresAttention,
+    assigned_cook: raw.assigned_cook ?? raw.assignedCook,
+    task_type: taskType,
+    color: /^#[0-9A-Fa-f]{6}$/.test(colorRaw)
+      ? colorRaw
+      : FALLBACK_RECIPE_COLORS[0],
+    tips: raw.tips ? String(raw.tips) : undefined,
+  };
+}
+
+function applyTaskUpdates(existingTasks, updates) {
+  const warnings = [];
+  let tasks = existingTasks.map((t) => ({ ...t }));
+  const removeIds = new Set(
+    (updates?.remove_task_ids ?? []).map((id) => String(id)),
+  );
+  tasks = tasks.filter((t) => !removeIds.has(t.task_id));
+
+  for (const patch of updates?.task_updates ?? []) {
+    const targetId = String(patch.task_id ?? "");
+    const idx = tasks.findIndex((t) => t.task_id === targetId);
+    if (idx === -1) {
+      warnings.push(`task_id not found: ${targetId}`);
+      continue;
+    }
+    const prev = tasks[idx];
+    const next = { ...prev };
+    if ("start_time" in patch)
+      next.start_time = toInt(patch.start_time, prev.start_time, {
+        min: 0,
+        max: 24 * 60,
+      });
+    if ("duration" in patch)
+      next.duration = toInt(patch.duration, prev.duration, {
+        min: 1,
+        max: 24 * 60,
+      });
+    if ("description" in patch)
+      next.description = stripHtmlInline(patch.description);
+    if ("uses_stove" in patch)
+      next.uses_stove = toBool(patch.uses_stove, prev.uses_stove);
+    if ("uses_cutting_board" in patch)
+      next.uses_cutting_board = toBool(
+        patch.uses_cutting_board,
+        prev.uses_cutting_board,
+      );
+    if ("requires_attention" in patch)
+      next.requires_attention = toBool(
+        patch.requires_attention,
+        prev.requires_attention,
+      );
+    if ("task_type" in patch) {
+      next.task_type = normalizeTaskType(
+        patch.task_type,
+        next.uses_stove,
+        next.requires_attention,
+      );
+    }
+    if ("tips" in patch)
+      next.tips = patch.tips ? String(patch.tips) : undefined;
+    next.end_time = next.start_time + next.duration;
+    tasks[idx] = next;
+  }
+
+  for (const rawTask of updates?.add_tasks ?? []) {
+    const normalized = normalizeScheduleTask(rawTask);
+    tasks.push(normalized);
+  }
+
+  tasks.sort((a, b) => a.start_time - b.start_time || a.end_time - b.end_time);
+  for (let i = 0; i < tasks.length; i++) {
+    if (!tasks[i].task_id) tasks[i].task_id = `task-${i + 1}`;
+    tasks[i].end_time = tasks[i].start_time + tasks[i].duration;
+  }
+
+  const nextStepByRecipe = new Map();
+  for (const task of tasks) {
+    if (task.task_type === "wash") {
+      task.step_index = -1;
+      continue;
+    }
+    const next = nextStepByRecipe.get(task.recipe_id) ?? 0;
+    task.step_index = next;
+    nextStepByRecipe.set(task.recipe_id, next + 1);
+  }
+
+  return { tasks, warnings };
+}
+
+const SCHEDULER_AGENT_TOOLS = [
+  {
+    name: "optimize_schedule",
+    description:
+      "利用可能なアルゴリズムから適切なものを選び、スケジュールを最適化して保存する。",
+    input_schema: {
+      type: "object",
+      properties: {
+        recipes: {
+          type: "array",
+          description: "レシピ配列",
+        },
+        kitchen: {
+          type: "object",
+          description: "キッチン制約",
+        },
+        objective: {
+          type: "string",
+          description: "最適化の狙い（例: 速度重視、同時完成重視）",
+        },
+        algorithm_candidates: {
+          type: "array",
+          items: { type: "string" },
+          description: "選択候補アルゴリズム",
+        },
+        options: {
+          type: "object",
+          description: "スケジューラの追加オプション",
+        },
+        schedule_name: {
+          type: "string",
+          description: "保存名",
+        },
+      },
+      required: ["recipes", "kitchen"],
+    },
+  },
+  {
+    name: "get_schedule",
+    description: "保存済みスケジュールを取得する。",
+    input_schema: {
+      type: "object",
+      properties: {
+        schedule_id: { type: "string" },
+        include_tasks: { type: "boolean" },
+        task_limit: { type: "integer" },
+      },
+      required: ["schedule_id"],
+    },
+  },
+  {
+    name: "update_schedule",
+    description:
+      "保存済みスケジュールへ手動調整（更新・追加・削除）を適用する。",
+    input_schema: {
+      type: "object",
+      properties: {
+        schedule_id: { type: "string" },
+        updates: {
+          type: "object",
+          properties: {
+            task_updates: { type: "array" },
+            add_tasks: { type: "array" },
+            remove_task_ids: { type: "array", items: { type: "string" } },
+          },
+        },
+      },
+      required: ["schedule_id", "updates"],
+    },
+  },
+];
+
+async function agentToolOptimizeSchedule(args) {
+  const {
+    recipes,
+    kitchen,
+    objective,
+    algorithm_candidates,
+    options = {},
+    schedule_name,
+  } = args ?? {};
+
+  if (!Array.isArray(recipes) || recipes.length === 0 || !kitchen) {
+    throw new Error("optimize_schedule requires recipes and kitchen");
+  }
+
+  const selection = chooseAgentAlgorithm({
+    recipes,
+    kitchen,
+    objective,
+    algorithmCandidates: algorithm_candidates,
+    forceAlgorithm: options?.force_algorithm,
+  });
+
+  const scheduleOptions = {
+    ...options,
+    algorithm: selection.algorithm,
+  };
+  if (scheduleOptions.algorithm === "claude_e2e") {
+    scheduleOptions.use_llm_analysis = true;
+  }
+
+  const result = await runCreateSchedule({
+    recipes,
+    kitchen,
+    options: scheduleOptions,
+  });
+
+  const now = new Date().toISOString();
+  const scheduleId = randomUUID();
+  const store = readAgenticStore();
+  const record = {
+    schedule_id: scheduleId,
+    schedule_name: String(schedule_name ?? ""),
+    objective: String(objective ?? ""),
+    selected_algorithm: selection.algorithm,
+    selection_reason: selection.reason,
+    algorithm_candidates: selection.candidates,
+    request: {
+      recipes,
+      kitchen,
+      options: scheduleOptions,
+    },
+    result,
+    version: 1,
+    created_at: now,
+    updated_at: now,
+  };
+  store.schedules[scheduleId] = record;
+  writeAgenticStore(store);
+
+  return {
+    schedule_id: scheduleId,
+    selected_algorithm: selection.algorithm,
+    selection_reason: selection.reason,
+    schedule_name: record.schedule_name,
+    summary: {
+      total_time: result?.schedule?.total_time ?? 0,
+      task_count: result?.schedule?.tasks?.length ?? 0,
+      algorithm_used: result?.schedule?.algorithm_used ?? selection.algorithm,
+    },
+  };
+}
+
+async function agentToolGetSchedule(args) {
+  const scheduleId = String(args?.schedule_id ?? "");
+  if (!scheduleId) throw new Error("get_schedule requires schedule_id");
+
+  const includeTasks = args?.include_tasks !== false;
+  const taskLimit = toInt(args?.task_limit, 200, { min: 1, max: 5_000 });
+  const store = readAgenticStore();
+  const record = store.schedules[scheduleId];
+  if (!record) throw new Error(`schedule not found: ${scheduleId}`);
+
+  const tasks = Array.isArray(record?.result?.schedule?.tasks)
+    ? record.result.schedule.tasks
+    : [];
+  const limitedTasks = includeTasks ? tasks.slice(0, taskLimit) : undefined;
+
+  return {
+    schedule_id: scheduleId,
+    version: record.version,
+    schedule_name: record.schedule_name,
+    selected_algorithm: record.selected_algorithm,
+    updated_at: record.updated_at,
+    schedule: {
+      total_time: record?.result?.schedule?.total_time ?? 0,
+      algorithm_used: record?.result?.schedule?.algorithm_used ?? "unknown",
+      task_count: tasks.length,
+      tasks: limitedTasks,
+      tasks_truncated: includeTasks ? tasks.length > taskLimit : false,
+    },
+  };
+}
+
+async function agentToolUpdateSchedule(args) {
+  const scheduleId = String(args?.schedule_id ?? "");
+  const updates = args?.updates ?? {};
+  if (!scheduleId) throw new Error("update_schedule requires schedule_id");
+
+  const store = readAgenticStore();
+  const record = store.schedules[scheduleId];
+  if (!record) throw new Error(`schedule not found: ${scheduleId}`);
+
+  const currentTasks = record?.result?.schedule?.tasks;
+  if (!Array.isArray(currentTasks)) {
+    throw new Error("stored schedule has invalid task format");
+  }
+
+  const { tasks, warnings } = applyTaskUpdates(currentTasks, updates);
+  const stats = computeScheduleStats(tasks);
+  const baseAlgorithm = String(
+    record.result?.schedule?.algorithm_used ?? "manual",
+  );
+  const algorithmUsed = baseAlgorithm.includes("+manual_update")
+    ? baseAlgorithm
+    : `${baseAlgorithm}+manual_update`;
+
+  record.result.schedule.tasks = stats.tasks;
+  record.result.schedule.total_time = stats.totalTime;
+  record.result.schedule.algorithm_used = algorithmUsed;
+  record.result.metrics = {
+    ...(record.result.metrics ?? {}),
+    computation_time_ms: 0,
+    sync_variance: stats.syncVariance,
+    parallel_windows: stats.parallelWindows,
+    recipe_end_times: stats.recipeEndTimes,
+  };
+  record.version = toInt(record.version, 1, { min: 1, max: 1_000_000 }) + 1;
+  record.updated_at = new Date().toISOString();
+  store.schedules[scheduleId] = record;
+  writeAgenticStore(store);
+
+  return {
+    schedule_id: scheduleId,
+    version: record.version,
+    warnings,
+    summary: {
+      total_time: record?.result?.schedule?.total_time ?? 0,
+      task_count: record?.result?.schedule?.tasks?.length ?? 0,
+      algorithm_used: record?.result?.schedule?.algorithm_used ?? "manual",
+    },
+  };
+}
+
+const SCHEDULER_AGENT_HANDLERS = {
+  optimize_schedule: agentToolOptimizeSchedule,
+  get_schedule: agentToolGetSchedule,
+  update_schedule: agentToolUpdateSchedule,
+};
+
+async function runSchedulerAgent({
+  userRequest,
+  recipes,
+  kitchen,
+  scheduleId,
+  objective,
+  algorithmCandidates,
+  options,
+  maxSteps,
+}) {
+  const requestText = String(userRequest ?? "").trim();
+  if (!requestText) {
+    throw new Error("user_request is required");
+  }
+
+  const stepsLimit = toInt(maxSteps, 8, { min: 1, max: 12 });
+  const context = {
+    recipes: Array.isArray(recipes) ? recipes : undefined,
+    kitchen: kitchen ?? undefined,
+    schedule_id: scheduleId ? String(scheduleId) : undefined,
+    objective: objective ? String(objective) : undefined,
+    algorithm_candidates: Array.isArray(algorithmCandidates)
+      ? algorithmCandidates
+      : undefined,
+    options: options ?? undefined,
+  };
+
+  const system = `あなたはスケジューリング最適化エージェントです。
+必ず tool calling を使って作業を進めてください。
+利用可能ツール:
+- optimize_schedule: スケジュール最適化と保存
+- get_schedule: 保存済みスケジュール取得
+- update_schedule: 保存済みスケジュールの手動調整
+
+ルール:
+- 新規作成が必要なら optimize_schedule を呼ぶ
+- 既存 schedule_id がある場合、内容確認には get_schedule を呼ぶ
+- 手動調整依頼がある場合は update_schedule を呼ぶ
+- 最後は日本語で簡潔に結果を要約し、schedule_id と次アクションを示す`;
+
+  const messages = [
+    {
+      role: "user",
+      content: `ユーザー依頼:\n${requestText}\n\n初期コンテキスト:\n${JSON.stringify(context, null, 2)}`,
+    },
+  ];
+
+  const trace = [];
+  let finalText = "";
+
+  for (let step = 1; step <= stepsLimit; step++) {
+    const response = await callAnthropic({
+      system,
+      maxTokens: 1400,
+      tools: SCHEDULER_AGENT_TOOLS,
+      toolChoice: { type: "auto" },
+      messages,
+    });
+
+    const content = Array.isArray(response?.content) ? response.content : [];
+    const toolUses = content.filter((c) => c?.type === "tool_use");
+    const text = content
+      .filter((c) => c?.type === "text")
+      .map((c) => String(c.text ?? ""))
+      .join("\n")
+      .trim();
+
+    messages.push({ role: "assistant", content });
+
+    if (toolUses.length === 0) {
+      finalText = text;
+      break;
+    }
+
+    const resultBlocks = [];
+    for (const toolUse of toolUses) {
+      const toolName = String(toolUse.name ?? "");
+      const handler = SCHEDULER_AGENT_HANDLERS[toolName];
+      let payload;
+      if (!handler) {
+        payload = { ok: false, error: `unknown tool: ${toolName}` };
+      } else {
+        try {
+          const result = await handler(toolUse.input ?? {});
+          payload = { ok: true, result };
+        } catch (e) {
+          payload = {
+            ok: false,
+            error: e instanceof Error ? e.message : String(e),
+          };
+        }
+      }
+
+      trace.push({
+        step,
+        tool: toolName,
+        ok: !!payload.ok,
+        schedule_id:
+          payload?.result?.schedule_id ?? toolUse?.input?.schedule_id ?? null,
+        error: payload.ok ? null : payload.error,
+      });
+
+      resultBlocks.push({
+        type: "tool_result",
+        tool_use_id: toolUse.id,
+        content: JSON.stringify(payload),
+      });
+    }
+
+    messages.push({
+      role: "user",
+      content: resultBlocks,
+    });
+  }
+
+const touchedScheduleIds = [
+    ...new Set(trace.map((t) => t.schedule_id).filter(Boolean)),
+  ];
+  return {
+    final_text: finalText || "処理を完了しました。",
+    trace,
+    schedule_ids: touchedScheduleIds,
+  };
 }
 
 const server = http.createServer(async (req, res) => {
@@ -543,89 +1660,51 @@ ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
       return;
     }
 
-    if (path === "/vps/scheduler/create-schedule") {
-      if (!scheduler) {
-        json(res, 500, { error: "Scheduler module not loaded. Run 'npm run build' in vps-api." });
+    if (path === "/vps/scheduler/agent/tools") {
+      json(res, 200, {
+        tools: SCHEDULER_AGENT_TOOLS,
+        supported_algorithms: AGENTIC_ALGORITHMS,
+      });
+      return;
+    }
+
+    if (path === "/vps/scheduler/agent/run") {
+      const {
+        user_request,
+        recipes,
+        kitchen,
+        schedule_id,
+        objective,
+        algorithm_candidates,
+        options,
+        max_steps,
+      } = body;
+
+      if (!String(user_request ?? "").trim()) {
+        json(res, 400, { error: "user_request is required" });
         return;
       }
 
+      const result = await runSchedulerAgent({
+        userRequest: user_request,
+        recipes,
+        kitchen,
+        scheduleId: schedule_id,
+        objective,
+        algorithmCandidates: algorithm_candidates,
+        options,
+        maxSteps: max_steps,
+      });
+      json(res, 200, {
+        mode: "tool_calling_agent",
+        result,
+      });
+      return;
+    }
+
+    if (path === "/vps/scheduler/create-schedule") {
       const { recipes, kitchen, options } = body;
-
-      // Optionally analyze recipes with LLM first
-      let analyzedRecipes = [];
-      if (options?.use_llm_analysis !== false) {
-        for (const recipe of recipes) {
-          try {
-            const stepsText = recipe.steps
-              .map((s, i) => `${i + 1}. ${s.text.replace(/<[^>]*>/g, "")}`)
-              .join("\n");
-            const ingredientsText = recipe.ingredients.join(", ");
-
-            const prompt = `レシピの各工程を解析し、必要に応じて細かいサブステップに分割してください。
-
-レシピ名: ${recipe.name}
-材料: ${ingredientsText}
-工程:
-${stepsText}
-
-## 重要：工程の分割ルール
-
-1つの工程に複数の作業が含まれている場合、必ず分割してください：
-
-【分割が必要な例】
-- 「じゃがいもを切って茹でる（15分）」→ 分割：
-  1. じゃがいもを切る（2分、手動、まな板使用）
-  2. 鍋に入れて火にかける（1分、手動、コンロ使用）
-  3. 茹でる（10分、放置、コンロ使用）
-  4. 水を切ってザルにあげる（2分、手動）
-
-## リソース判断基準
-
-- uses_stove: コンロを使うか（炒める、煮る、焼く、沸かす、茹でる等）
-- uses_cutting_board: まな板を使うか（切る、刻む、みじん切り等）
-- requires_attention: 人の手が必要か
-  - true: 切る、炒める、混ぜる、材料を入れる、火にかける、取り出す、盛り付け等
-  - false: 煮込み中、蒸らし中、茹で中（放置して待つだけの時間）
-
-## 出力形式
-
-JSONの配列のみを出力してください。
-
-[
-  {
-    "step_index": 0,
-    "step_description": "工程の説明",
-    "duration": 分数,
-    "uses_stove": true/false,
-    "uses_cutting_board": true/false,
-    "requires_attention": true/false,
-    "tips": "この工程の注意点やコツ"
-  }
-]`;
-
-            const data = await callAnthropic({
-              maxTokens: 2048,
-              messages: [{ role: "user", content: prompt }],
-            });
-
-            const text = data.content?.[0]?.text ?? "";
-            const start = text.indexOf("[");
-            const end = text.lastIndexOf("]");
-            if (start !== -1 && end !== -1) {
-              const steps = JSON.parse(text.slice(start, end + 1));
-              analyzedRecipes.push({ recipeId: recipe.id, steps });
-            }
-          } catch (e) {
-            console.warn(`LLM analysis failed for ${recipe.name}:`, e.message);
-          }
-        }
-      }
-
-      const result = await scheduler.createSchedule(
-        { recipes, kitchen, options },
-        analyzedRecipes.length > 0 ? analyzedRecipes : undefined
-      );
-
+      const result = await runCreateSchedule({ recipes, kitchen, options });
       json(res, 200, result);
       return;
     }

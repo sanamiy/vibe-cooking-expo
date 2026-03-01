@@ -1,8 +1,8 @@
 {
   "tts": "online_elevenlabs",
-  "apiMode": "vps_proxy",
+  "apiMode": "cloudflare",
   "voiceInputMode": "asr_then_llm",
   "voxtralSpeechPrompt": "音声の内容を日本語で簡潔に文字起こししてください。補足説明はせず、発話テキストのみを返してください。",
   "voxtralDialoguePrompt": "",
-  "enableVoiceAlgorithmSelector": true
+  "enableVoiceAlgorithmSelector": false
 }

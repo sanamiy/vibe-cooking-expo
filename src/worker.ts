@@ -49,6 +49,9 @@ export default {
         if (path === "/vps/scheduler/analyze-recipe") {
           return withCors(await handleAnalyzeRecipe(request, env));
         }
+        if (path === "/vps/audio/understand") {
+          return withCors(await handleAudioUnderstand(request, env));
+        }
       }
     } catch (e) {
       return withCors(
@@ -58,6 +61,10 @@ export default {
       );
     }
 
-    return env.ASSETS.fetch(request);
+    try {
+      return await env.ASSETS.fetch(request);
+    } catch {
+      return env.ASSETS.fetch(new Request(new URL("/index.html", request.url)));
+    }
   },
 };
