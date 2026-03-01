@@ -67,13 +67,16 @@ export default function ShoppingScreen() {
                   <View
                     style={[styles.recipeLabel, { backgroundColor: color }]}
                   >
-                    <Text style={styles.recipeLabelText}>
-                      レシピ {rIdx + 1}
-                    </Text>
+                    <Text style={styles.recipeLabelText}>{rIdx + 1}品目</Text>
                   </View>
                 )}
                 <Text style={styles.recipe}>{group.name}</Text>
-                <View style={styles.divider} />
+                <View
+                  style={[
+                    styles.divider,
+                    isMulti && { backgroundColor: color },
+                  ]}
+                />
               </View>
 
               <View style={styles.card}>

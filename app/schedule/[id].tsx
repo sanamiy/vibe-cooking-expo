@@ -56,6 +56,7 @@ export default function ScheduleScreen() {
         const result = await scheduleMultipleRecipes(
           recipes,
           settings.stoveBurners,
+          settings.schedulerAlgorithm,
         );
         if (!cancelled) {
           // Store scheduler tasks for each recipe so cook-interactive can use them
@@ -85,7 +86,7 @@ export default function ScheduleScreen() {
     return () => {
       cancelled = true;
     };
-  }, [recipes, settings.stoveBurners]);
+  }, [recipes, settings.stoveBurners, settings.schedulerAlgorithm]);
 
   // レシピ名 → 色のマップ
   const recipeColorMap = useMemo(() => {
@@ -599,15 +600,15 @@ const taskStyles = StyleSheet.create({
   tagText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#fff",
+    color: theme.colors.subText,
   },
   stoveTag: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.border,
   },
   boardTag: {
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.border,
   },
   passiveTag: {
-    backgroundColor: theme.colors.success,
+    backgroundColor: theme.colors.border,
   },
 });

@@ -5,7 +5,7 @@ import { buildRecipeGantt, RecipeGanttData, GanttTask } from "@/utils/gantt";
 import { stripHtml } from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
@@ -244,18 +244,20 @@ export default function CookInteractiveScreen() {
 
   // Debug: keyboard navigation (dev only)
   useEffect(() => {
-    const g = globalThis as Record<string, unknown>;
-    if (typeof g.addEventListener !== "function") return;
-    const handleKeyDown = (ev: unknown) => {
-      const e = ev as { key: string };
-      if (e.key === "ArrowRight" || e.key === "n") {
+    if (Platform.OS !== "web") return;
+    const w = globalThis as any;
+    if (!w || typeof w.addEventListener !== "function") {
+      return;
+    }
+    const handleKeyDown = (e: any) => {
+      if (e?.key === "ArrowRight" || e?.key === "n") {
         setCurrentIndex((prev) => Math.min(prev + 1, combinedSteps.length - 1));
-      } else if (e.key === "ArrowLeft" || e.key === "p") {
+      } else if (e?.key === "ArrowLeft" || e?.key === "p") {
         setCurrentIndex((prev) => Math.max(prev - 1, 0));
       }
     };
-    g.addEventListener("keydown", handleKeyDown);
-    return () => (g.removeEventListener as Function)("keydown", handleKeyDown);
+    w.addEventListener("keydown", handleKeyDown);
+    return () => w.removeEventListener("keydown", handleKeyDown);
   }, [combinedSteps.length]);
 
   // Timer countdown
@@ -294,7 +296,12 @@ export default function CookInteractiveScreen() {
     for (let i = 0; i < combinedSteps.length; i++) {
       const step = combinedSteps[i];
       if (!progress[step.recipeId]) {
-        progress[step.recipeId] = { done: 0, total: 0, name: step.recipeName, color: step.color };
+        progress[step.recipeId] = {
+          done: 0,
+          total: 0,
+          name: step.recipeName,
+          color: step.color,
+        };
       }
       progress[step.recipeId].total += 1;
       if (i < currentIndex) {
@@ -359,7 +366,9 @@ export default function CookInteractiveScreen() {
               <View
                 style={[
                   styles.typeBadge,
-                  { backgroundColor: getTaskTypeColor(currentStep.schedulerTask.task_type) },
+                  {
+                    backgroundColor: getTaskTypeColor(currentStep.schedulerTask.task_type),
+                  },
                 ]}
               >
                 <Text style={styles.typeBadgeText}>
@@ -713,7 +722,12 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  ganttLabel: { fontSize: 12, color: theme.colors.subText, fontWeight: "600", flex: 1 },
+  ganttLabel: {
+    fontSize: 12,
+    color: theme.colors.subText,
+    fontWeight: "600",
+    flex: 1,
+  },
   activeLabel: { color: theme.colors.primary, fontWeight: "800" },
   doneLabel: { color: theme.colors.success },
   track: {

@@ -22,8 +22,11 @@ function main() {
   const remoteComposeDir = `${remoteDir}/vps-compose`;
   const remoteEnvFile =
     process.env.VPS_ENV_FILE || "/opt/vps-secrets/vibe-cooking-vps.env";
+  const expoQrAfterDeploy = (process.env.EXPO_QR_AFTER_DEPLOY ?? "1") !== "0";
 
   const root = repoRoot();
+
+  run("npm", ["run", "build:web"], { cwd: root });
 
   run("ssh", [
     host,
@@ -39,8 +42,6 @@ function main() {
     "node_modules/",
     "--exclude",
     ".expo/",
-    "--exclude",
-    "dist/",
     "--exclude",
     "build/",
     "--exclude",
@@ -62,6 +63,22 @@ function main() {
     host,
     `bash -lc 'set -euo pipefail; curl -fsS https://temp.synome.jp/vps/health'`,
   ]);
+
+  // Optionally start the Expo dev server so Expo Go QR is shown right away.
+  // This keeps the process running until you quit Expo (Ctrl+C).
+  if (expoQrAfterDeploy && process.stdout.isTTY && !process.env.CI) {
+    // eslint-disable-next-line no-console
+    console.log("\nStarting Expo dev server (for Expo Go QR)...");
+    const extraArgs = (process.env.EXPO_START_ARGS ?? "--tunnel")
+      .split(" ")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const npmArgs = ["run", "start"];
+    if (extraArgs.length > 0) {
+      npmArgs.push("--", ...extraArgs);
+    }
+    run("npm", npmArgs, { cwd: root });
+  }
 }
 
 main();
