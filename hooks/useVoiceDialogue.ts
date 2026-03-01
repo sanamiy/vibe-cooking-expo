@@ -308,13 +308,21 @@ export function useVoiceDialogue({
       setDialogueState("processing");
       await playStartBgmForMs(5000);
       const stepText = stripHtml(steps[0].text);
-      const guidance = await generateStepGuidance(
-        stepText,
-        0,
-        steps.length,
-        recipeName,
-        recipeContext,
-      );
+      let guidance = stepText;
+      try {
+        guidance = await generateStepGuidance(
+          stepText,
+          0,
+          steps.length,
+          recipeName,
+          recipeContext,
+        );
+      } catch (e) {
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn("[voice] generateStepGuidance failed:", e);
+        }
+      }
       const greeting = `${recipeName}の調理を始めましょう。${guidance}`;
       setLastResponse(greeting);
       setConversationHistory([{ role: "assistant", content: greeting }]);
