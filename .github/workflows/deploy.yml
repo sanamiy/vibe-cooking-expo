@@ -16,6 +16,8 @@ jobs:
           node-version: "22"
       - run: npm ci
       - run: npx expo export --platform web
+        env:
+          EXPO_PUBLIC_VPS_API_BASE_URL: https://temp.synome.jp
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
