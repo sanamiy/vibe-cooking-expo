@@ -1,0 +1,9 @@
+{
+  "input_compare_html": "/home/yusuke/gitrepos/vibe-cooking-expo/test-results/compare-spliton-greedy-vs-agent-2026-03-01T04-24-20-810Z/compare.html",
+  "output_html": "/home/yusuke/gitrepos/vibe-cooking-expo/test-results/wait-vs-work-compare-2026-03-01T04-31-26-420Z/wait-vs-work.html",
+  "output_images": [
+    "/home/yusuke/gitrepos/vibe-cooking-expo/test-results/wait-vs-work-compare-2026-03-01T04-31-26-420Z/wait-vs-work-full.png",
+    "/home/yusuke/gitrepos/vibe-cooking-expo/test-results/wait-vs-work-compare-2026-03-01T04-31-26-420Z/wait-vs-work-top.png"
+  ],
+  "note": "待ち時間分類はタスク文言ベース（煮込み/蒸らし/放置/分間煮る など）"
+}
