@@ -35,6 +35,7 @@ interface VoxtralDialogueResult {
   assistantReply: string;
   intent?: string;
   userText?: string;
+  raw?: string;
 }
 
 interface UseVoiceDialogueProps {
@@ -94,7 +95,8 @@ export function useVoiceDialogue({
       const nb = normalizeSpeechText(b);
       if (!na || !nb) return false;
       const shorter = na.length <= nb.length ? na : nb;
-      if (shorter.length < 8) return false;
+      // Japanese command phrases are often short ("次の工程です" etc.)
+      if (shorter.length < 4) return false;
       return na.includes(shorter) || nb.includes(shorter);
     },
     [normalizeSpeechText],
@@ -577,16 +579,36 @@ export function useVoiceDialogue({
       const response = String(result.assistantReply ?? "").trim();
       if (!response) return;
 
+      const userText = String(result.userText ?? "").trim();
+      const echoProbe = userText || String(result.raw ?? "").trim();
+      const withinEchoWindow = Date.now() - lastSpeechEndedAtRef.current < 2500;
+      const looksLikeEcho =
+        withinEchoWindow &&
+        hasSubstantialOverlap(
+          echoProbe,
+          lastAssistantUtteranceRef.current || lastResponse,
+        );
+      if (looksLikeEcho) {
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn("[voice] ignored likely dialogue echo:", echoProbe);
+        }
+        setDialogueState((prev) =>
+          prev === "processing" || prev === "interrupted" ? "listening" : prev,
+        );
+        return;
+      }
+
+      const intent = String(result.intent ?? "").trim();
       await stopSpeaking();
       setDialogueState("processing");
 
-      if (result.intent === "next_step" && currentIndex < steps.length - 1) {
+      if (intent === "next_step" && currentIndex < steps.length - 1) {
         onChangeIndex(currentIndex + 1);
-      } else if (result.intent === "previous_step" && currentIndex > 0) {
+      } else if (intent === "previous_step" && currentIndex > 0) {
         onChangeIndex(currentIndex - 1);
       }
 
-      const userText = String(result.userText ?? "").trim();
       setConversationHistory((prev) => {
         const next = [...prev];
         if (userText) next.push({ role: "user", content: userText });
@@ -596,11 +618,20 @@ export function useVoiceDialogue({
       setLastResponse(response);
       await speakText(response);
 
-      if (result.intent === "end_session") {
+      if (intent === "end_session") {
         onSessionEnd();
       }
     },
-    [currentIndex, onChangeIndex, onSessionEnd, speakText, steps.length, stopSpeaking],
+    [
+      currentIndex,
+      hasSubstantialOverlap,
+      lastResponse,
+      onChangeIndex,
+      onSessionEnd,
+      speakText,
+      steps.length,
+      stopSpeaking,
+    ],
   );
 
   return {
