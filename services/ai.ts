@@ -5,7 +5,6 @@ import {
   requireMistralApiKey,
 } from "@/services/apiConfig";
 import { postJsonVps, shouldUseVpsProxy } from "@/services/vpsClient";
-import { callAnthropicMessages } from "@/services/anthropicClient";
 
 async function callMistralChat(
   messages: any[],
@@ -124,6 +123,12 @@ ${recipeName ? `料理名: ${recipeName}` : ""}
 ${prevStep ? `前の工程: ${prevStep}` : "（最初の工程です）"}
 ${nextStep ? `次の工程: ${nextStep}` : "（最後の工程です）"}
 
+重要ルール:
+- 「終わりました」「終わった」「できました」「完了」などの完了報告は、質問ではありません。
+- 次の工程が存在する場合、完了報告は必ず next_step に分類してください。
+- 次の工程が存在しない（最後の工程）場合、完了報告は end_session に分類してください。
+- 疑問文・質問内容がある場合のみ question を返してください。
+
 JSON形式で返してください: {"intent": "ラベル"}`;
 
   const data = await callMistralChat(
@@ -209,7 +214,12 @@ ${
 ${recipeInfo}
 
 現在の工程: ${currentStep}
-進捗: ${stepProgress}`,
+進捗: ${stepProgress}
+
+厳守:
+- 現在工程の内容だけに基づいて答えること。
+- 次工程・前工程の具体的な手順を説明しないこと。
+- 工程移動を促す質問が来ても、具体手順は話さず、短く案内だけ返すこと。`,
     },
     ...((history || []).slice(-10).map((h) => ({
       role: h.role,
@@ -303,68 +313,12 @@ export async function generateStepGuidance(
   recipeName: string,
   recipeContext?: RecipeContext,
 ): Promise<string> {
-  if (shouldUseVpsProxy()) {
-    try {
-      const data = await postJsonVps<{ guidance: string }>(
-        "/vps/ai/generate-step-guidance",
-        {
-          stepText,
-          stepIndex,
-          totalSteps,
-          recipeName,
-          recipeContext,
-        },
-      );
-      return data.guidance;
-    } catch (e) {
-      if (__DEV__) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "[ai] VPS generate-step-guidance failed, fallback to direct:",
-          e,
-        );
-      }
-    }
-  }
-
   const tipForStep = recipeContext?.stepTips?.[stepIndex] ?? "";
-  const ingredientsInfo = recipeContext
-    ? `\n材料: ${(recipeContext.ingredients || []).join("、")}`
-    : "";
-
-  const system = `あなたは調理ナビゲーターです。料理の工程を、手が塞がっている人に音声で伝えるための案内文を生成してください。
-2-3文で、ポイントやコツを含めて簡潔に案内してください。「です・ます」調で。
-マークダウン記法（#、*、-など）は使わず、プレーンテキストのみで出力してください。`;
-
-  const fallbackGuidance = [
-    `工程${stepIndex + 1}/${totalSteps}は「${stepText}」です。`,
+  const normalizedStep = String(stepText ?? "").replace(/\s+/g, " ").trim();
+  return [
+    `工程${stepIndex + 1}/${totalSteps}は「${normalizedStep}」です。`,
     tipForStep ? `コツは${tipForStep}です。` : "焦らず順番どおりに進めましょう。",
   ].join("");
-
-  try {
-    const data = await callAnthropicMessages({
-      system,
-      maxTokens: 256,
-      messages: [
-        {
-          role: "user",
-          content: `料理: ${recipeName}${ingredientsInfo}
-工程 ${stepIndex + 1}/${totalSteps}: ${stepText}
-${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
-
-この工程の音声案内文を生成してください。`,
-        },
-      ],
-    });
-    const text = String(data.content?.[0]?.text ?? "").trim();
-    return text || fallbackGuidance;
-  } catch (e) {
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.warn("[ai] direct generate-step-guidance failed, using fallback:", e);
-    }
-    return fallbackGuidance;
-  }
 }
 
 // ---------- ElevenLabs: TTS ----------
