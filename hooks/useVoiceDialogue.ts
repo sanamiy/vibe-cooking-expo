@@ -95,9 +95,10 @@ export function useVoiceDialogue({
       const nb = normalizeSpeechText(b);
       if (!na || !nb) return false;
       const shorter = na.length <= nb.length ? na : nb;
+      const longer = na.length > nb.length ? na : nb;
       // Japanese command phrases are often short ("次の工程です" etc.)
       if (shorter.length < 4) return false;
-      return na.includes(shorter) || nb.includes(shorter);
+      return longer.includes(shorter);
     },
     [normalizeSpeechText],
   );
