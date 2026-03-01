@@ -336,22 +336,35 @@ export async function generateStepGuidance(
 2-3文で、ポイントやコツを含めて簡潔に案内してください。「です・ます」調で。
 マークダウン記法（#、*、-など）は使わず、プレーンテキストのみで出力してください。`;
 
-  const data = await callAnthropicMessages({
-    system,
-    maxTokens: 256,
-    messages: [
-      {
-        role: "user",
-        content: `料理: ${recipeName}${ingredientsInfo}
+  const fallbackGuidance = [
+    `工程${stepIndex + 1}/${totalSteps}は「${stepText}」です。`,
+    tipForStep ? `コツは${tipForStep}です。` : "焦らず順番どおりに進めましょう。",
+  ].join("");
+
+  try {
+    const data = await callAnthropicMessages({
+      system,
+      maxTokens: 256,
+      messages: [
+        {
+          role: "user",
+          content: `料理: ${recipeName}${ingredientsInfo}
 工程 ${stepIndex + 1}/${totalSteps}: ${stepText}
 ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
 
 この工程の音声案内文を生成してください。`,
-      },
-    ],
-  });
-
-  return data.content?.[0]?.text ?? "";
+        },
+      ],
+    });
+    const text = String(data.content?.[0]?.text ?? "").trim();
+    return text || fallbackGuidance;
+  } catch (e) {
+    if (__DEV__) {
+      // eslint-disable-next-line no-console
+      console.warn("[ai] direct generate-step-guidance failed, using fallback:", e);
+    }
+    return fallbackGuidance;
+  }
 }
 
 // ---------- ElevenLabs: TTS ----------

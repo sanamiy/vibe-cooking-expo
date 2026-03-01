@@ -108,7 +108,7 @@ export function VoiceDialoguePanel({
   onSelectInput,
   onSelectOutput,
   showVoiceAlgorithmSelector = false,
-  selectedVoiceInputMode = "voxtral_speech_understanding",
+  selectedVoiceInputMode = "asr_then_llm",
   onSelectVoiceInputMode,
 }: VoiceDialoguePanelProps) {
   const state = stateLabels[dialogueState];
