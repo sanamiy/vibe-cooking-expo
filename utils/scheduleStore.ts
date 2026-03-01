@@ -33,8 +33,3 @@ export function clearScheduleData() {
   storedTips = {};
   storedTasks = {};
 }
-
-/** @deprecated use clearScheduleData() */
-export function clearScheduleTips() {
-  clearScheduleData();
-}

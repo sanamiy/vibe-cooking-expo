@@ -1,40 +1,11 @@
 import {
-  getApiMode,
   getElevenLabsModelId,
   getElevenLabsVoiceId,
-  getVpsBaseUrlOptional,
-  requireClaudeApiKey,
   requireElevenLabsApiKey,
   requireMistralApiKey,
-  requireVpsBaseUrl,
 } from "@/services/apiConfig";
-import { Platform } from "react-native";
-
-const IS_WEB = Platform.OS === "web";
-
-function shouldUseVpsProxy(): boolean {
-  const mode = getApiMode();
-  if (mode === "vps_proxy") return true;
-  if (mode !== "direct_client") return false;
-  if (!IS_WEB) return false;
-  return !!getVpsBaseUrlOptional();
-}
-
-async function postJsonVps<T>(path: string, body: any): Promise<T> {
-  const base = requireVpsBaseUrl();
-  const res = await fetch(`${base}${path}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`VPS API error ${res.status}: ${text}`);
-  }
-  return (await res.json()) as T;
-}
+import { postJsonVps, shouldUseVpsProxy } from "@/services/vpsClient";
+import { callAnthropicMessages } from "@/services/anthropicClient";
 
 async function callMistralChat(
   messages: any[],
@@ -56,31 +27,6 @@ async function callMistralChat(
   });
   const text = await res.text();
   if (!res.ok) throw new Error(`Mistral API error ${res.status}: ${text}`);
-  return JSON.parse(text);
-}
-
-async function callAnthropicMessages(params: {
-  system?: string;
-  messages: any[];
-  maxTokens: number;
-}) {
-  const apiKey = requireClaudeApiKey();
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: params.maxTokens,
-      ...(params.system ? { system: params.system } : {}),
-      messages: params.messages,
-    }),
-  });
-  const text = await res.text();
-  if (!res.ok) throw new Error(`Anthropic API error ${res.status}: ${text}`);
   return JSON.parse(text);
 }
 
