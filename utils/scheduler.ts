@@ -227,6 +227,63 @@ function classifyContamination(description: string): string {
   return "other";
 }
 
+function splitDescriptionClauses(description: string): string[] {
+  const normalized = stripHtmlInline(description).replace(/[。．]+/g, "。").trim();
+  if (!normalized) return [];
+
+  const sentences = normalized
+    .split("。")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const clauses: string[] = [];
+  for (const sentence of sentences) {
+    const pieces = sentence
+      .split(/(?:してから|し終えたら|したら|して|し、| then | and )/i)
+      .map((s) => s.trim())
+      .filter((s) => s.length >= 2);
+    if (pieces.length > 0) clauses.push(...pieces);
+  }
+
+  return clauses.length > 0 ? clauses : [normalized];
+}
+
+function splitTaskConsecutively(task: SchedulerTask): SchedulerTask[] {
+  if (task.task_type === "wash") return [task];
+
+  const clauses = splitDescriptionClauses(task.step_description);
+  const canSplit = clauses.length >= 2 && task.duration >= 2;
+  if (!canSplit) return [task];
+
+  const partCount = Math.min(clauses.length, Math.min(task.duration, 4));
+  const selected = clauses.slice(0, partCount);
+  const base = Math.floor(task.duration / partCount);
+  const remainder = task.duration % partCount;
+
+  return selected.map((stepDescription, i) => {
+    const duration = Math.max(1, base + (i < remainder ? 1 : 0));
+    return {
+      ...task,
+      step_description: stepDescription,
+      duration,
+    };
+  });
+}
+
+function applySequentialSplit(tasks: SchedulerTask[]): SchedulerTask[] {
+  const ordered = [...tasks].sort((a, b) => a.step_index - b.step_index);
+  const expanded: SchedulerTask[] = [];
+
+  for (const task of ordered) {
+    expanded.push(...splitTaskConsecutively(task));
+  }
+
+  return expanded.map((task, index) => ({
+    ...task,
+    step_index: index,
+  }));
+}
+
 // ─── Greedy Scheduler ───────────────────────────────
 
 type TimeRange = [number, number];
@@ -458,7 +515,7 @@ function buildTasksFromGantt(recipe: Recipe, color: string): SchedulerTask[] {
 
   const gantt = buildRecipeGantt(recipe.id, steps);
 
-  return gantt.tasks.map((ganttTask) => {
+  const tasks = gantt.tasks.map((ganttTask) => {
     const classified = classifyStep(ganttTask.source_text);
     const description = stripHtmlInline(ganttTask.source_text);
     return {
@@ -483,6 +540,7 @@ function buildTasksFromGantt(recipe: Recipe, color: string): SchedulerTask[] {
       tips: "",
     };
   });
+  return applySequentialSplit(tasks);
 }
 
 /**
@@ -503,7 +561,7 @@ async function buildTasksFromLLM(
     steps,
   );
 
-  return stepResources.map((sr) => {
+  const tasks = stepResources.map((sr) => {
     const needsAttention = sr.requires_attention || sr.step_index === 0;
     return {
       recipe_id: recipe.id,
@@ -527,6 +585,7 @@ async function buildTasksFromLLM(
       tips: sr.tips ?? "",
     };
   });
+  return applySequentialSplit(tasks);
 }
 
 /**
@@ -543,11 +602,13 @@ export async function scheduleMultipleRecipes(
   stoveBurners: number,
   algorithm: SchedulerAlgorithmType = "auto",
 ): Promise<MultiRecipeSchedule> {
+  const effectiveAlgorithm: SchedulerAlgorithmType =
+    algorithm === "auto" && recipes.length === 3 ? "greedy" : algorithm;
   const useVps = shouldUseVpsProxy();
-  let useLLMInLocalFallback = useVps && algorithm !== "claude_e2e";
+  let useLLMInLocalFallback = useVps && effectiveAlgorithm !== "claude_e2e";
 
   // VPS API経由でスケジューリング（高度なアルゴリズムを使用）
-  if (useVps && algorithm !== "greedy") {
+  if (useVps && effectiveAlgorithm !== "greedy") {
     try {
       const recipeInputs = recipes.map((r) => ({
         id: r.id,
@@ -568,7 +629,7 @@ export async function scheduleMultipleRecipes(
           cooks: 1,
         },
         options: {
-          algorithm,
+          algorithm: effectiveAlgorithm,
           use_llm_analysis: true,
           hygiene_correction: true,
         },
@@ -596,7 +657,7 @@ export async function scheduleMultipleRecipes(
     } catch (e) {
       console.warn("VPS scheduler API failed, using local fallback:", e);
       // claude_e2eの失敗時は追加のLLM呼び出しをせず、ローカルルールベースへフォールバック
-      if (algorithm === "claude_e2e") useLLMInLocalFallback = false;
+      if (effectiveAlgorithm === "claude_e2e") useLLMInLocalFallback = false;
     }
   }
 
