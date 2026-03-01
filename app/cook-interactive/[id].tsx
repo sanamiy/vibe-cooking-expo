@@ -1,27 +1,24 @@
 import prebuiltGantt from "@/data/gantt/recipes-gantt.json";
 import { theme } from "@/constants/theme";
 import { useRecipes } from "@/hooks/useRecipes";
+import { useTranslation } from "react-i18next";
 import { buildRecipeGantt, RecipeGanttData, GanttTask } from "@/utils/gantt";
-import { stripHtml } from "@/utils/recipe";
+import {
+  getLocalizedIngredients,
+  getLocalizedInstructionSteps,
+  getLocalizedName,
+  stripHtml,
+} from "@/utils/recipe";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { BackButton } from "@/components/BackButton";
-import {
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
-import type { VoiceInputMode } from "@/hooks/useVoiceCommands";
+
+type VoiceInputMode = "asr_then_llm" | "voxtral_speech_understanding" | "voxtral_dialogue";
 import { useVoiceDialogue } from "@/hooks/useVoiceDialogue";
-import {
-  VoiceDeviceSelectors,
-  VoiceDialoguePanel,
-} from "@/components/VoiceDialoguePanel";
+import { VoiceDeviceSelectors, VoiceDialoguePanel } from "@/components/VoiceDialoguePanel";
 import { useAudioDevices } from "@/hooks/useAudioDevices";
 import type { RecipeContext } from "@/services/ai";
 import { getScheduleTips, getScheduleTasks } from "@/utils/scheduleStore";
@@ -34,9 +31,7 @@ const config = require("@/config.json") as {
   enableVoiceAlgorithmSelector?: boolean;
 };
 
-const ENABLE_VOICE_ALGORITHM_SELECTOR = Boolean(
-  config?.enableVoiceAlgorithmSelector,
-);
+const ENABLE_VOICE_ALGORITHM_SELECTOR = Boolean(config?.enableVoiceAlgorithmSelector);
 
 const formatCountdownLabel = (countdown: number | null) => {
   if (countdown === null) return "";
@@ -45,16 +40,16 @@ const formatCountdownLabel = (countdown: number | null) => {
   return `${mm}:${ss}`;
 };
 
-const getTaskTypeLabel = (taskType: string) => {
+const getTaskTypeLabel = (taskType: string, t: (key: string) => string) => {
   switch (taskType) {
     case "prep":
-      return "下準備";
+      return t("cook.taskPrep");
     case "cook_active":
-      return "加熱中";
+      return t("cook.taskCookActive");
     case "cook_passive":
-      return "待機";
+      return t("cook.taskCookPassive");
     case "wash":
-      return "洗い物";
+      return t("cook.taskWash");
     default:
       return taskType;
   }
@@ -88,6 +83,7 @@ const RECIPE_COLORS = ["#FF6B6B", "#4ECDC4", "#FFE66D", "#95E1D3", "#F38181"];
 export default function CookInteractiveScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getRecipeById } = useRecipes();
+  const { t, i18n } = useTranslation();
 
   const ids = useMemo(() => String(id).split(","), [id]);
   const recipes = useMemo(
@@ -97,10 +93,10 @@ export default function CookInteractiveScreen() {
   const combinedRecipeName = useMemo(
     () =>
       recipes
-        .map((r) => r?.name)
+        .map((r) => (r ? getLocalizedName(r, i18n.language) : null))
         .filter(Boolean)
-        .join("、"),
-    [recipes],
+        .join(i18n.language === "en" ? ", " : "、"),
+    [recipes, i18n.language],
   );
 
   // Combine all scheduled tasks from all recipes, sorted by start_time
@@ -123,9 +119,7 @@ export default function CookInteractiveScreen() {
         recipeName: t.recipe_name,
         text: t.step_description,
         schedulerTask: t,
-        color:
-          t.color ||
-          RECIPE_COLORS[ids.indexOf(t.recipe_id) % RECIPE_COLORS.length],
+        color: t.color || RECIPE_COLORS[ids.indexOf(t.recipe_id) % RECIPE_COLORS.length],
       }));
     }
     // Fallback: interleave original recipe steps
@@ -133,13 +127,14 @@ export default function CookInteractiveScreen() {
     for (let i = 0; i < ids.length; i++) {
       const recipe = recipes.find((r) => r?.id === ids[i]);
       if (!recipe) continue;
-      const recipeSteps = recipe.instruction_steps?.length
-        ? recipe.instruction_steps.map((s) => s.text)
+      const localizedSteps = getLocalizedInstructionSteps(recipe, i18n.language);
+      const recipeSteps = localizedSteps.length
+        ? localizedSteps.map((s) => s.text)
         : (recipe.instructions ?? []);
       for (const text of recipeSteps) {
         steps.push({
           recipeId: recipe.id,
-          recipeName: recipe.name,
+          recipeName: getLocalizedName(recipe, i18n.language),
           text,
           color: RECIPE_COLORS[i % RECIPE_COLORS.length],
         });
@@ -149,18 +144,13 @@ export default function CookInteractiveScreen() {
   }, [allScheduledTasks, ids, recipes]);
 
   // For voice dialogue, use simple steps array
-  const steps = useMemo(
-    () => combinedSteps.map((s) => ({ text: s.text })),
-    [combinedSteps],
-  );
+  const steps = useMemo(() => combinedSteps.map((s) => ({ text: s.text })), [combinedSteps]);
 
   // Build combined gantt chart
   const gantt = useMemo<RecipeGanttData>(() => {
     if (allScheduledTasks.length > 0) {
       // Note: scheduler duration and start_time are already in MINUTES
-      const totalTime = Math.max(
-        ...allScheduledTasks.map((t) => t.start_time + t.duration),
-      );
+      const totalTime = Math.max(...allScheduledTasks.map((t) => t.start_time + t.duration));
       return {
         version: 1 as const,
         recipe_id: ids.join(","),
@@ -176,9 +166,7 @@ export default function CookInteractiveScreen() {
           return {
             task_id: `${t.recipe_id}-${idx}`,
             step_index: idx + 1,
-            label:
-              t.step_description.slice(0, 25) +
-              (t.step_description.length > 25 ? "…" : ""),
+            label: t.step_description.slice(0, 25) + (t.step_description.length > 25 ? "…" : ""),
             source_text: t.step_description,
             duration_min: durationMin,
             start_min: startMin,
@@ -192,9 +180,9 @@ export default function CookInteractiveScreen() {
       };
     }
     // Fallback to first recipe's prebuilt gantt
-    const prebuilt = (
-      prebuiltGantt as { recipes?: RecipeGanttData[] }
-    ).recipes?.find((r) => r.recipe_id === ids[0]);
+    const prebuilt = (prebuiltGantt as { recipes?: RecipeGanttData[] }).recipes?.find(
+      (r) => r.recipe_id === ids[0],
+    );
     return prebuilt ?? buildRecipeGantt(ids[0], steps);
   }, [ids, steps, allScheduledTasks]);
 
@@ -204,15 +192,15 @@ export default function CookInteractiveScreen() {
     const allIngredients: string[] = [];
     const allTips: string[] = [];
     for (const recipe of recipes) {
-      if (recipe?.ingredients) allIngredients.push(...recipe.ingredients);
+      if (recipe) allIngredients.push(...getLocalizedIngredients(recipe, i18n.language));
       const tips = getScheduleTips(recipe?.id ?? "");
       if (tips.length > 0) allTips.push(...tips);
     }
     return {
       recipeName: recipes
-        .map((r) => r?.name)
+        .map((r) => (r ? getLocalizedName(r, i18n.language) : null))
         .filter(Boolean)
-        .join("、"),
+        .join(i18n.language === "en" ? ", " : "、"),
       ingredients: allIngredients,
       allSteps: combinedSteps.map((s) => stripHtml(s.text)),
       ...(allTips.length > 0 ? { stepTips: allTips } : {}),
@@ -275,22 +263,33 @@ export default function CookInteractiveScreen() {
 
   const voxtralDialoguePrompt = useMemo(() => {
     const currentStepText = stripHtml(steps[currentIndex]?.text ?? "");
-    const prevStepText =
-      currentIndex > 0 ? stripHtml(steps[currentIndex - 1]?.text ?? "") : "";
+    const prevStepText = currentIndex > 0 ? stripHtml(steps[currentIndex - 1]?.text ?? "") : "";
     const nextStepText =
-      currentIndex < steps.length - 1
-        ? stripHtml(steps[currentIndex + 1]?.text ?? "")
-        : "";
+      currentIndex < steps.length - 1 ? stripHtml(steps[currentIndex + 1]?.text ?? "") : "";
+    const isEn = i18n.language === "en";
+    const userLabel = isEn ? "User" : "ユーザー";
+    const assistantLabel = isEn ? "Assistant" : "アシスタント";
+    const noneLabel = isEn ? "None" : "なし";
     const historyText = conversationHistory
       .slice(-6)
-      .map(
-        (h) =>
-          `${h.role === "user" ? "ユーザー" : "アシスタント"}: ${h.content}`,
-      )
+      .map((h) => `${h.role === "user" ? userLabel : assistantLabel}: ${h.content}`)
       .join("\n");
 
     const customPrompt = String(config?.voxtralDialoguePrompt ?? "").trim();
     if (customPrompt) return customPrompt;
+
+    if (isEn) {
+      return `You are a voice assistant for someone who is cooking. Understand the intent of the spoken input and reply briefly and practically in English.
+Recipe: ${recipeContext?.recipeName ?? combinedRecipeName}
+Current step (${currentIndex + 1}/${steps.length}): ${currentStepText}
+Previous step: ${prevStepText || "None"}
+Next step: ${nextStepText || "None"}
+Conversation history:
+${historyText || "None"}
+
+Return ONLY the following JSON (no code fences):
+{"intent":"next_step|previous_step|question|timer_status|end_session|stay","assistant_reply":"Short English reply to speak to the user","user_text":"Summary of recognized user speech"}`;
+    }
 
     return `あなたは料理中ユーザー向けの音声アシスタントです。入力音声の意図を理解し、日本語で短く実用的に返答してください。
 料理名: ${recipeContext?.recipeName ?? combinedRecipeName}
@@ -302,27 +301,15 @@ ${historyText || "なし"}
 
 以下のJSONのみを返してください（コードフェンス禁止）:
 {"intent":"next_step|previous_step|question|timer_status|end_session|stay","assistant_reply":"ユーザーに話す短い日本語応答","user_text":"認識したユーザー発話の要約"}`;
-  }, [
-    conversationHistory,
-    currentIndex,
-    recipeContext?.recipeName,
-    combinedRecipeName,
-    steps,
-  ]);
+  }, [conversationHistory, currentIndex, recipeContext?.recipeName, combinedRecipeName, steps]);
 
   const { isListening, startListening } = useVoiceCommands({
     onTranscript: handleTranscript,
     onSpeechStart: interrupt,
     onSpeechEnd: resetFromInterrupted,
-    onVoxtralDialogueResult: processVoxtralDialogueResult,
     active: dialogueState !== "processing",
     inputDeviceId: selectedInputId,
     isSpeaking: dialogueState === "speaking",
-    voiceInputMode,
-    voxtralSpeechPrompt:
-      voiceInputMode === "voxtral_dialogue"
-        ? voxtralDialoguePrompt
-        : config?.voxtralSpeechPrompt,
   });
 
   useEffect(() => {
@@ -372,18 +359,47 @@ ${historyText || "なし"}
 
   const currentStep = combinedSteps[currentIndex];
   const countdownLabel = formatCountdownLabel(countdown);
+  const completedSteps = Math.max(0, Math.min(currentIndex, combinedSteps.length));
+  const remainingSteps = Math.max(0, combinedSteps.length - completedSteps - 1);
+
+  const progressPercent =
+    combinedSteps.length > 0 ? Math.round(((currentIndex + 1) / combinedSteps.length) * 100) : 0;
+
+  const recipeProgress = useMemo(() => {
+    const progress: Record<string, { done: number; total: number; name: string; color: string }> =
+      {};
+    for (let i = 0; i < combinedSteps.length; i++) {
+      const step = combinedSteps[i];
+      if (!progress[step.recipeId]) {
+        progress[step.recipeId] = {
+          done: 0,
+          total: 0,
+          name: step.recipeName,
+          color: step.color,
+        };
+      }
+      progress[step.recipeId].total += 1;
+      if (i < currentIndex) {
+        progress[step.recipeId].done += 1;
+      } else if (i === currentIndex) {
+        progress[step.recipeId].done += 0.5;
+      }
+    }
+    return Object.entries(progress).map(([id, p]) => ({
+      recipeId: id,
+      ...p,
+      percent: Math.round((p.done / p.total) * 100),
+    }));
+  }, [combinedSteps, currentIndex]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header with prominent progress */}
       <View style={styles.header}>
-        <BackButton label="スケジュール" onPress={() => router.back()} />
-        <Text style={styles.title}>調理ナビ</Text>
+        <BackButton label={t("common.schedule")} onPress={() => router.back()} />
+        <Text style={styles.title}>{t("cook.title")}</Text>
         <Pressable
-          style={({ pressed }) => [
-            styles.settingsBtn,
-            pressed && { opacity: 0.8 },
-          ]}
+          style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.8 }]}
           onPress={() => router.push("/settings")}
           hitSlop={12}
         >
@@ -392,15 +408,51 @@ ${historyText || "なし"}
       </View>
 
       {/* Prominent progress bar at top */}
+      <View style={styles.topProgressContainer}>
+        <View style={styles.topProgressInfo}>
+          <Text style={styles.topProgressLabel}>
+            {t("cook.step", { current: currentIndex + 1, total: combinedSteps.length })}
+          </Text>
+          <Text style={styles.topProgressPercent}>{progressPercent}%</Text>
+        </View>
+        <View style={styles.topProgressBar}>
+          <View style={[styles.topProgressFill, { width: `${progressPercent}%` }]} />
+        </View>
+        {recipeProgress.length > 1 && (
+          <View style={styles.topRecipeProgress}>
+            {recipeProgress.map((rp) => (
+              <View key={rp.recipeId} style={styles.topRecipeItem}>
+                <View style={[styles.topRecipeDot, { backgroundColor: rp.color }]} />
+                <Text style={styles.topRecipeName} numberOfLines={1}>
+                  {rp.name}
+                </Text>
+                <Text style={styles.topRecipePercent}>{rp.percent}%</Text>
+              </View>
+            ))}
+          </View>
+        )}
+        <View style={styles.stepStateSummary}>
+          <View style={[styles.stepStateChip, styles.stepStateDone]}>
+            <Text style={styles.stepStateChipText}>
+              {t("cook.done")} {completedSteps}
+            </Text>
+          </View>
+          <View style={[styles.stepStateChip, styles.stepStateCurrent]}>
+            <Text style={styles.stepStateChipText}>
+              {t("cook.current")} {currentIndex + 1}
+            </Text>
+          </View>
+          <View style={[styles.stepStateChip, styles.stepStatePending]}>
+            <Text style={styles.stepStateChipText}>
+              {t("cook.pending")} {remainingSteps}
+            </Text>
+          </View>
+        </View>
+      </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         {/* Current step card */}
-        <View
-          style={[
-            styles.card,
-            { borderLeftWidth: 4, borderLeftColor: currentStep?.color },
-          ]}
-        >
+        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: currentStep?.color }]}>
           <View style={styles.stepHeader}>
             <View style={styles.stepBadge}>
               <Text style={styles.stepBadgeText}>
@@ -412,28 +464,22 @@ ${historyText || "なし"}
                 style={[
                   styles.typeBadge,
                   {
-                    backgroundColor: getTaskTypeColor(
-                      currentStep.schedulerTask.task_type,
-                    ),
+                    backgroundColor: getTaskTypeColor(currentStep.schedulerTask.task_type),
                   },
                 ]}
               >
                 <Text style={styles.typeBadgeText}>
-                  {getTaskTypeLabel(currentStep.schedulerTask.task_type)}
+                  {getTaskTypeLabel(currentStep.schedulerTask.task_type, t)}
                 </Text>
               </View>
             )}
           </View>
           <Text style={styles.recipeLabel}>📖 {currentStep?.recipeName}</Text>
-          <Text style={styles.stepText}>
-            {stripHtml(currentStep?.text ?? "手順がありません")}
-          </Text>
+          <Text style={styles.stepText}>{stripHtml(currentStep?.text ?? t("cook.noStep"))}</Text>
           {currentStep?.schedulerTask?.tips && (
             <View style={styles.tipsContainer}>
-              <Text style={styles.tipsLabel}>💡 コツ</Text>
-              <Text style={styles.tipsText}>
-                {currentStep.schedulerTask.tips}
-              </Text>
+              <Text style={styles.tipsLabel}>💡 {t("cook.tips")}</Text>
+              <Text style={styles.tipsText}>{currentStep.schedulerTask.tips}</Text>
             </View>
           )}
         </View>
@@ -441,7 +487,7 @@ ${historyText || "なし"}
         {/* Countdown timer */}
         {countdownLabel ? (
           <View style={styles.countdown}>
-            <Text style={styles.countdownLabel}>タイマー</Text>
+            <Text style={styles.countdownLabel}>{t("cook.timer")}</Text>
             <Text style={styles.countdownValue}>{countdownLabel}</Text>
           </View>
         ) : null}
@@ -465,36 +511,33 @@ ${historyText || "なし"}
 
         {/* Gantt chart */}
         <View style={styles.card}>
+          <Text style={styles.subTitle}>{t("cook.ganttTitle")}</Text>
           {combinedSteps.map((step, idx) => {
             const task = gantt.tasks[idx];
             const total = Math.max(1, gantt.total_estimated_minutes);
             const fallbackLeft = `${(idx / Math.max(1, combinedSteps.length)) * 100}%`;
             const fallbackWidth = `${Math.max(8, 100 / Math.max(1, combinedSteps.length))}%`;
-            const left = task
-              ? `${(task.start_min / total) * 100}%`
-              : fallbackLeft;
+            const left = task ? `${(task.start_min / total) * 100}%` : fallbackLeft;
             const width = task
               ? `${Math.max(8, (task.duration_min / total) * 100)}%`
               : fallbackWidth;
             const isActive = idx === currentIndex;
             const isDone = idx < currentIndex;
             const stepColor = step.color ?? theme.colors.border;
-            const statusText = isDone ? "完了" : isActive ? "実行中" : "未着手";
+            const statusText = isDone
+              ? t("cook.statusDone")
+              : isActive
+                ? t("cook.statusActive")
+                : t("cook.statusPending");
             const label =
-              stripHtml(step.text).slice(0, 25) +
-              (stripHtml(step.text).length > 25 ? "…" : "");
+              stripHtml(step.text).slice(0, 25) + (stripHtml(step.text).length > 25 ? "…" : "");
             return (
               <View
                 key={`${step.recipeId}-${idx}`}
                 style={[styles.ganttRow, isActive && styles.ganttRowActive]}
               >
                 <View style={styles.ganttLabelRow}>
-                  <View
-                    style={[
-                      styles.ganttColorDot,
-                      { backgroundColor: stepColor },
-                    ]}
-                  />
+                  <View style={[styles.ganttColorDot, { backgroundColor: stepColor }]} />
                   <Text
                     style={[
                       styles.ganttLabel,

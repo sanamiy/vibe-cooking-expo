@@ -1,11 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import i18n from "@/i18n";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 export type SchedulerAlgorithm =
   | "auto"
@@ -20,6 +15,7 @@ interface AppSettings {
   servingsPerMeal: number;
   stoveBurners: number;
   schedulerAlgorithm: SchedulerAlgorithm;
+  language: "ja" | "en";
 }
 
 interface AppSettingsContextValue {
@@ -33,17 +29,12 @@ const defaultSettings: AppSettings = {
   servingsPerMeal: 4,
   stoveBurners: 2,
   schedulerAlgorithm: "auto",
+  language: "ja",
 };
 
-const AppSettingsContext = createContext<AppSettingsContextValue | undefined>(
-  undefined,
-);
+const AppSettingsContext = createContext<AppSettingsContextValue | undefined>(undefined);
 
-export const AppSettingsProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const AppSettingsProvider = ({ children }: { children: React.ReactNode }) => {
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [isReady, setIsReady] = useState(false);
 
@@ -66,26 +57,22 @@ export const AppSettingsProvider = ({
 
   useEffect(() => {
     if (!isReady) return;
-    AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)).catch(
-      () => undefined,
-    );
+    AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)).catch(() => undefined);
+    if (i18n.language !== settings.language) {
+      i18n.changeLanguage(settings.language);
+    }
   }, [isReady, settings]);
 
   const value = useMemo(
     () => ({
       settings,
-      updateSettings: (next: Partial<AppSettings>) =>
-        setSettings((prev) => ({ ...prev, ...next })),
+      updateSettings: (next: Partial<AppSettings>) => setSettings((prev) => ({ ...prev, ...next })),
       isReady,
     }),
     [isReady, settings],
   );
 
-  return (
-    <AppSettingsContext.Provider value={value}>
-      {children}
-    </AppSettingsContext.Provider>
-  );
+  return <AppSettingsContext.Provider value={value}>{children}</AppSettingsContext.Provider>;
 };
 
 export const useAppSettings = () => {

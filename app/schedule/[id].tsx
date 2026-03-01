@@ -9,27 +9,20 @@ import {
   type MultiRecipeSchedule,
   type SchedulerTask,
 } from "@/utils/scheduler";
+import { getLocalizedName } from "@/utils/recipe";
 import { setScheduleTips, setScheduleTasks } from "@/utils/scheduleStore";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
 export default function ScheduleScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getRecipeById } = useRecipes();
   const { settings } = useAppSettings();
   const insets = useSafeAreaInsets();
+  const { t, i18n } = useTranslation();
 
   const ids = useMemo(() => String(id).split(","), [id]);
   const recipes = useMemo(
@@ -76,9 +69,7 @@ export default function ScheduleScreen() {
         }
       } catch (e) {
         if (!cancelled) {
-          setError(
-            e instanceof Error ? e.message : "スケジュール作成に失敗しました",
-          );
+          setError(e instanceof Error ? e.message : t("schedule.createFailed"));
           setLoading(false);
         }
       }
@@ -95,7 +86,7 @@ export default function ScheduleScreen() {
     recipes.forEach((r, idx) => {
       map.set(r.id, {
         color: RECIPE_COLORS[idx % RECIPE_COLORS.length],
-        name: r.name,
+        name: getLocalizedName(r, i18n.language),
       });
     });
     return map;
@@ -105,7 +96,7 @@ export default function ScheduleScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.notFound}>
-          <Text>レシピが見つかりませんでした。</Text>
+          <Text>{t("common.recipeNotFound")}</Text>
         </View>
       </SafeAreaView>
     );
@@ -114,13 +105,10 @@ export default function ScheduleScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <BackButton label="買い出し" onPress={() => router.back()} />
-        <Text style={styles.title}>スケジュール</Text>
+        <BackButton label={t("common.shopping")} onPress={() => router.back()} />
+        <Text style={styles.title}>{t("schedule.title")}</Text>
         <Pressable
-          style={({ pressed }) => [
-            styles.settingsBtn,
-            pressed && { opacity: 0.8 },
-          ]}
+          style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.8 }]}
           onPress={() => router.push("/settings")}
           hitSlop={12}
         >
@@ -128,25 +116,18 @@ export default function ScheduleScreen() {
         </Pressable>
       </View>
 
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: 120 + insets.bottom },
-        ]}
-      >
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 120 + insets.bottom }]}>
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
-            <Text style={styles.loadingText}>スケジュールを作成中...</Text>
-            <Text style={styles.loadingSubText}>
-              レシピの工程を分析しています
-            </Text>
+            <Text style={styles.loadingText}>{t("schedule.creating")}</Text>
+            <Text style={styles.loadingSubText}>{t("schedule.analyzing")}</Text>
           </View>
         ) : error ? (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{error}</Text>
             <AppButton
-              label="再試行"
+              label={t("common.retry")}
               variant="outline"
               onPress={() => {
                 setError(null);
@@ -158,23 +139,22 @@ export default function ScheduleScreen() {
           <>
             {/* サマリー */}
             <View style={styles.summaryCard}>
+              <Text style={styles.summaryTitle}>{t("schedule.cookingPlan")}</Text>
               <View style={styles.summaryRow}>
                 <View style={styles.summaryItem}>
                   <Text style={styles.summaryEmoji}>⏱️</Text>
                   <Text style={styles.summaryValue}>{schedule.total_time}</Text>
-                  <Text style={styles.summaryLabel}>合計（分）</Text>
+                  <Text style={styles.summaryLabel}>{t("schedule.totalMinutes")}</Text>
                 </View>
                 <View style={styles.summaryItem}>
                   <Text style={styles.summaryEmoji}>📖</Text>
                   <Text style={styles.summaryValue}>{recipes.length}</Text>
-                  <Text style={styles.summaryLabel}>メニュー数</Text>
+                  <Text style={styles.summaryLabel}>{t("schedule.recipeCount")}</Text>
                 </View>
                 <View style={styles.summaryItem}>
                   <Text style={styles.summaryEmoji}>🔥</Text>
-                  <Text style={styles.summaryValue}>
-                    {settings.stoveBurners}
-                  </Text>
-                  <Text style={styles.summaryLabel}>コンロ口数</Text>
+                  <Text style={styles.summaryValue}>{settings.stoveBurners}</Text>
+                  <Text style={styles.summaryLabel}>{t("schedule.stoveBurnerCount")}</Text>
                 </View>
               </View>
             </View>
@@ -187,28 +167,24 @@ export default function ScheduleScreen() {
                     style={[
                       styles.legendDot,
                       {
-                        backgroundColor:
-                          RECIPE_COLORS[idx % RECIPE_COLORS.length],
+                        backgroundColor: RECIPE_COLORS[idx % RECIPE_COLORS.length],
                       },
                     ]}
                   />
-                  <Text style={styles.legendText}>{r.name}</Text>
+                  <Text style={styles.legendText}>{getLocalizedName(r, i18n.language)}</Text>
                 </View>
               ))}
             </View>
 
             {/* タイムラインガントチャート */}
             <View style={styles.card}>
-              <Text style={styles.subTitle}>タイムライン</Text>
-              <GanttChart
-                tasks={schedule.tasks}
-                totalTime={schedule.total_time}
-              />
+              <Text style={styles.subTitle}>{t("schedule.timeline")}</Text>
+              <GanttChart tasks={schedule.tasks} totalTime={schedule.total_time} />
             </View>
 
             {/* タスク一覧 */}
             <View style={styles.card}>
-              <Text style={styles.subTitle}>工程一覧（時系列順）</Text>
+              <Text style={styles.subTitle}>{t("schedule.taskList")}</Text>
               {schedule.tasks
                 .slice()
                 .sort((a, b) => a.start_time - b.start_time)
@@ -223,7 +199,7 @@ export default function ScheduleScreen() {
       {schedule && !loading && (
         <View style={[styles.bottomBar, { paddingBottom: 12 + insets.bottom }]}>
           <AppButton
-            label="調理を開始する"
+            label={t("schedule.startCooking")}
             onPress={() => router.push(`/cook-interactive/${ids.join(",")}`)}
           />
         </View>
@@ -234,13 +210,8 @@ export default function ScheduleScreen() {
 
 /* ─── ガントチャート ─────────────────────────── */
 
-function GanttChart({
-  tasks,
-  totalTime,
-}: {
-  tasks: SchedulerTask[];
-  totalTime: number;
-}) {
+function GanttChart({ tasks, totalTime }: { tasks: SchedulerTask[]; totalTime: number }) {
+  const { t: tr } = useTranslation();
   if (totalTime === 0) return null;
 
   // 5分刻みの目盛り
@@ -257,12 +228,9 @@ function GanttChart({
         {ticks.map((t) => (
           <Text
             key={t}
-            style={[
-              ganttStyles.tickLabel,
-              { left: `${(t / totalTime) * 100}%` as any },
-            ]}
+            style={[ganttStyles.tickLabel, { left: `${(t / totalTime) * 100}%` as any }]}
           >
-            {t}分
+            {tr("schedule.minuteTick", { t })}
           </Text>
         ))}
       </View>
@@ -288,9 +256,7 @@ function GanttChart({
                     {
                       left: `${leftPct}%` as any,
                       width: `${widthPct}%` as any,
-                      backgroundColor: isWash
-                        ? theme.colors.border
-                        : task.color,
+                      backgroundColor: isWash ? theme.colors.border : task.color,
                     },
                     isWash && ganttStyles.washBar,
                   ]}
@@ -306,6 +272,7 @@ function GanttChart({
 /* ─── タスク行 ─────────────────────────────── */
 
 function TaskRow({ task, index }: { task: SchedulerTask; index: number }) {
+  const { t } = useTranslation();
   const isWash = task.task_type === "wash";
   const endTime = task.start_time + task.duration;
 
@@ -313,7 +280,7 @@ function TaskRow({ task, index }: { task: SchedulerTask; index: number }) {
     <View style={[taskStyles.row, isWash && taskStyles.washRow]}>
       <View style={taskStyles.timeCol}>
         <Text style={taskStyles.time}>
-          {task.start_time}〜{endTime}分
+          {t("schedule.timeRange", { start: task.start_time, end: endTime })}
         </Text>
       </View>
       <View
@@ -331,17 +298,17 @@ function TaskRow({ task, index }: { task: SchedulerTask; index: number }) {
         <View style={taskStyles.tags}>
           {task.uses_stove && (
             <View style={[taskStyles.tag, taskStyles.stoveTag]}>
-              <Text style={taskStyles.tagText}>コンロ</Text>
+              <Text style={taskStyles.tagText}>{t("schedule.tagStove")}</Text>
             </View>
           )}
           {task.uses_cutting_board && (
             <View style={[taskStyles.tag, taskStyles.boardTag]}>
-              <Text style={taskStyles.tagText}>まな板</Text>
+              <Text style={taskStyles.tagText}>{t("schedule.tagCuttingBoard")}</Text>
             </View>
           )}
           {!task.requires_attention && (
             <View style={[taskStyles.tag, taskStyles.passiveTag]}>
-              <Text style={taskStyles.tagText}>放置OK</Text>
+              <Text style={taskStyles.tagText}>{t("schedule.tagPassive")}</Text>
             </View>
           )}
         </View>

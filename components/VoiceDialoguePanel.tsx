@@ -1,16 +1,10 @@
 import { theme } from "@/constants/theme";
 import { DialogueState } from "@/hooks/useVoiceDialogue";
 import { AudioDevice } from "@/hooks/useAudioDevices";
-import type { VoiceInputMode } from "@/hooks/useVoiceCommands";
-import {
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+type VoiceInputMode = "asr_then_llm" | "voxtral_speech_understanding" | "voxtral_dialogue";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ConversationEntry {
   role: "user" | "assistant";
@@ -33,11 +27,11 @@ interface VoiceDialoguePanelProps {
   onSelectVoiceInputMode?: (mode: VoiceInputMode) => void;
 }
 
-const stateLabels: Record<DialogueState, { icon: string; text: string }> = {
-  listening: { icon: "🎤", text: "聞いています..." },
-  processing: { icon: "🤔", text: "考えています..." },
-  speaking: { icon: "🔊", text: "話しています..." },
-  interrupted: { icon: "✋", text: "割り込み中..." },
+const stateLabels: Record<DialogueState, { icon: string; key: string }> = {
+  listening: { icon: "🎤", key: "voice.listening" },
+  processing: { icon: "🤔", key: "voice.processing" },
+  speaking: { icon: "🔊", key: "voice.speaking" },
+  interrupted: { icon: "✋", key: "voice.interrupted" },
 };
 
 function DevicePicker({
@@ -53,6 +47,7 @@ function DevicePicker({
   selectedId: string;
   onSelect: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   if (Platform.OS !== "web" || devices.length === 0) return null;
 
@@ -63,7 +58,7 @@ function DevicePicker({
       <Pressable style={pickerStyles.button} onPress={() => setOpen(!open)}>
         <Text style={pickerStyles.icon}>{icon}</Text>
         <Text style={pickerStyles.label} numberOfLines={1}>
-          {label}: {selected?.label ?? "デフォルト"}
+          {label}: {selected?.label ?? t("voice.defaultDevice")}
         </Text>
         <Text style={pickerStyles.arrow}>{open ? "▲" : "▼"}</Text>
       </Pressable>
@@ -113,17 +108,18 @@ export function VoiceDeviceSelectors({
   onSelectInput: (id: string) => void;
   onSelectOutput: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.deviceRow}>
       <DevicePicker
-        label="入力"
+        label={t("voice.input")}
         icon="🎙️"
         devices={inputDevices}
         selectedId={selectedInputId}
         onSelect={onSelectInput}
       />
       <DevicePicker
-        label="出力"
+        label={t("voice.output")}
         icon="🔈"
         devices={outputDevices}
         selectedId={selectedOutputId}
@@ -148,6 +144,7 @@ export function VoiceDialoguePanel({
   selectedVoiceInputMode = "asr_then_llm",
   onSelectVoiceInputMode,
 }: VoiceDialoguePanelProps) {
+  const { t } = useTranslation();
   const state = stateLabels[dialogueState];
 
   return (
@@ -165,24 +162,22 @@ export function VoiceDialoguePanel({
 
       {showVoiceAlgorithmSelector ? (
         <View style={styles.modeSelectorCard}>
-          <Text style={styles.modeSelectorLabel}>音声認識アルゴリズム</Text>
+          <Text style={styles.modeSelectorLabel}>{t("voice.algorithmLabel")}</Text>
           <View style={styles.modeSelectorRow}>
             <Pressable
               style={[
                 styles.modeButton,
-                selectedVoiceInputMode === "voxtral_dialogue" &&
-                  styles.modeButtonSelected,
+                selectedVoiceInputMode === "voxtral_dialogue" && styles.modeButtonSelected,
               ]}
               onPress={() => onSelectVoiceInputMode?.("voxtral_dialogue")}
             >
               <Text
                 style={[
                   styles.modeButtonText,
-                  selectedVoiceInputMode === "voxtral_dialogue" &&
-                    styles.modeButtonTextSelected,
+                  selectedVoiceInputMode === "voxtral_dialogue" && styles.modeButtonTextSelected,
                 ]}
               >
-                音声LLM対話
+                {t("voice.voiceLlmDialogue")}
               </Text>
             </Pressable>
             <Pressable
@@ -191,9 +186,7 @@ export function VoiceDialoguePanel({
                 selectedVoiceInputMode === "voxtral_speech_understanding" &&
                   styles.modeButtonSelected,
               ]}
-              onPress={() =>
-                onSelectVoiceInputMode?.("voxtral_speech_understanding")
-              }
+              onPress={() => onSelectVoiceInputMode?.("voxtral_speech_understanding")}
             >
               <Text
                 style={[
@@ -202,22 +195,20 @@ export function VoiceDialoguePanel({
                     styles.modeButtonTextSelected,
                 ]}
               >
-                音声LLM
+                {t("voice.voiceLlm")}
               </Text>
             </Pressable>
             <Pressable
               style={[
                 styles.modeButton,
-                selectedVoiceInputMode === "asr_then_llm" &&
-                  styles.modeButtonSelected,
+                selectedVoiceInputMode === "asr_then_llm" && styles.modeButtonSelected,
               ]}
               onPress={() => onSelectVoiceInputMode?.("asr_then_llm")}
             >
               <Text
                 style={[
                   styles.modeButtonText,
-                  selectedVoiceInputMode === "asr_then_llm" &&
-                    styles.modeButtonTextSelected,
+                  selectedVoiceInputMode === "asr_then_llm" && styles.modeButtonTextSelected,
                 ]}
               >
                 ASR → LLM
@@ -238,7 +229,7 @@ export function VoiceDialoguePanel({
           ]}
         >
           <Text style={styles.stateIcon}>{state.icon}</Text>
-          <Text style={styles.stateText}>{state.text}</Text>
+          <Text style={styles.stateText}>{t(state.key)}</Text>
         </View>
       </View>
 
@@ -253,17 +244,12 @@ export function VoiceDialoguePanel({
           {conversationHistory.slice(-6).map((entry, i) => (
             <View
               key={i}
-              style={[
-                styles.bubble,
-                entry.role === "user" ? styles.userBubble : styles.aiBubble,
-              ]}
+              style={[styles.bubble, entry.role === "user" ? styles.userBubble : styles.aiBubble]}
             >
               <Text
                 style={[
                   styles.bubbleText,
-                  entry.role === "user"
-                    ? styles.userBubbleText
-                    : styles.aiBubbleText,
+                  entry.role === "user" ? styles.userBubbleText : styles.aiBubbleText,
                 ]}
               >
                 {entry.content}
