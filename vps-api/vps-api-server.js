@@ -917,6 +917,467 @@ function applyTaskUpdates(existingTasks, updates) {
   return { tasks, warnings };
 }
 
+function normalizeEvaluationCriteria(rawCriteria) {
+  const criteria = {
+    must_respect_kitchen_limits: true,
+    max_total_time: null,
+    max_sync_variance: null,
+    min_parallel_windows: null,
+    custom_rules: [],
+  };
+
+  if (typeof rawCriteria === "string") {
+    const text = rawCriteria.trim();
+    if (text) criteria.custom_rules.push(text);
+    return criteria;
+  }
+
+  if (Array.isArray(rawCriteria)) {
+    criteria.custom_rules = rawCriteria
+      .map((v) => String(v ?? "").trim())
+      .filter(Boolean);
+    return criteria;
+  }
+
+  if (!rawCriteria || typeof rawCriteria !== "object") {
+    return criteria;
+  }
+
+  if ("must_respect_kitchen_limits" in rawCriteria) {
+    criteria.must_respect_kitchen_limits = toBool(
+      rawCriteria.must_respect_kitchen_limits,
+      true,
+    );
+  }
+
+  if ("max_total_time" in rawCriteria) {
+    const n = Number(rawCriteria.max_total_time);
+    criteria.max_total_time = Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : null;
+  }
+
+  if ("max_sync_variance" in rawCriteria) {
+    const n = Number(rawCriteria.max_sync_variance);
+    criteria.max_sync_variance = Number.isFinite(n)
+      ? Math.max(0, Math.trunc(n))
+      : null;
+  }
+
+  if ("min_parallel_windows" in rawCriteria) {
+    const n = Number(rawCriteria.min_parallel_windows);
+    criteria.min_parallel_windows = Number.isFinite(n)
+      ? Math.max(0, Math.trunc(n))
+      : null;
+  }
+
+  const ruleTexts = [];
+  const pushRule = (value) => {
+    const text = String(value ?? "").trim();
+    if (text) ruleTexts.push(text);
+  };
+
+  if (typeof rawCriteria.criteria_text === "string") {
+    pushRule(rawCriteria.criteria_text);
+  }
+
+  if (Array.isArray(rawCriteria.criteria_rules)) {
+    for (const rule of rawCriteria.criteria_rules) pushRule(rule);
+  }
+
+  if (Array.isArray(rawCriteria.custom_rules)) {
+    for (const rule of rawCriteria.custom_rules) pushRule(rule);
+  }
+
+  if (Array.isArray(rawCriteria.rules)) {
+    for (const rule of rawCriteria.rules) {
+      if (typeof rule === "string") {
+        pushRule(rule);
+      } else if (rule && typeof rule === "object") {
+        pushRule(rule.criterion ?? rule.text ?? rule.rule);
+      }
+    }
+  }
+
+  criteria.custom_rules = [...new Set(ruleTexts)];
+  return criteria;
+}
+
+function findResourceViolations(tasks, kitchen) {
+  const stoveLimit = toInt(kitchen?.stove_burners, 1, { min: 0, max: 100 });
+  const boardLimit = toInt(kitchen?.cutting_boards, 1, { min: 0, max: 100 });
+  const cooksLimit = toInt(kitchen?.cooks, 1, { min: 0, max: 100 });
+  const totalTime = tasks.length > 0 ? Math.max(...tasks.map((t) => t.end_time), 0) : 0;
+
+  const violations = [];
+  for (let minute = 0; minute < totalTime; minute++) {
+    let stoveUsed = 0;
+    let boardUsed = 0;
+    let attentionUsed = 0;
+
+    for (const task of tasks) {
+      if (!(task.start_time < minute + 1 && task.end_time > minute)) continue;
+      if (task.uses_stove) stoveUsed++;
+      if (task.uses_cutting_board) boardUsed++;
+      if (task.requires_attention) attentionUsed++;
+    }
+
+    if (stoveUsed > stoveLimit) {
+      violations.push({
+        type: "stove_burners",
+        minute,
+        used: stoveUsed,
+        limit: stoveLimit,
+      });
+    }
+    if (boardUsed > boardLimit) {
+      violations.push({
+        type: "cutting_boards",
+        minute,
+        used: boardUsed,
+        limit: boardLimit,
+      });
+    }
+    if (attentionUsed > cooksLimit) {
+      violations.push({
+        type: "cooks_attention",
+        minute,
+        used: attentionUsed,
+        limit: cooksLimit,
+      });
+    }
+  }
+
+  return violations;
+}
+
+function findStepOrderViolations(tasks) {
+  const violations = [];
+  const byRecipe = new Map();
+  for (const task of tasks) {
+    if (task.step_index < 0) continue;
+    if (!byRecipe.has(task.recipe_id)) byRecipe.set(task.recipe_id, []);
+    byRecipe.get(task.recipe_id).push(task);
+  }
+
+  for (const [recipeId, recipeTasks] of byRecipe.entries()) {
+    const sorted = [...recipeTasks].sort((a, b) => {
+      if (a.step_index !== b.step_index) return a.step_index - b.step_index;
+      if (a.start_time !== b.start_time) return a.start_time - b.start_time;
+      return a.end_time - b.end_time;
+    });
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = sorted[i - 1];
+      const curr = sorted[i];
+      if (curr.step_index > prev.step_index && curr.start_time < prev.end_time) {
+        violations.push({
+          recipe_id: recipeId,
+          previous_task_id: prev.task_id,
+          current_task_id: curr.task_id,
+          previous_range: `${prev.start_time}-${prev.end_time}`,
+          current_range: `${curr.start_time}-${curr.end_time}`,
+        });
+      }
+    }
+  }
+
+  return violations;
+}
+
+function buildCriteriaResultsFromDeterministicChecks({
+  criteria,
+  stats,
+  scheduleTasks,
+  kitchen,
+}) {
+  const results = [];
+  const blockers = [];
+
+  const resourceViolations = criteria.must_respect_kitchen_limits
+    ? findResourceViolations(scheduleTasks, kitchen)
+    : [];
+  const resourcePass = resourceViolations.length === 0;
+  results.push({
+    criterion: "キッチン制約を超えない",
+    passed: resourcePass,
+    reason: resourcePass
+      ? "コンロ・まな板・注意タスク人数の上限を超えていません。"
+      : `制約超過が ${resourceViolations.length} 箇所あります。`,
+    source: "deterministic",
+  });
+  if (!resourcePass) {
+    blockers.push(
+      `キッチン制約違反: ${resourceViolations
+        .slice(0, 3)
+        .map((v) => `${v.type}@${v.minute}分(使用${v.used}/上限${v.limit})`)
+        .join(", ")}`,
+    );
+  }
+
+  const stepOrderViolations = findStepOrderViolations(scheduleTasks);
+  const stepOrderPass = stepOrderViolations.length === 0;
+  results.push({
+    criterion: "同一レシピの工程順序を守る",
+    passed: stepOrderPass,
+    reason: stepOrderPass
+      ? "工程順序違反は検出されませんでした。"
+      : `工程順序違反が ${stepOrderViolations.length} 箇所あります。`,
+    source: "deterministic",
+  });
+  if (!stepOrderPass) {
+    blockers.push(
+      `工程順序違反: ${stepOrderViolations
+        .slice(0, 3)
+        .map((v) => `${v.recipe_id} ${v.previous_range} -> ${v.current_range}`)
+        .join(", ")}`,
+    );
+  }
+
+  if (criteria.max_total_time != null) {
+    const pass = stats.totalTime <= criteria.max_total_time;
+    results.push({
+      criterion: `総時間 <= ${criteria.max_total_time}分`,
+      passed: pass,
+      reason: `実測 ${stats.totalTime}分`,
+      source: "deterministic",
+    });
+    if (!pass) blockers.push(`総時間超過: ${stats.totalTime}分`);
+  }
+
+  if (criteria.max_sync_variance != null) {
+    const pass = stats.syncVariance <= criteria.max_sync_variance;
+    results.push({
+      criterion: `同時完成ばらつき <= ${criteria.max_sync_variance}分`,
+      passed: pass,
+      reason: `実測 ${stats.syncVariance}分`,
+      source: "deterministic",
+    });
+    if (!pass) blockers.push(`同時完成ばらつき超過: ${stats.syncVariance}分`);
+  }
+
+  if (criteria.min_parallel_windows != null) {
+    const pass = stats.parallelWindows >= criteria.min_parallel_windows;
+    results.push({
+      criterion: `並列ウィンドウ >= ${criteria.min_parallel_windows}`,
+      passed: pass,
+      reason: `実測 ${stats.parallelWindows}`,
+      source: "deterministic",
+    });
+    if (!pass) blockers.push(`並列ウィンドウ不足: ${stats.parallelWindows}`);
+  }
+
+  return {
+    results,
+    blockers,
+    resourceViolations,
+    stepOrderViolations,
+  };
+}
+
+function normalizeCriteriaResults(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      const criterion = String(
+        item?.criterion ?? item?.name ?? item?.rule ?? "",
+      ).trim();
+      if (!criterion) return null;
+      return {
+        criterion,
+        passed: toBool(item?.passed, false),
+        reason: String(item?.reason ?? item?.comment ?? ""),
+        source: "llm",
+      };
+    })
+    .filter(Boolean);
+}
+
+async function runScheduleEvaluationOneCall(args) {
+  const scheduleId = String(args?.schedule_id ?? "");
+  const providedSchedule = args?.schedule;
+  const providedKitchen = args?.kitchen;
+  const criteriaInput =
+    args?.criteria ?? args?.criteria_text ?? args?.criteria_rules ?? {};
+  const criteria = normalizeEvaluationCriteria(criteriaInput);
+  const taskLimit = toInt(args?.task_limit_for_llm, 120, { min: 20, max: 500 });
+
+  let resolvedSchedule = providedSchedule;
+  let resolvedKitchen = providedKitchen;
+  let resolvedScheduleId = scheduleId || null;
+
+  if (scheduleId) {
+    const store = readAgenticStore();
+    const record = store.schedules[scheduleId];
+    if (!record) throw new Error(`schedule not found: ${scheduleId}`);
+    resolvedSchedule = record?.result?.schedule;
+    resolvedKitchen = resolvedKitchen ?? record?.request?.kitchen;
+  }
+
+  if (!resolvedSchedule) {
+    throw new Error("evaluate_schedule requires schedule_id or schedule");
+  }
+
+  const rawTasks = Array.isArray(resolvedSchedule?.tasks)
+    ? resolvedSchedule.tasks
+    : Array.isArray(resolvedSchedule?.schedule?.tasks)
+      ? resolvedSchedule.schedule.tasks
+      : [];
+  if (rawTasks.length === 0) {
+    throw new Error("schedule.tasks is empty");
+  }
+
+  const normalizedTasks = rawTasks.map((t, i) =>
+    normalizeScheduleTask(t, `eval-${i + 1}`),
+  );
+  const stats = computeScheduleStats(normalizedTasks);
+  const algorithmUsed = String(
+    resolvedSchedule?.algorithm_used ??
+      resolvedSchedule?.schedule?.algorithm_used ??
+      "unknown",
+  );
+
+  const {
+    results: deterministicResults,
+    blockers: deterministicBlockers,
+    resourceViolations,
+    stepOrderViolations,
+  } = buildCriteriaResultsFromDeterministicChecks({
+    criteria,
+    stats,
+    scheduleTasks: stats.tasks,
+    kitchen: resolvedKitchen ?? {},
+  });
+
+  let llmPayload = null;
+  let llmError = null;
+  if (criteria.custom_rules.length > 0) {
+    const scheduleForLlm = stats.tasks.slice(0, taskLimit).map((t) => ({
+      task_id: t.task_id,
+      recipe_id: t.recipe_id,
+      recipe_name: t.recipe_name,
+      step_index: t.step_index,
+      time: `${t.start_time}-${t.end_time}`,
+      task_type: t.task_type,
+      requires_attention: t.requires_attention,
+      uses_stove: t.uses_stove,
+      uses_cutting_board: t.uses_cutting_board,
+      description: t.description,
+    }));
+
+    const system = `あなたはスケジュール評価エージェントです。
+出力はJSONオブジェクトのみ。コードブロック禁止。
+厳密に次の形式:
+{
+  "pass": true/false,
+  "score": 0-100の整数,
+  "summary": "全体評価",
+  "criteria_results": [
+    { "criterion": "基準文", "passed": true/false, "reason": "根拠" }
+  ],
+  "blockers": ["未達の重要項目"],
+  "suggestions": ["改善案"]
+}`;
+
+    const prompt = {
+      criteria: criteria.custom_rules,
+      schedule_meta: {
+        schedule_id: resolvedScheduleId,
+        algorithm_used: algorithmUsed,
+        total_time: stats.totalTime,
+        task_count: stats.tasks.length,
+        sync_variance: stats.syncVariance,
+        parallel_windows: stats.parallelWindows,
+      },
+      kitchen: resolvedKitchen ?? null,
+      deterministic_findings: {
+        blockers: deterministicBlockers,
+        resource_violations: resourceViolations.slice(0, 10),
+        step_order_violations: stepOrderViolations.slice(0, 10),
+      },
+      tasks: scheduleForLlm,
+      tasks_truncated: stats.tasks.length > taskLimit,
+    };
+
+    try {
+      const data = await callAnthropic({
+        system,
+        maxTokens: 1200,
+        temperature: 0,
+        messages: [{ role: "user", content: JSON.stringify(prompt, null, 2) }],
+      });
+      const text = (Array.isArray(data?.content) ? data.content : [])
+        .filter((c) => c?.type === "text")
+        .map((c) => String(c?.text ?? ""))
+        .join("\n")
+        .trim();
+      llmPayload = extractJsonObject(text);
+    } catch (e) {
+      llmError = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  const llmCriteriaResults = normalizeCriteriaResults(llmPayload?.criteria_results);
+  const llmBlockers = Array.isArray(llmPayload?.blockers)
+    ? llmPayload.blockers.map((v) => String(v))
+    : [];
+  const llmSuggestions = Array.isArray(llmPayload?.suggestions)
+    ? llmPayload.suggestions.map((v) => String(v))
+    : [];
+  const deterministicPass = deterministicResults.every((r) => r.passed);
+  const llmPass = llmPayload
+    ? toBool(llmPayload?.pass, false)
+    : criteria.custom_rules.length > 0
+      ? false
+      : true;
+  const pass = deterministicPass && llmPass;
+  const score = llmPayload
+    ? toInt(llmPayload?.score, pass ? 100 : 0, { min: 0, max: 100 })
+    : toInt(
+        Math.round(
+          (deterministicResults.filter((r) => r.passed).length /
+            Math.max(1, deterministicResults.length)) *
+            100,
+        ),
+        pass ? 100 : 0,
+        { min: 0, max: 100 },
+      );
+
+  const summary = llmPayload?.summary
+    ? String(llmPayload.summary)
+    : pass
+      ? "評価基準を満たしています。"
+      : "評価基準を満たしていません。";
+
+  const blockers = [...deterministicBlockers, ...llmBlockers];
+  if (llmError) blockers.push(`LLM評価失敗: ${llmError}`);
+  const suggestions = llmSuggestions;
+  if (!pass && suggestions.length === 0) {
+    suggestions.push("未達基準を満たすように schedule を update して再評価してください。");
+  }
+
+  return {
+    schedule_id: resolvedScheduleId,
+    pass,
+    score,
+    summary,
+    criteria_used: criteria,
+    criteria_results: [...deterministicResults, ...llmCriteriaResults],
+    blockers,
+    suggestions,
+    schedule_stats: {
+      total_time: stats.totalTime,
+      task_count: stats.tasks.length,
+      algorithm_used: algorithmUsed,
+      sync_variance: stats.syncVariance,
+      parallel_windows: stats.parallelWindows,
+    },
+    diagnostics: {
+      llm_called: criteria.custom_rules.length > 0,
+      llm_error: llmError,
+      resource_violations_count: resourceViolations.length,
+      step_order_violations_count: stepOrderViolations.length,
+    },
+  };
+}
+
 const SCHEDULER_AGENT_TOOLS = [
   {
     name: "optimize_schedule",
@@ -985,6 +1446,46 @@ const SCHEDULER_AGENT_TOOLS = [
         },
       },
       required: ["schedule_id", "updates"],
+    },
+  },
+  {
+    name: "evaluate_schedule",
+    description:
+      "与えられた基準でスケジュールを評価し、pass/failと改善提案を返す（1回評価）。",
+    input_schema: {
+      type: "object",
+      properties: {
+        schedule_id: {
+          type: "string",
+          description: "保存済みスケジュールID（指定時はstoreから取得）",
+        },
+        schedule: {
+          type: "object",
+          description: "直接評価したいスケジュール（tasks配列を含む）",
+        },
+        kitchen: {
+          type: "object",
+          description: "キッチン制約（schedule直渡し時に推奨）",
+        },
+        criteria: {
+          type: "object",
+          description:
+            "評価基準。max_total_time/max_sync_variance/min_parallel_windows/custom_rules など。",
+        },
+        criteria_text: {
+          type: "string",
+          description: "自然言語の評価基準（任意）",
+        },
+        criteria_rules: {
+          type: "array",
+          items: { type: "string" },
+          description: "自然言語の評価基準一覧（任意）",
+        },
+        task_limit_for_llm: {
+          type: "integer",
+          description: "LLM評価へ渡す最大タスク数（20-500）",
+        },
+      },
     },
   },
 ];
@@ -1142,10 +1643,15 @@ async function agentToolUpdateSchedule(args) {
   };
 }
 
+async function agentToolEvaluateSchedule(args) {
+  return await runScheduleEvaluationOneCall(args ?? {});
+}
+
 const SCHEDULER_AGENT_HANDLERS = {
   optimize_schedule: agentToolOptimizeSchedule,
   get_schedule: agentToolGetSchedule,
   update_schedule: agentToolUpdateSchedule,
+  evaluate_schedule: agentToolEvaluateSchedule,
 };
 
 async function runSchedulerAgent({
@@ -1181,11 +1687,14 @@ async function runSchedulerAgent({
 - optimize_schedule: スケジュール最適化と保存
 - get_schedule: 保存済みスケジュール取得
 - update_schedule: 保存済みスケジュールの手動調整
+- evaluate_schedule: 評価基準に対する pass/fail 判定
 
 ルール:
 - 新規作成が必要なら optimize_schedule を呼ぶ
 - 既存 schedule_id がある場合、内容確認には get_schedule を呼ぶ
 - 手動調整依頼がある場合は update_schedule を呼ぶ
+- 合否判定依頼がある場合は evaluate_schedule を呼ぶ
+- evaluate_schedule で pass=true なら作業完了として最終回答する
 - 最後は日本語で簡潔に結果を要約し、schedule_id と次アクションを示す`;
 
   const messages = [
@@ -1531,6 +2040,38 @@ ${tipForStep ? `この工程の注意点・コツ: ${tipForStep}` : ""}
       json(res, 200, {
         tools: SCHEDULER_AGENT_TOOLS,
         supported_algorithms: AGENTIC_ALGORITHMS,
+      });
+      return;
+    }
+
+    if (path === "/vps/scheduler/agent/evaluate") {
+      const {
+        schedule_id,
+        schedule,
+        kitchen,
+        criteria,
+        criteria_text,
+        criteria_rules,
+        task_limit_for_llm,
+      } = body;
+
+      const result = await runScheduleEvaluationOneCall({
+        schedule_id,
+        schedule,
+        kitchen,
+        criteria:
+          criteria ??
+          (criteria_text || Array.isArray(criteria_rules)
+            ? {
+                criteria_text,
+                criteria_rules,
+              }
+            : undefined),
+        task_limit_for_llm,
+      });
+      json(res, 200, {
+        mode: "one_call_evaluator",
+        result,
       });
       return;
     }
