@@ -262,19 +262,18 @@ export default function CookInteractiveScreen() {
   // Debug: keyboard navigation (dev only)
   useEffect(() => {
     if (Platform.OS !== "web") return;
-    const w = globalThis as any;
-    if (!w || typeof w.addEventListener !== "function") {
-      return;
-    }
-    const handleKeyDown = (e: any) => {
-      if (e?.key === "ArrowRight" || e?.key === "n") {
+    const g = globalThis as Record<string, unknown>;
+    if (typeof g.addEventListener !== "function") return;
+    const handleKeyDown = (ev: unknown) => {
+      const e = ev as { key?: string };
+      if (e.key === "ArrowRight" || e.key === "n") {
         setCurrentIndex((prev) => Math.min(prev + 1, combinedSteps.length - 1));
       } else if (e?.key === "ArrowLeft" || e?.key === "p") {
         setCurrentIndex((prev) => Math.max(prev - 1, 0));
       }
     };
-    w.addEventListener("keydown", handleKeyDown);
-    return () => w.removeEventListener("keydown", handleKeyDown);
+    g.addEventListener("keydown", handleKeyDown);
+    return () => (g.removeEventListener as Function)("keydown", handleKeyDown);
   }, [combinedSteps.length]);
 
   // Timer countdown
