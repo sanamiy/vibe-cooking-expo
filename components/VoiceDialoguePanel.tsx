@@ -140,6 +140,24 @@ export function VoiceDialoguePanel({
             <Pressable
               style={[
                 styles.modeButton,
+                selectedVoiceInputMode === "voxtral_dialogue" &&
+                  styles.modeButtonSelected,
+              ]}
+              onPress={() => onSelectVoiceInputMode?.("voxtral_dialogue")}
+            >
+              <Text
+                style={[
+                  styles.modeButtonText,
+                  selectedVoiceInputMode === "voxtral_dialogue" &&
+                    styles.modeButtonTextSelected,
+                ]}
+              >
+                音声LLM対話
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.modeButton,
                 selectedVoiceInputMode === "voxtral_speech_understanding" &&
                   styles.modeButtonSelected,
               ]}

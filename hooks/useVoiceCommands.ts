@@ -9,6 +9,7 @@ interface UseVoiceCommandsProps {
   onInterimTranscript?: (text: string) => void;
   onSpeechStart?: () => void;
   onSpeechEnd?: () => void; // Called when speech ends but no transcript (noise/echo)
+  onVoxtralDialogueResult?: (result: VoxtralDialogueResult) => void;
   active?: boolean;
   inputDeviceId?: string;
   isSpeaking?: boolean;
@@ -16,7 +17,26 @@ interface UseVoiceCommandsProps {
   voxtralSpeechPrompt?: string;
 }
 
-export type VoiceInputMode = "asr_then_llm" | "voxtral_speech_understanding";
+export type VoiceInputMode =
+  | "asr_then_llm"
+  | "voxtral_speech_understanding"
+  | "voxtral_dialogue";
+
+export interface VoxtralDialogueResult {
+  assistantReply: string;
+  intent?: string;
+  userText?: string;
+  raw: string;
+}
+
+const defaultReplyByIntent: Record<string, string> = {
+  next_step: "次の工程に進みます。",
+  previous_step: "前の工程に戻ります。",
+  timer_status: "タイマー情報を確認します。",
+  end_session: "調理ナビを終了します。",
+  question: "質問にお答えします。",
+  stay: "了解しました。",
+};
 
 const config = require("@/config.json") as {
   voiceInputMode?: VoiceInputMode;
@@ -74,6 +94,7 @@ export function useVoiceCommands({
   onInterimTranscript,
   onSpeechStart,
   onSpeechEnd,
+  onVoxtralDialogueResult,
   active = true,
   inputDeviceId,
   isSpeaking = false,
@@ -103,6 +124,9 @@ export function useVoiceCommands({
   const onSpeechEndRef = useRef(onSpeechEnd);
   onSpeechEndRef.current = onSpeechEnd;
 
+  const onVoxtralDialogueResultRef = useRef(onVoxtralDialogueResult);
+  onVoxtralDialogueResultRef.current = onVoxtralDialogueResult;
+
   // Audio chunks buffer for realtime streaming
   const audioChunksRef = useRef<Int16Array[]>([]);
   const isRecordingRef = useRef(false);
@@ -124,6 +148,39 @@ export function useVoiceCommands({
     if (lower.endsWith(".ogg")) return "audio/ogg";
     if (lower.endsWith(".flac")) return "audio/flac";
     return "audio/m4a";
+  };
+
+  const tryParseJsonObject = (text: string): Record<string, any> | null => {
+    const trimmed = String(text ?? "").trim();
+    if (!trimmed) return null;
+    try {
+      const parsed = JSON.parse(trimmed);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      // ignore
+    }
+
+    const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    if (fenced?.[1]) {
+      try {
+        const parsed = JSON.parse(fenced[1]);
+        return parsed && typeof parsed === "object" ? parsed : null;
+      } catch {
+        // ignore
+      }
+    }
+
+    const rawObj = trimmed.match(/\{[\s\S]*\}/);
+    if (rawObj?.[0]) {
+      try {
+        const parsed = JSON.parse(rawObj[0]);
+        return parsed && typeof parsed === "object" ? parsed : null;
+      } catch {
+        // ignore
+      }
+    }
+
+    return null;
   };
 
   const stopNativeRecording = useCallback(async () => {
@@ -371,8 +428,9 @@ export function useVoiceCommands({
             voxtralSpeechPrompt ?? config?.voxtralSpeechPrompt;
           const useSpeechUnderstandingMode =
             activeVoiceInputMode === "voxtral_speech_understanding";
+          const useDialogueMode = activeVoiceInputMode === "voxtral_dialogue";
 
-          if (useSpeechUnderstandingMode) {
+          if (useSpeechUnderstandingMode || useDialogueMode) {
             try {
               const understoodText = await understandAudioWithVoxtral(
                 recordedChunks,
@@ -382,9 +440,42 @@ export function useVoiceCommands({
               );
               if (understoodText.trim()) {
                 gotTranscript = true;
-                onInterimTranscriptRef.current?.(understoodText);
-                onTranscriptRef.current(understoodText);
-                console.log("Voxtral speech understanding:", understoodText);
+                if (useDialogueMode) {
+                  const parsed = tryParseJsonObject(understoodText);
+                  const assistantReply = String(
+                    parsed?.assistant_reply ??
+                      parsed?.reply ??
+                      parsed?.response ??
+                      "",
+                  ).trim();
+                  const intent = parsed?.intent
+                    ? String(parsed.intent).trim()
+                    : undefined;
+                  const userText = parsed?.user_text
+                    ? String(parsed.user_text).trim()
+                    : undefined;
+
+                  const normalizedReply =
+                    assistantReply ||
+                    (intent ? defaultReplyByIntent[intent] ?? "" : "");
+
+                  if (normalizedReply) {
+                    onVoxtralDialogueResultRef.current?.({
+                      assistantReply: normalizedReply,
+                      intent,
+                      userText,
+                      raw: understoodText,
+                    });
+                  } else {
+                    // Fallback to existing transcript pipeline
+                    onTranscriptRef.current(understoodText);
+                  }
+                  console.log("Voxtral dialogue response:", understoodText);
+                } else {
+                  onInterimTranscriptRef.current?.(understoodText);
+                  onTranscriptRef.current(understoodText);
+                  console.log("Voxtral speech understanding:", understoodText);
+                }
               }
             } catch (e) {
               const err =

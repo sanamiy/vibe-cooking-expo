@@ -1,7 +1,8 @@
 {
   "tts": "online_elevenlabs",
   "apiMode": "direct_client",
-  "voiceInputMode": "voxtral_speech_understanding",
+  "voiceInputMode": "voxtral_dialogue",
   "voxtralSpeechPrompt": "音声の内容を日本語で簡潔に文字起こししてください。補足説明はせず、発話テキストのみを返してください。",
+  "voxtralDialoguePrompt": "",
   "enableVoiceAlgorithmSelector": true
 }
