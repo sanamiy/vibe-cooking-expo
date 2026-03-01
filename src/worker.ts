@@ -8,6 +8,7 @@ import { handleBargeIn } from "./routes/bargeIn";
 import { handleStepGuidance } from "./routes/stepGuidance";
 import { handleTts } from "./routes/tts";
 import { handleAnalyzeRecipe } from "./routes/analyzeRecipe";
+import { handleAudioUnderstand } from "./routes/audioUnderstand";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -44,6 +45,9 @@ export default {
         }
         if (path === "/vps/scheduler/analyze-recipe") {
           return withCors(await handleAnalyzeRecipe(request, env));
+        }
+        if (path === "/vps/audio/understand") {
+          return withCors(await handleAudioUnderstand(request, env));
         }
       }
     } catch (e) {

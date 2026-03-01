@@ -1,12 +1,12 @@
-import { getApiMode, requireVpsBaseUrl } from "@/services/apiConfig";
+import { getApiMode, requireProxyBaseUrl } from "@/services/apiConfig";
 
-export function shouldUseVpsProxy(): boolean {
+export function shouldUseServerProxy(): boolean {
   const mode = getApiMode();
-  return mode === "vps_proxy";
+  return mode === "vps_proxy" || mode === "cloudflare";
 }
 
 export async function postJsonVps<T>(path: string, body: any): Promise<T> {
-  const base = requireVpsBaseUrl();
+  const base = requireProxyBaseUrl();
   const res = await fetch(`${base}${path}`, {
     method: "POST",
     headers: {

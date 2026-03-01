@@ -1,5 +1,5 @@
 import { requireMistralApiKey } from "@/services/apiConfig";
-import { postJsonVps, shouldUseVpsProxy } from "@/services/vpsClient";
+import { postJsonVps, shouldUseServerProxy } from "@/services/vpsClient";
 
 const DEFAULT_MODEL = "voxtral-mini-2507";
 const DEFAULT_PROMPT =
@@ -148,7 +148,7 @@ export async function understandAudioWithVoxtral(
   const wav = buildWavFromChunks(audioChunks);
   const audioBase64 = await blobToBase64(wav);
 
-  if (shouldUseVpsProxy()) {
+  if (shouldUseServerProxy()) {
     const data = await postJsonVps<{ text: string }>("/vps/audio/understand", {
       audioBase64,
       model: opts?.model ?? DEFAULT_MODEL,
